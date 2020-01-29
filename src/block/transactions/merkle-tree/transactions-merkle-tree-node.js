@@ -1,6 +1,6 @@
-const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.protocol.dataStructures.merkleTree;
-const {Helper, Exception} = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
+const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.kernel.dataStructures.merkleTree;
+const {Helper, Exception} = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
 
 export default class TransactionsMerkleTreeNode extends MerkleTreeNode {
 

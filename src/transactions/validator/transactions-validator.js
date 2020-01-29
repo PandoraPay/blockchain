@@ -2,7 +2,7 @@
 const {TransactionTypeEnum, TransactionScriptTypeEnum} = global.cryptography.transactions;
 const {BaseTransaction} = global.cryptography.transactions.base;
 
-const {Exception, EnumHelper, StringHelper, BufferHelper} = global.protocol.helpers;
+const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helpers;
 
 import BlockchainSimpleTransaction from "src/transactions/simple-transaction/blockchain-simple-transaction"
 

@@ -1,5 +1,5 @@
 const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = global.networking.sockets.protocol;
-const {Exception} = global.protocol.helpers;
+const {Exception} = global.kernel.helpers;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list

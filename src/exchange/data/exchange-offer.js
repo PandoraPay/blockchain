@@ -1,6 +1,6 @@
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, Exception, EnumHelper } = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, Exception, EnumHelper } = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
 
 import ExchangeOfferPayment from "./exchange-offer-payment"
 import ExchangeOfferTypeEnum from "./exchange-offer-type-enum"

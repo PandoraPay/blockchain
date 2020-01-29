@@ -3,8 +3,8 @@ import WalletManager from "./manager/wallet-manager"
 import WalletEncryption from "./encryption/wallet-encryption"
 import WalletTransfer from "./transfer/wallet-transfer"
 
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, EnumHelper, Exception} = global.protocol.helpers;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, EnumHelper, Exception} = global.kernel.helpers;
 
 const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
 

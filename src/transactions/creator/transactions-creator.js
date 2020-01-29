@@ -1,4 +1,4 @@
-const {Exception} = global.protocol.helpers;
+const {Exception} = global.kernel.helpers;
 const {TransactionTypeEnum} = global.cryptography.transactions;
 
 import BlockchainSimpleTransaction from "src/transactions/simple-transaction/blockchain-simple-transaction"

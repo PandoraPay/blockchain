@@ -3,9 +3,9 @@ import BaseChainData from "./base-chain-data"
 import TransactionsCreator from "src/transactions/creator/transactions-creator"
 import TransactionsValidator from "../../transactions/validator/transactions-validator";
 
-const {BN} = global.protocol.utils;
+const {BN} = global.kernel.utils;
 
-const {Events} = global.protocol.helpers.events;
+const {Events} = global.kernel.helpers.events;
 
 export default class BaseChain extends Events{
 

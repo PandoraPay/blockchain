@@ -1,5 +1,5 @@
 const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, Exception, StringHelper, EnumHelper} = global.protocol.helpers;
+const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
 
 export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin {
 

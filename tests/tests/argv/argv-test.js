@@ -1,4 +1,4 @@
-const {Helper, BufferHelper} = global.protocol.helpers;
+const {Helper, BufferHelper} = global.kernel.helpers;
 
 export default (argv) =>  Helper.merge( argv, {
 

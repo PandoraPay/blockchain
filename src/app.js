@@ -1,8 +1,8 @@
-const Protocol = global.protocol;
+const Protocol = global.kernel;
 const Network = global.networking;
 const Crytopgrahy = global.cryptography;
-const {NetworkTypeEnum} = global.protocol.enums;
-const {Helper, Exception, BufferHelper} = global.protocol.helpers;
+const {NetworkTypeEnum} = global.kernel.enums;
+const {Helper, Exception, BufferHelper} = global.kernel.helpers;
 
 import Argv from "bin/argv/argv"
 import MainChain from "src/chain/main-chain/main-chain";

@@ -1,7 +1,7 @@
-const {MarshalData} = global.protocol.marshal;
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, Exception} = global.protocol.helpers;
-const {BN, BigNumber} = global.protocol.utils;
+const {MarshalData} = global.kernel.marshal;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, Exception} = global.kernel.helpers;
+const {BN, BigNumber} = global.kernel.utils;
 
 import TxHashVirtualMap from "src/chain/maps/txs/tx-hash/tx-hash-virtual-map";
 import AddressHashVirtualMap from "src/chain/maps/addresses/addresses-hash/address-hash-virtual-map";

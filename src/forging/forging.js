@@ -1,6 +1,6 @@
 import ForgeBlock from "./forge-block"
-const  {setAsyncInterval, clearAsyncInterval} = global.protocol.helpers.AsyncInterval;
-const {Helper, Exception} = global.protocol.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class Forging  {
 

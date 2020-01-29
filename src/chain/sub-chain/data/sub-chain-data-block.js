@@ -1,6 +1,6 @@
-const {Helper, Exception} = global.protocol.helpers;
-const {DBSchema} = global.protocol.marshal.db;
-const {DBSchemaBuffer, DBSchemaString} = global.protocol.marshal.db.samples;
+const {Helper, Exception} = global.kernel.helpers;
+const {DBSchema} = global.kernel.marshal.db;
+const {DBSchemaBuffer, DBSchemaString} = global.kernel.marshal.db.samples;
 
 import BaseChainData from "../../base/base-chain-data";
 import Block from "src/block/block"

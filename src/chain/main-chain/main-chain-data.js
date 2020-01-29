@@ -1,8 +1,8 @@
 import Block from "../../block/block";
 import TransactionsMerkleTreeNode from "../../block/transactions/merkle-tree/transactions-merkle-tree-node"
 
-const {Helper, Exception} = global.protocol.helpers;
-const {MarshalData} = global.protocol.marshal;
+const {Helper, Exception} = global.kernel.helpers;
+const {MarshalData} = global.kernel.marshal;
 
 import BaseChainData from "./../base/base-chain-data";
 import AccountTreeNodeData from "./../../chain/account-tree/data/account-tree-node-data";

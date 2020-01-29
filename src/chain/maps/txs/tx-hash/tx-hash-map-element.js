@@ -1,5 +1,5 @@
-const {HashMapElement} = global.protocol.dataStructures.hashMap;
-const {Helper, Exception} = global.protocol.helpers;
+const {HashMapElement} = global.kernel.dataStructures.hashMap;
+const {Helper, Exception} = global.kernel.helpers;
 
 import TxHashMapData from "./data/tx-hash-map-data"
 

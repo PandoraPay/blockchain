@@ -1,5 +1,5 @@
 const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
-const {Helper, Exception} = global.protocol.helpers;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class WalletEncryption {
 

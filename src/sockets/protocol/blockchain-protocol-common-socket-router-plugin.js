@@ -1,7 +1,7 @@
 const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, Exception} = global.protocol.helpers;
-const  {setAsyncInterval, clearAsyncInterval} = global.protocol.helpers.AsyncInterval;
-const {MarshalData} = global.protocol.marshal;
+const {Helper, Exception} = global.kernel.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
+const {MarshalData} = global.kernel.marshal;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list

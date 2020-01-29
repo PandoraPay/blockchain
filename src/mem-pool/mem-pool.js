@@ -1,6 +1,6 @@
-const {Helper, Exception, StringHelper} = global.protocol.helpers;
-const {DBSchema} = global.protocol.marshal.db;
-const {DBSchemaBufferBig, DBSchemaString} = global.protocol.marshal.db.samples;
+const {Helper, Exception, StringHelper} = global.kernel.helpers;
+const {DBSchema} = global.kernel.marshal.db;
+const {DBSchemaBufferBig, DBSchemaString} = global.kernel.marshal.db.samples;
 const {BaseTransaction} = global.cryptography.transactions.base;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 

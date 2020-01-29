@@ -1,5 +1,5 @@
 import ArgvTest from "./argv/argv-test"
-const {describeList} = global.protocol.tests;
+const {describeList} = global.kernel.tests;
 
 import TestsWallet from "./tests-files/wallet/tests-wallet"
 

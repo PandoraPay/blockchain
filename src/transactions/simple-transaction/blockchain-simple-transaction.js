@@ -1,5 +1,5 @@
 const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
-const {Helper, Exception} = global.protocol.helpers;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class BlockainSimpleTransaction extends SimpleTransaction {
 

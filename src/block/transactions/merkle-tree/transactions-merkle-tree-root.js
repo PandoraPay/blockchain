@@ -1,6 +1,6 @@
-const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.protocol.dataStructures.merkleTree;
-const {MerkleTreeRoot} = global.protocol.dataStructures.merkleTree;
-const {Helper, Exception} = global.protocol.helpers;
+const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.kernel.dataStructures.merkleTree;
+const {MerkleTreeRoot} = global.kernel.dataStructures.merkleTree;
+const {Helper, Exception} = global.kernel.helpers;
 
 import TransactionsMerkleTreeNode from "./transactions-merkle-tree-node"
 

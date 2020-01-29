@@ -1,5 +1,5 @@
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, Exception} = global.protocol.helpers;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class AddressHashMapData extends DBSchema {
 

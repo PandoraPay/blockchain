@@ -1,6 +1,6 @@
-const {Helper, Exception} = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
-const {DBSchema} = global.protocol.marshal.db;
+const {Helper, Exception} = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
+const {DBSchema} = global.kernel.marshal.db;
 
 export default class MemPoolTxData extends DBSchema {
 

@@ -1,5 +1,5 @@
 import SubChainData from "../sub-chain/data/sub-chain-data";
-const {Helper, Exception} = global.protocol.helpers;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class ForkSubChainData extends SubChainData{
 

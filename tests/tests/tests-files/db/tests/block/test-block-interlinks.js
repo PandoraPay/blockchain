@@ -1,4 +1,4 @@
-const {describe} = global.protocol.tests;
+const {describe} = global.kernel.tests;
 
 import Block from "src/block/block"
 

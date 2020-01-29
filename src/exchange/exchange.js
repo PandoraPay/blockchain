@@ -4,9 +4,9 @@ import ExchangeOfferValidator from "./validator/exchange-offer-validator";
 import AvailablePayments from "./data/available-payments"
 import ExchangeOffer from "./data/exchange-offer";
 
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, Exception} = global.protocol.helpers;
-const  {setAsyncInterval, clearAsyncInterval} = global.protocol.helpers.AsyncInterval;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, Exception} = global.kernel.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
 
 class Exchange extends DBSchema{
 

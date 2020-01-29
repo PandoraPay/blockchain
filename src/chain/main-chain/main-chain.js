@@ -1,8 +1,8 @@
 import ForkSubChain from "../fork-sub-chain/fork-sub-chain";
 
-const {Exception} = global.protocol.helpers;
-const {MarshalData} = global.protocol.marshal;
-const {DBSchema} = global.protocol.marshal.db;
+const {Exception} = global.kernel.helpers;
+const {MarshalData} = global.kernel.marshal;
+const {DBSchema} = global.kernel.marshal.db;
 
 import Block from "src/block/block"
 import BaseChain from "../base/base-chain"

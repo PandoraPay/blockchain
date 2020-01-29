@@ -1,4 +1,4 @@
-const {Helper, Exception, StringHelper, EnumHelper} = global.protocol.helpers;
+const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 class CommonAccountTreeFunctions {

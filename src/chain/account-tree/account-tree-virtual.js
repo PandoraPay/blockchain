@@ -1,5 +1,5 @@
-const {RadixTreeVirtual} = global.protocol.dataStructures.radixTree;
-const {Helper, Exception} = global.protocol.helpers;
+const {RadixTreeVirtual} = global.kernel.dataStructures.radixTree;
+const {Helper, Exception} = global.kernel.helpers;
 
 import AccountTreeRoot from "./account-tree-root";
 import CommonAccountTreeFunctions from "./common-account-tree-functions";

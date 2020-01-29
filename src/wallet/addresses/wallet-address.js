@@ -1,10 +1,10 @@
 import WalletAddressKeys from "./data/wallet-address-keys";
 
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, EnumHelper, Exception, BufferHelper} = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, EnumHelper, Exception, BufferHelper} = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
 
-const {DBSchemaBuffer, DBSchemaNumber} = global.protocol.marshal.db.samples;
+const {DBSchemaBuffer, DBSchemaNumber} = global.kernel.marshal.db.samples;
 const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
 
 export default class WalletAddress extends DBSchema {

@@ -1,5 +1,5 @@
 
-const {Helper, Exception} = global.protocol.helpers;
+const {Helper, Exception} = global.kernel.helpers;
 
 import Block from "../block";
 

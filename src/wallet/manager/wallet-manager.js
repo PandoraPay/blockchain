@@ -1,7 +1,7 @@
 const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
 import WalletAddress from "../addresses/wallet-address";
-const {Helper, Exception, BufferHelper} = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
+const {Helper, Exception, BufferHelper} = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
 const {Address} = global.cryptography.addresses.public;
 
 export default class WalletManager{

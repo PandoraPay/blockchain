@@ -1,5 +1,5 @@
-const {DBSchemaBufferUnique} = global.protocol.marshal.db.samples;
-const {Helper, Exception} = global.protocol.helpers;
+const {DBSchemaBufferUnique} = global.kernel.marshal.db.samples;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class SubChainDataHashUnique extends DBSchemaBufferUnique {
 

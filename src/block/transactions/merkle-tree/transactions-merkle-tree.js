@@ -1,5 +1,5 @@
-const {MerkleTree} = global.protocol.dataStructures.merkleTree;
-const {Helper, Exception} = global.protocol.helpers;
+const {MerkleTree} = global.kernel.dataStructures.merkleTree;
+const {Helper, Exception} = global.kernel.helpers;
 
 import TransactionsMerkleTreeRoot from "./transactions-merkle-tree-root"
 const {BaseTransaction} = global.cryptography.transactions.base;

@@ -1,6 +1,6 @@
 if (!global.kernel) require('kernel');
-if (!global.cryptography) require('kernel');
-if (!global.networking) require('kernel');
+if (!global.cryptography) require('cryptography');
+if (!global.networking) require('networking');
 
 const kernel = global.kernel;
 const cryptography = global.cryptography;

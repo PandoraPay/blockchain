@@ -1,4 +1,4 @@
-const {Helper} = global.protocol.helpers;
+const {Helper} = global.kernel.helpers;
 
 import BlockInterlinks from "../../interlinks/block-interlinks"
 

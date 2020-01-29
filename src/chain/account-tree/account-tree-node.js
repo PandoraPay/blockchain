@@ -1,5 +1,5 @@
-const {RadixTreeNode, RadixTreeNodeTypeEnum} = global.protocol.dataStructures.radixTree;
-const {Helper, Exception} = global.protocol.helpers;
+const {RadixTreeNode, RadixTreeNodeTypeEnum} = global.kernel.dataStructures.radixTree;
+const {Helper, Exception} = global.kernel.helpers;
 
 import AccountTreeNodeData from "./data/account-tree-node-data";
 

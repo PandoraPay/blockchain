@@ -1,4 +1,4 @@
-const {Exception} = global.protocol.helpers;
+const {Exception} = global.kernel.helpers;
 
 export default class TestNet{
 

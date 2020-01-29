@@ -1,6 +1,6 @@
-const {DBSchema} = global.protocol.marshal.db;
-const {Helper, Exception} = global.protocol.helpers;
-const {CryptoHelper} = global.protocol.helpers.crypto;
+const {DBSchema} = global.kernel.marshal.db;
+const {Helper, Exception} = global.kernel.helpers;
+const {CryptoHelper} = global.kernel.helpers.crypto;
 
 import AccountTreeNodeDataBalance from "./account-tree-node-data-balance";
 

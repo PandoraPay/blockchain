@@ -1,4 +1,4 @@
-const {Exception, EnumHelper, StringHelper, BufferHelper} = global.protocol.helpers;
+const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helpers;
 import ExchangeOffer from "./../data/exchange-offer"
 
 export default class ExchangeOfferValidator{

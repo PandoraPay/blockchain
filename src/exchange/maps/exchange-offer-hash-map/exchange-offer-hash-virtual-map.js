@@ -1,5 +1,5 @@
-const {HashVirtualMap} = global.protocol.dataStructures.hashMap;
-const {Helper, Exception} = global.protocol.helpers;
+const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
+const {Helper, Exception} = global.kernel.helpers;
 
 import ExchangeOfferHashMapElement from "./exchange-offer-hash-map-element"
 

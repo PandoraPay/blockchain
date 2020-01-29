@@ -1,4 +1,4 @@
-const {describe} = global.protocol.tests;
+const {describe} = global.kernel.tests;
 const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
 
 export default function run () {

@@ -1,6 +1,6 @@
-const {Helper, Exception} = global.protocol.helpers;
-const {DBSchema} = global.protocol.marshal.db;
-const {BN} = global.protocol.utils;
+const {Helper, Exception} = global.kernel.helpers;
+const {DBSchema} = global.kernel.marshal.db;
+const {BN} = global.kernel.utils;
 
 import Interlink from "./interlink"
 

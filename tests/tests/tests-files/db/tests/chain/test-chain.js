@@ -1,5 +1,5 @@
-const  {Helper} = global.protocol.helpers;
-const {describe} = global.protocol.tests;
+const  {Helper} = global.kernel.helpers;
+const {describe} = global.kernel.tests;
 
 const hashes = {}, kernelHashes = {};
 

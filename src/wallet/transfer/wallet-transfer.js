@@ -1,4 +1,4 @@
-const {Exception, StringHelper, BufferHelper, EnumHelper} = global.protocol.helpers;
+const {Exception, StringHelper, BufferHelper, EnumHelper} = global.kernel.helpers;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 export default class WalletTransfer {

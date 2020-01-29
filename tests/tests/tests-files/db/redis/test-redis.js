@@ -6,9 +6,9 @@ import TestTransactionsChainCluster from "../tests/transactions/stake/test-trans
 import TestTransaction from "../tests/transactions/test-transaction"
 
 
-const  {Helper} = global.protocol.helpers;
-const {describe} = global.protocol.tests;
-const {DBConstructor} = global.protocol.marshal.db;
+const  {Helper} = global.kernel.helpers;
+const {describe} = global.kernel.tests;
+const {DBConstructor} = global.kernel.marshal.db;
 const cluster = require('cluster');
 
 /**
