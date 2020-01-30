@@ -13,6 +13,11 @@ export default class AccountTreeRoot extends RadixTreeRoot {
 
             fields: {
 
+                table: {
+                    default: "accNode",
+                    fixedBytes: 7,
+                },
+
                 data: {
 
                     type: "object",

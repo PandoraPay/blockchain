@@ -11,6 +11,11 @@ export default class AccountTreeNode extends RadixTreeNode {
 
             fields: {
 
+                table: {
+                    default: "accNode",
+                    fixedBytes: 7,
+                },
+
                 data: {
 
                     type: "object",

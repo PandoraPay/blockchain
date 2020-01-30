@@ -185,8 +185,9 @@ export default class TestNet{
                 if (!this._testnetWalletsSent && !moneySent) return; // i din't send it to
 
             } else{
-                return;
             }
+
+            return;
 
             if (processing) return;
             processing = true;
