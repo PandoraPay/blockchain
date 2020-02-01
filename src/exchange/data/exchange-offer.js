@@ -123,6 +123,11 @@ export default class ExchangeOffer extends DBSchema {
 
             },
 
+            saving:{
+                storeDataNotId: true,
+            },
+
+
             options: {
                 hashing: {
                     enabled: true,

@@ -184,7 +184,7 @@ class Exchange extends DBSchema{
         const out = await exchangeData.hashMap.updateMap(offer.publicKeyHash, offer );
 
         exchangeData.array.push(out);
-        exchangeData.map[ offer.hash().toString("hex") ] = out;;
+        exchangeData.map[ offer.hash().toString("hex") ] = out;
 
         if (propagateOfferMasterCluster && this._scope.db.isSynchronized ){
             await this.subscribeMessage("exchange/insert-offer", {

@@ -1,4 +1,4 @@
-const Protocol = global.kernel;
+const Kernel = global.kernel;
 const Network = global.networking;
 const Crytopgrahy = global.cryptography;
 const {NetworkTypeEnum} = global.kernel.enums;
@@ -26,7 +26,7 @@ import Testnet from "./testnet/testnet"
 
 import Tests from 'tests/tests/tests-index';
 
-export default class App extends Protocol.utils.App {
+export default class App extends Kernel.utils.App {
 
     constructor(args){
         super(args);
