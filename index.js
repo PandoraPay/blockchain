@@ -15,7 +15,6 @@ const TransactionsMerkleTreeRoot = require('src/block/transactions/merkle-tree/t
 const AccountTreeNode = require("src/chain/account-tree/account-tree-node").default;
 const AccountTreeVirtual = require("src/chain/account-tree/account-tree-virtual").default;
 const AccountTreeRoot = require("src/chain/account-tree/account-tree-root").default;
-const CommonAccountTreeRoot = require("src/chain/account-tree/common-account-tree-functions").default;
 const AccountTreeNodeData = require("src/chain/account-tree/data/account-tree-node-data").default;
 const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
 const Genesis = require('src/block/genesis/genesis').default;
@@ -70,7 +69,6 @@ const library = {
                 AccountTreeNode,
                 AccountTreeRoot,
                 AccountTreeVirtual,
-                CommonAccountTreeRoot,
                 AccountTreeNodeData,
             }
 

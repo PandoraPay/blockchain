@@ -50,27 +50,25 @@ export default class ForgeBlock {
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
-            const lock = await block._scope.chain.data.lock( -1 );
+            //create a local chainData
+            let chainData = block._scope.chain.cloneData();
 
-            let error;
-            try{
-                await this._scope.memPool.includeTransactions( block, createTransactionsCallback  );
+            await this._scope.memPool.includeTransactions( block, createTransactionsCallback, chainData  );
 
-                block.pos.fees = await block.sumFees(); // in case it was changed
+            //reset chainData
+            chainData = block._scope.chain.cloneData();
 
-                block.totalDifficulty = await block.computeTotalDifficulty();
+            block.pos.fees = await block.sumFees(); // in case it was changed
 
-                block.accountTreeHash = await block.calculateAccountTreeHash( );
-            }catch(err){
-                lock();
-                throw err;
-            }
+            block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
 
-            lock();
+            block.accountTreeHash = await block.calculateAccountTreeHash( block._scope.chain, chainData) ;
 
             await block.pos.signBlockUsingForgerPrivateKey( stakeForgerPrivateKey );
 
-            if ( await block.pos.validatePOS() === false) throw new Exception(this, "Forging - POS is invalid");
+            chainData = block._scope.chain.cloneData();
+
+            if ( await block.pos.validatePOS( block._scope.chain, chainData) === false) throw new Exception(this, "Forging - POS is invalid");
 
             return true;
 

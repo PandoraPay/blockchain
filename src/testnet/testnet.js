@@ -187,13 +187,11 @@ export default class TestNet{
             } else{
             }
 
-            return;
-
             if (processing) return;
             processing = true;
 
             const count = 12;
-            const txs = Math.floor( Math.random()*10 ) + 1;
+            const txs = Math.floor( Math.random()*10 ) + 2;
             const value = Math.floor( Math.random() * 5 +1 );
             const amount = this._scope.argv.transactions.coins.convertToUnits( value ) * count;
             const amountRequired = txs * amount + this._scope.argv.transactions.coins.convertToUnits( 2 * this._scope.argv.transactions.staking.stakingMinimumStake  );

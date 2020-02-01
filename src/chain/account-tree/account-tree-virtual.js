@@ -12,7 +12,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
             fields: {
 
-                table: {
+                id: {
                     default: "accTree",
                     fixedBytes: 7,
                 },
@@ -31,6 +31,9 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
         const out = await this.findRadixLeaf(publicKeyHash);
+
+        if (out && !out.data)
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), node: out, id: out.id});
 
         const balances = out ? out.data.balances : undefined;
 
@@ -54,6 +57,9 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         publicKeyHash = this.processLeafLabel(publicKeyHash);
         const out = await this.findRadixLeaf(publicKeyHash);
 
+        if (out && !out.data)
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), node: out, id: out.id});
+
         const balances = out ? out.data.balances : undefined;
 
         if (balances)
@@ -62,12 +68,17 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
                     return balance.amount;
 
 
-        //otherwise return undefined
+        //otherwise return undefined2
     }
 
     async getNonce( publicKeyHash ){
 
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+
         const out = await this.findRadixLeaf(publicKeyHash);
+        if (out && !out.data)
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), node, id: node.id});
+
         return out ? out.data.nonce : undefined;
 
     }
@@ -83,6 +94,9 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         const out = await this.findRadix(publicKeyHash);
         const node = out.result ? out.node : undefined;
+
+        if (node && !node.data)
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), node, id: node.id});
 
         const balances = node ? node.data.balances : undefined;
 
@@ -133,6 +147,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
                 amount: value,
             }, "object" );
             node.__changes.data = true;
+            node.data.__changes.balances = true;
 
             await node.propagateHashChange(); //refresh hash
             await this._saveNode(node);
@@ -141,7 +156,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         } else {
 
-            if (!this._scope.argv.transactions.coins.validateCoins(value) ) throw new Exception(this, "Balance would become negative #2", {publicKeyHash, value } );
+            if (!this._scope.argv.transactions.coins.validateCoins(value) ) throw new Exception(this, "Balance would become negative #2", {publicKeyHash: publicKeyHash.toString("hex"), value } );
 
             await this.addRadix(publicKeyHash, {
 
@@ -149,8 +164,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
                 balances: [{
                     tokenCurrency,
                     amount: value,
-                }
-                ]
+                }]
 
             } );
 
@@ -168,6 +182,10 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         const out = await this.findRadix(publicKeyHash);
         const node = out.result ? out.node : undefined;
+
+        if (node && !node.data)
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), node, id: node.id});
+
 
         const prevValue = node ? node.data.nonce : undefined;
 
@@ -190,7 +208,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         } else {
 
-            throw new Exception(this, "Update nonce but account doesn't exist", {publicKeyHash, value });
+            throw new Exception(this, "Update nonce but account doesn't exist", {publicKeyHash: publicKeyHash.toString("hex"), value });
 
         }
     }

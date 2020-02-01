@@ -277,13 +277,13 @@ export default class Block extends DBSchema {
      */
     async calculateAccountTreeHash(chain = this._scope.chain, chainData = chain.data){
 
-        await this.addBlock(chain, chainData, false);
+        if ( await this.addBlock(chain, chainData, false) !== true) throw new Exception(this, "calculateAccountTreeHash - addBlock raised an error");
 
         const hash = chainData.accountTree.hash();
 
         //console.log("account hash", hash.toString("hex") );
 
-        await this.removeBlock(chain, chainData);
+        if ( await this.removeBlock(chain, chainData) !== true) throw new Exception(this, "calculateAccountTreeHash - removeBlock raised an error");
 
         return hash;
 
@@ -297,7 +297,7 @@ export default class Block extends DBSchema {
         //update miner balance with coinbase reward
         try{
 
-            await chainData.accountTree.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
+            await chainData.accountTree.updateBalance( this.pos.stakeForgerPublicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
 
         }catch(err){
 
@@ -326,7 +326,7 @@ export default class Block extends DBSchema {
 
     async removeBlock(chain = this._scope.chain, chainData = chain.data){
 
-        await chainData.accountTree.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
+        await chainData.accountTree.updateBalance( this.pos.stakeForgerPublicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
 
         const outTxs = await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this);
 

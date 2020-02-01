@@ -86,7 +86,7 @@ export default class MainChain extends BaseChain {
                     //let's reset the virtual HashMaps and AccountTree
                     this.data.resetState();
 
-                    await this.emit("blocks/included", {
+                    this.emit("blocks/included", {
                         data: { end: this.data.end},
                         senderSockets: {},
                     });
@@ -163,13 +163,12 @@ export default class MainChain extends BaseChain {
 
             this._scope.logger.warn(this, 'Filtered Identical Blocks' );
 
-            let successIndex;
-
             const blocksRemoved = await newData.spliceBlocks( blocks[0].height, );
             if (!blocksRemoved) throw new Exception(this, "error removing blocks");
 
             this._scope.logger.warn(this, 'Blocks Removed' );
 
+            let successIndex;
             for (let i=0; i < blocks.length; i++){
 
                 const block = blocks[i];
@@ -204,6 +203,10 @@ export default class MainChain extends BaseChain {
                 this._scope.logger.warn(this, 'Block added', i );
             }
 
+            if (successIndex === undefined) throw new Exception(this, "SuccessIndex is undefined");
+
+            blocks = blocks.splice(0 , successIndex+1);
+
 
             //saving the blocks which will be removed from oldData
             for (let i=0; i < blocksRemoved.length; i++){
@@ -214,10 +217,6 @@ export default class MainChain extends BaseChain {
                 for (const tx of txs)
                     oldData.transactionsHashesMap[tx.hash().toString("hex")] = tx;
             }
-
-            //saving it
-            //a lock is necessary to avoid sending corrupted data to other nodes like a block from previous chain.data and a block from the new block.data
-            this.data = newData;
 
             //mark it is being saved
             oldData.beingSaved = true;
@@ -243,7 +242,7 @@ export default class MainChain extends BaseChain {
 
             //saving new blocks
             try{
-                for (let i=0; i <= successIndex; i++){
+                for (let i=0; i < blocks.length; i++){
 
                     this._scope.logger.warn(this, "saving block", blocks[i].height );
 
@@ -259,18 +258,21 @@ export default class MainChain extends BaseChain {
                 throw new Exception(this, "Error deleting block");
             }
 
-
-            newData.clearOnlyLocalBlocks();
+            //saving it
+            //a lock is necessary to avoid sending corrupted data to other nodes like a block from previous chain.data and a block from the new block.data
+            this.data = newData;
 
             /**
              * Successful
              */
 
             await newData.saveState();
-            newData.resetState();
 
             newData.beingSaved = false;
             await newData.save();
+
+            newData.clearOnlyLocalBlocks();
+
 
             oldData.beingSaved = false; //oldData is no longer used, so it will not have any effect
 
@@ -287,7 +289,7 @@ export default class MainChain extends BaseChain {
 
             this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
 
-            await this.emit("blocks/included", {
+            this.emit("blocks/included", {
                 data: { blocks: blocks, end: this.end},
                 senderSockets,
             });

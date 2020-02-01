@@ -108,7 +108,7 @@ export default class BlockPoS extends DBSchema {
 
     }
 
-    async validatePOS(chain = this._scope.chain){
+    async validatePOS(chain = this._scope.chain, chainData = chain.data){
 
         if (this.block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && this.stakingAmount < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
             throw new Exception(this, "not enough coins for staking");
@@ -121,7 +121,7 @@ export default class BlockPoS extends DBSchema {
         if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, this.stakeForgerPublicKey ) )
             throw new Exception(this, "POS signature is invalid");
 
-        const out = await chain.data.accountTree.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        const out = await chainData.accountTree.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         if (out === undefined) throw new Exception(this, "Account not found", {
             forgerPublicKeyHash: this.stakeForgerPublicKeyHash,
