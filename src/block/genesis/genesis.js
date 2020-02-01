@@ -62,7 +62,7 @@ export default class Genesis extends Block{
         return this._scope.genesis.settings;
     }
 
-    async _validateBlockInfo(chain = this._scope.chain){
+    async _validateBlockInfo(chain = this._scope.chain, chainData = chain.data){
 
         /**
          * validate prevHash

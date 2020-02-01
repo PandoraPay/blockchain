@@ -3,15 +3,7 @@ const {Helper, Exception} = global.kernel.helpers;
 
 export default class BlockainSimpleTransaction extends SimpleTransaction {
 
-    async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
-
-        const out = await this.validateTransactionInclusion(chain, chainData, block);
-        if (!out) throw new Exception(this, "Validate Transaction Inclusion failed");
-
-        return true;
-    }
-
-    async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
+    async validateTransactionInfo(chain = this._scope.chain, chainData = chain.data, block){
 
         for (const vin of this.vin)
             if ( !this._scope.argv.transactions.coins.validateCoins( vin.amount ) ) throw new Exception(this, "Vin is not good");
@@ -29,10 +21,10 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         return true;
     }
 
-    async validateTransactionInclusion(chain = this._scope.chain, chainData = chain.data, block){
+    async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
 
 
-        if ( await this.validateTransaction(chain, chainData, block) === false) throw new Exception(this, "Validate Transaction is false", {   });
+        if ( await this.validateTransactionInfo(chain, chainData, block) !== true) throw new Exception(this, "Validate Transaction is false", {   });
 
         /**
          * Check nonce and balances

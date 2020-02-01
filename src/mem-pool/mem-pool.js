@@ -247,8 +247,8 @@ export default  class MemPool extends DBSchema{
 
         try{
 
-            const out1 = await tx.validateTransactionInclusion( chain, chainData, block);
-            if (!out1) throw new Exception(this, "validateTransactionInclusion failed");
+            const out1 = await tx.validateTransaction( chain, chainData, block);
+            if (!out1) throw new Exception(this, "validateTransaction failed");
 
         }catch(err){
 
@@ -419,7 +419,7 @@ export default  class MemPool extends DBSchema{
         }
 
         if (validateTxData) {
-            if (await transaction.validateTransaction(this._scope.mainChain) !== true) throw new Exception(this, "Transaction validation failed");
+            if (await transaction.validateTransactionInfo(this._scope.mainChain) !== true) throw new Exception(this, "Transaction validation failed");
         }
 
 

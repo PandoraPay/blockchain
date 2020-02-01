@@ -60,9 +60,9 @@ export default class TransactionsMerkleTree extends MerkleTree {
         return this._scope.parent;
     }
 
-    async validateMerkleTree(chain = this._scope.chain, block){
+    async validateMerkleTree(chain = this._scope.chain, chainData = chain.data, block){
 
-        super.validateMerkleTree.call(this);
+        if (super.validateMerkleTree() !== true) throw new Exception(this, "ValidateMerkleTree is false");
 
         const leavesNonPruned = await this.leavesNonPruned();
 
@@ -95,7 +95,7 @@ export default class TransactionsMerkleTree extends MerkleTree {
         /**
          * Signatures validation can be batched
          */
-        const promises = transactionsNonPruned.map( tx => tx.verifyTransactionSignatures(chain) );
+        const promises = transactionsNonPruned.map( tx => tx.verify(chain, chainData) );
 
         const verification = await Promise.all(promises);
 

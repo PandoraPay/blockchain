@@ -231,21 +231,21 @@ export default class Block extends DBSchema {
 
     }
 
-    async validateBlock(chain = this._scope.chain){
+    async validateBlock(chain = this._scope.chain, chainData = chain.data){
 
-        if (await this._validateBlockInfo(chain) === false) return false;
+        if (await this._validateBlockInfo(chain, chainData) === false) return false;
 
         /**
          * Validate POS
          */
 
-        if (await this.pos.validatePOS(chain) === false ) return false;
+        if (await this.pos.validatePOS(chain, chainData) === false ) return false;
 
         /**
          * validate Merkle tree
          */
         
-        if (await this.transactionsMerkleTree.validateMerkleTree( chain, this ) === false) return false;
+        if (await this.transactionsMerkleTree.validateMerkleTree( chain, chainData, this ) === false) return false;
 
         /**
          * validate pos
@@ -255,7 +255,7 @@ export default class Block extends DBSchema {
             throw new Exception(this, "kernel hash is invalid");
 
 
-        const totalDifficulty = await this.computeTotalDifficulty(chain);
+        const totalDifficulty = await this.computeTotalDifficulty(chain, chainData);
         if ( !this.totalDifficulty.eq(totalDifficulty) )
             throw new Exception(this, "total difficulty doesn't match");
 
@@ -289,7 +289,7 @@ export default class Block extends DBSchema {
 
     }
 
-    async addBlock(chain = this._scope.chain, chainData = chain.data, verify = true ){
+    async addBlock(chain = this._scope.chain, chainData = chain.data, verifyAccountTreeHash = true ){
 
         //update transactions
         if (await this.transactionsMerkleTree.transactionsMerkleTreeInclude(chain, chainData, this) !== true) return false;
@@ -308,7 +308,7 @@ export default class Block extends DBSchema {
         }
 
 
-        if (verify){
+        if (verifyAccountTreeHash){
             const hash = chainData.accountTree.hash();
 
             if ( !hash.equals(this.accountTreeHash) ){
@@ -328,9 +328,7 @@ export default class Block extends DBSchema {
 
         await chainData.accountTree.updateBalance( this.pos.stakeForgerPublicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
 
-        const outTxs = await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this);
-
-        if (!outTxs ) return false;
+        if ( await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this) !== true)  return false;
 
         return true;
     }
