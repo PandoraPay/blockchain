@@ -317,9 +317,9 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
          * Sort by chainwork
          */
 
-        this.forkSubchainsList.sort((
-            a, b) => a.data.ready && a.data.chainwork.sorts.worksort.filter.call(this) ? 0 :  a.data.chainwork.sorts.worksort.score.call(this) -
-                     b.data.ready && b.data.chainwork.sorts.worksort.filter.call(this) ? 0 : b.data.chainwork.sorts.worksort.score.call(this) );
+        this.forkSubchainsList.sort(
+            (a, b) => a.data.ready && a.data.chainwork.sorts.worksort.filter.call(a) ? 0 : a.data.chainwork.sorts.worksort.score.call(a) -
+                                 b.data.ready && b.data.chainwork.sorts.worksort.filter.call(b) ? 0 : b.data.chainwork.sorts.worksort.score.call(b) );
 
         //getting the best subchain
         const forkSubchain = this.forkSubchainsList[0];
@@ -343,12 +343,12 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 if (this._scope.argv.debug.enabled)
                     this._scope.logger.log( this, "subchain downloaded successfully" );
 
-                await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, this.forkSubchains[forkSubchainId].sockets );
+                await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, forkSubchain.sockets );
 
                 // await forkSubchain.data.save();
                 // await forkSubchain.data.delete();
 
-                this.forkSubchainsList.splice( 0, 1);
+                this._deleteForkSubchain(forkSubchain);
 
                 return;
             }
@@ -374,10 +374,10 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, 'solveForkSubchains raised an error', err );
 
+            this._deleteForkSubchain(forkSubchain);
+
             if (forkSubchain)
                 await forkSubchain.data.delete();
-
-            this.forkSubchainsList.splice( 0, 1);
         }
 
 

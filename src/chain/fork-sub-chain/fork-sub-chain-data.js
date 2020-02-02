@@ -14,6 +14,13 @@ export default class ForkSubChainData extends SubChainData{
                         fixedBytes: 4,
                     },
 
+                    ready: {
+                        type: "boolean",
+                        default: false,
+
+                        position: 300,
+                    },
+
                     chainwork:{
 
                         sorts :{
@@ -29,7 +36,9 @@ export default class ForkSubChainData extends SubChainData{
                                 },
 
                             }
-                        }
+                        },
+
+                        position: 301,
 
                     },
 
@@ -40,7 +49,7 @@ export default class ForkSubChainData extends SubChainData{
                             return forkStart >= this.start;
                         },
 
-                        position: 300,
+                        position: 302,
                     },
 
                     forkEnd:{
@@ -50,7 +59,7 @@ export default class ForkSubChainData extends SubChainData{
                             return forkEnd >= this.end;
                         },
 
-                        position: 301,
+                        position: 303,
                     },
 
                     timestamp: {
@@ -60,16 +69,11 @@ export default class ForkSubChainData extends SubChainData{
                             return scope.genesis.settings.getDateNow();
                         },
 
-                        position: 302,
+                        position: 304,
 
                     },
 
-                    ready: {
-                        type: "boolean",
-                        default: false,
 
-                        position: 303,
-                    },
 
                 }
 

@@ -132,7 +132,10 @@ export default  class MemPool extends DBSchema{
 
 
                 }catch(err){
-                    this._scope.logger.error(this, "Mem Pool raised an error", err);
+
+                    if (err instanceof Exception && err.message !== "Hash already found")
+                        this._scope.logger.error(this, "Mem Pool raised an error", err);
+
                 }
 
             });
