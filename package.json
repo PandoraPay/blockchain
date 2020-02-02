@@ -2,11 +2,9 @@
   "name": "blockchain",
   "version": "0.0.1",
   "description": "Blockchain data structure and consensus",
-  "homepage": "https://github.com/",
-  "author": "Mark Pundsack",
+  "homepage": "https://github.com/PandoraPay",
   "license": "MIT",
   "contributors": [
-    "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com)"
   ],
   "keywords": [
     "webpack",
@@ -49,10 +47,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-sample"
+    "url": "https://github.com/PandoraPay/blockchain"
   },
   "bugs": {
-    "url": "https://github.com/"
+    "url": "https://github.com/PandoraPay/blockchain/issues"
   },
   "browser": {
     "./lib/util/btoa.js": "./lib/util/btoa.web.js"
