@@ -113,7 +113,7 @@ export default class MainChainData extends BaseChainData {
 
         await this.accountTree.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
 
-        await super.clearData.call(this);
+        await super.clearData(this);
 
     }
 

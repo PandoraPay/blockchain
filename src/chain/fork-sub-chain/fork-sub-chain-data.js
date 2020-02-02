@@ -86,11 +86,5 @@ export default class ForkSubChainData extends SubChainData{
 
     }
 
-    async clearData(){
-
-        await super.clearData.call(this);
-
-    }
-
 
 }

@@ -60,10 +60,5 @@ export default class SubChainDataBlock extends DBSchema {
 
     }
 
-    async clearData(){
-
-        await super.clearData.call(this);
-
-    }
 
 }

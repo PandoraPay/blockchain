@@ -30,7 +30,7 @@ export default class MainChain extends BaseChain {
 
         if ( this._init ) return true;
 
-        //this._scope.logger.log(this, "Initializing");
+        this._scope.logger.log(this, "Initializing Main Chain");
 
         let cleared = false;
 
@@ -332,8 +332,7 @@ export default class MainChain extends BaseChain {
 
     async _loadChain(){
 
-        if ( await this.data.exists() )
-            await this.data.load();
+        await this.data.loadData();
 
         return true;
     }

@@ -181,7 +181,7 @@ export default class BaseChainData extends DBSchema {
         return AccountTreeVirtual;
     }
 
-    async _loadChain(){
+    async loadData(){
 
         if ( await this.exists() )
             await this.load();
@@ -191,6 +191,8 @@ export default class BaseChainData extends DBSchema {
 
     async clearData(){
 
+        if ( await this.exists() )
+            await this.delete();
 
     }
 

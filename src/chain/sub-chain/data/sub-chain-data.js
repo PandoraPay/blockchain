@@ -89,7 +89,7 @@ export default class SubChainData extends BaseChainData{
 
     async clearData(){
 
-        await super.clearData.call(this);
+        await super.clearData(this);
 
         this.listBlocks = [];
         this.blocks = {};
