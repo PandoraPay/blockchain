@@ -3,7 +3,7 @@ const {Helper, Exception} = global.kernel.helpers;
 
 import ExchangeOffer from "./../../data/exchange-offer"
 
-export default class TxHashMapElement extends HashMapElement {
+export default class ExchangeOfferSellHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 
@@ -16,8 +16,8 @@ export default class TxHashMapElement extends HashMapElement {
                 },
 
                 table: {
-                    default: "exOfferHash",
-                    fixedBytes: 11,
+                    default: "exOfferSellHash",
+                    fixedBytes: 15,
                 },
 
                 data: {

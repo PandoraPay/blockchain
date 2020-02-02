@@ -102,6 +102,10 @@ export default class ExchangeOffer extends DBSchema {
                 price:{
                     type: "number",
 
+                    validation(price){
+                        return price > 0;
+                    },
+
                     position: 110,
                 },
 
@@ -197,10 +201,20 @@ export default class ExchangeOffer extends DBSchema {
 
         const buffer = this.prefixBufferForSignature();
 
-        const out = this._scope.cryptography.cryptoSignature.verify( buffer, this.signature, this.publicKey );
-        if (!out) throw new Exception(this, "Signature invalid", this.toJSON() );
+        if (this._scope.cryptography.cryptoSignature.verify( buffer, this.signature, this.publicKey ) !== true) throw new Exception(this, "Signature invalid", this.toJSON() );
+
+        if (this.isExpired() ) throw new Exception(this, "Offer is expired" );
 
         return true;
+    }
+
+    isExpired(){
+
+        if (this.height < this._scope.mainChain.data.end - this._scope.argv.exchange.maximumLifeSpan )
+            return true;
+
+        return false;
+
     }
 
 }

@@ -1,7 +1,7 @@
 const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
 const {Helper, Exception} = global.kernel.helpers;
 
-import ExchangeOfferHashMapElement from "./exchange-offer-hash-map-element"
+import ExchangeOfferBuyHashMapElement from "./exchange-offer-buy-hash-map-element"
 
 /**
  * Not required for consensus, but used to store the offers.
@@ -9,7 +9,7 @@ import ExchangeOfferHashMapElement from "./exchange-offer-hash-map-element"
  *
  */
 
-export default class ExchangeOfferHashVirtualMap extends HashVirtualMap {
+export default class ExchangeOfferBuyHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 
@@ -18,12 +18,12 @@ export default class ExchangeOfferHashVirtualMap extends HashVirtualMap {
             fields: {
 
                 table: {
-                    default: "exOfferHash",
-                    fixedBytes: 11,
+                    default: "exOfferBuyHashMap",
+                    fixedBytes: 17,
                 },
 
                 element: {
-                    classObject: ExchangeOfferHashMapElement,
+                    classObject: ExchangeOfferBuyHashMapElement,
                 },
 
             },

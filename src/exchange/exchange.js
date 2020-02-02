@@ -1,4 +1,6 @@
-import ExchangeOfferHashVirtualMap from "./maps/exchange-offer-hash-map/exchange-offer-hash-virtual-map"
+import ExchangeOfferBuyHashVirtualMap from "./maps/exchange-offer-buy-hash-map/exchange-offer-buy-hash-virtual-map"
+import ExchangeOfferSellHashVirtualMap from "./maps/exchange-offer-sell-hash-map/exchange-offer-sell-hash-virtual-map"
+
 import ExchangeOfferTypeEnum from "./data/exchange-offer-type-enum"
 import ExchangeOfferValidator from "./validator/exchange-offer-validator";
 import AvailablePayments from "./data/available-payments"
@@ -15,28 +17,19 @@ class Exchange extends DBSchema{
         super(scope);
 
         if (!this._scope.AvailablePayments) this._scope.AvailablePayments = AvailablePayments;
-        if (!this._scope.ExchangeOfferHashVirtualMap) this._scope.ExchangeOfferHashVirtualMap = ExchangeOfferHashVirtualMap;
+        if (!this._scope.ExchangeOfferBuyHashVirtualMap) this._scope.ExchangeOfferBuyHashVirtualMap = ExchangeOfferBuyHashVirtualMap;
+        if (!this._scope.ExchangeOfferSellHashVirtualMap) this._scope.ExchangeOfferSellHashVirtualMap = ExchangeOfferSellHashVirtualMap;
 
         if (!this.availablePayments) this.availablePayments = new this._scope.AvailablePayments(this._scope);
 
 
         this.exchangeOfferValidator = new ExchangeOfferValidator(this._scope );
 
-        this._exchangeOfferBuyHashMap = new this._scope.ExchangeOfferHashVirtualMap(this._scope, {
-            table: {
-                default: "exOfferHashBuy",
-                fixedBytes: 14,
-            },
-        });
+        this._exchangeOfferBuyHashMap = new this._scope.ExchangeOfferBuyHashVirtualMap(this._scope);
         this.exchangeOfferBuyMap = {};
         this.exchangeOfferBuyArray = [];
 
-        this._exchangeOfferSellHashMap = new this._scope.ExchangeOfferHashVirtualMap(this._scope, {
-            table: {
-                default: "exOfferHashSell",
-                fixedBytes: 15,
-            },
-        });
+        this._exchangeOfferSellHashMap = new this._scope.ExchangeOfferSellHashVirtualMap(this._scope);
         this.exchangeOfferSellMap = {};
         this.exchangeOfferSellArray = [];
 
@@ -56,6 +49,7 @@ class Exchange extends DBSchema{
         this._init = false;
 
         this._saveExchangeOffersHashMapsInterval = setAsyncInterval( this._saveExchangeOffersHashMaps.bind(this), 5*60*1000 );
+        this._removeExpiredExchangeOffersHashMapsInterval = setAsyncInterval( this._removeExpiredExchangeOffersHashMaps.bind(this), 60*60*1000 );
 
     }
 
@@ -106,9 +100,9 @@ class Exchange extends DBSchema{
                 const virtualMap = item.hashMap._virtualMap;
 
                 for (const key in virtualMap)
-                    if (virtualMap[key].type === "add" || virtualMap[key].type === "data" ) {
+                    if (virtualMap[key].type === "add" || virtualMap[key].type === "view" ) {
                         item.array.push( virtualMap[key].element );
-                        map[ virtualMap[key].element.data.hash().toString("hex") ].array.push( virtualMap[key].element );
+                        item.map[ virtualMap[key].element.data.hash().toString("hex") ].array.push( virtualMap[key].element );
                     }
 
             }
@@ -203,8 +197,28 @@ class Exchange extends DBSchema{
 
     async _saveExchangeOffersHashMaps(){
         try{
-            await this._exchangeOfferBuyHashMap.saveVirtualMap(false);
-            await this._exchangeOfferSellHashMap.saveVirtualMap(false);
+
+            for (const item of this.exchangeData )
+                await item.hashMap.saveVirtualMap(false);
+
+        }catch(err){
+            if (this._scope.argv.debug.enabled)
+                this._scope.logger.error(this, "Saving Exchange Offers raised an error", err);
+        }
+    }
+
+    async _removeExpiredExchangeOffersHashMaps(){
+        try{
+
+            for (const item of this.exchangeData )
+                for (let i=item.array.length-1; i >= 0 ; i-- )
+                    if (item.array[i].isExpired()){
+
+                        item.splice(i, 1);
+                        delete item.map[item.array[i].hash().toString("hex")];
+                    }
+
+
         }catch(err){
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "Saving Exchange Offers raised an error", err);
@@ -216,6 +230,9 @@ class Exchange extends DBSchema{
         if (type === ExchangeOfferTypeEnum.EXCHANGE_OFFER_SELL) return this.exchangeData[1];
         throw new Exception(this, "Invalid offer type");
     }
+
+
+
 
 }
 

@@ -141,7 +141,7 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
             out = await this._scope.exchange.newExchangeOffer( offerObject, true, true, socket);
         }catch(err){
             if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, "newTx raised an error", err);
+                this._scope.logger.error(this, "newExchange raised an error", err);
         }
 
         resolver(!!out);

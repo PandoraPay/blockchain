@@ -441,7 +441,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         if (typeof forkSubchainId === "object") forkSubchainId = forkSubchainId.data.id;
 
-        this.forkSubchainsList.splice(  this.forkSubchains.indexOf( this.forkSubchains[forkSubchainId] ), 1 );
+        this.forkSubchainsList.splice(  this.forkSubchainsList.indexOf( this.forkSubchains[forkSubchainId] ), 1 );
         delete this.forkSubchains[forkSubchainId];
 
     }

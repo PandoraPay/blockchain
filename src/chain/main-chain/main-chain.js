@@ -178,7 +178,7 @@ export default class MainChain extends BaseChain {
 
                     this._scope.logger.info(this, "Block couldn't be added");
 
-                    if (newData.chainwork.lt( oldData.chainwork )) //in case still the chainwork is greater
+                    if (newData.chainwork.lte( oldData.chainwork )) //in case still the chainwork is greater
                         throw new Exception(this, "Success is false");
 
                     break;
