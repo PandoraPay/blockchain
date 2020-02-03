@@ -3,6 +3,8 @@ import ExchangeOfferSellHashVirtualMap from "./maps/exchange-offer-sell-hash-map
 
 import ExchangeOfferTypeEnum from "./data/exchange-offer-type-enum"
 import ExchangeOfferValidator from "./validator/exchange-offer-validator";
+import ExchangeOfferCreator from "./creator/exchange-offer-creator";
+
 import AvailablePayments from "./data/available-payments"
 import ExchangeOffer from "./data/exchange-offer";
 
@@ -24,6 +26,7 @@ class Exchange extends DBSchema{
 
 
         this.exchangeOfferValidator = new ExchangeOfferValidator(this._scope );
+        this.exchangeOfferCreator = new ExchangeOfferCreator(this._scope );
 
         this._exchangeOfferBuyHashMap = new this._scope.ExchangeOfferBuyHashVirtualMap(this._scope);
         this.exchangeOfferBuyMap = {};
@@ -111,11 +114,6 @@ class Exchange extends DBSchema{
 
         }
 
-    }
-
-    createExchangeOffer( offerData ){
-        const offer = new ExchangeOffer(this._scope,undefined, offerData);
-        return offer;
     }
 
     async newExchangeOffer( offer, propagateOfferMasterCluster, validateOffer, senderSockets ){
