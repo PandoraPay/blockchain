@@ -16,7 +16,18 @@ class Exchange extends DBSchema{
 
     constructor(scope){
 
-        super(scope);
+        super(scope, Helper.merge({
+
+            fields: {
+
+                table: {
+                    default: "exchange",
+                    fixedBytes: 8,
+                },
+
+            }
+
+        }) );
 
         if (!this._scope.AvailablePayments) this._scope.AvailablePayments = AvailablePayments;
         if (!this._scope.ExchangeOfferBuyHashVirtualMap) this._scope.ExchangeOfferBuyHashVirtualMap = ExchangeOfferBuyHashVirtualMap;
@@ -64,7 +75,6 @@ class Exchange extends DBSchema{
             if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
                 await this._exchangeOfferBuyHashMap.clearHashMap();
                 await this._exchangeOfferSellHashMap.clearHashMap();
-
             }
 
         if ( this._scope.db.isSynchronized ) {
@@ -118,15 +128,24 @@ class Exchange extends DBSchema{
 
     async newExchangeOffer( offer, propagateOfferMasterCluster, validateOffer, senderSockets ){
 
+        let lock;
+
+        if (!this._scope.db.isSynchronized) lock = await this.lock(-1);
+
+        let out;
+
         try{
 
-            const out = await this._includeExchangeOffer(offer, propagateOfferMasterCluster, validateOffer, true, senderSockets);
-            return out;
+            out = await this._includeExchangeOffer(offer, propagateOfferMasterCluster, validateOffer, true, senderSockets);
+
 
         }catch(err){
             this._scope.logger.error(this, "Error adding exchange offer ", err);
         }
 
+        if (lock) lock();
+
+        return out;
     }
 
     async _includeExchangeOffer(offer, propagateOfferMasterCluster, validateOffer = true, propagateToSockets=true, senderSockets){

@@ -26,7 +26,8 @@ export default class ExchangeOfferCreator {
 
         const offer = new ExchangeOffer(this._scope,undefined, data );
 
-        const signature = offer.signOffer( privateKey );
+        let signature;
+        if (privateKey ) signature = offer.signOffer( privateKey );
 
         return {
             offer,

@@ -140,7 +140,9 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.warn(this, 'Locking...', blocks.map( it => it.height ));
 
-        const lock = await this.data.lock( -1,  );
+        let lock;
+        if (this._scope.db.isSynchronized)
+            lock = await this.data.lock( -1,  );
 
         this._scope.logger.warn(this, 'Lock obtained', blocks.map( it => it.height ));
 
@@ -324,7 +326,7 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
 
-        await lock();
+        if (lock) await lock();
 
         return result;
 

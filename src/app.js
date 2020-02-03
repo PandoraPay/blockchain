@@ -229,9 +229,12 @@ export default class App extends Kernel.utils.App {
 
     }
 
-    get wallet(){ return this._scope.wallet };
-    get forging(){ return this._scope.forging };
-    get mainChain(){ return this._scope.mainChain };
-    get genesis(){ return this._scope.genesis };
+    get cryptography(){ return this._scope.cryptography }
+
+    get wallet(){ return this._scope.wallet }
+    get forging(){ return this._scope.forging }
+    get mainChain(){ return this._scope.mainChain }
+    get genesis(){ return this._scope.genesis }
+    get exchange(){ return this._scope.exchange }
 
 }
