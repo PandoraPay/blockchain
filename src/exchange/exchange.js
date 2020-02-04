@@ -130,7 +130,7 @@ class Exchange extends DBSchema{
 
         let lock;
 
-        if (!this._scope.db.isSynchronized) lock = await this.lock(-1);
+        if (this._scope.db.isSynchronized) lock = await this.lock(-1);
 
         let out;
 

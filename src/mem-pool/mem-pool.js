@@ -96,19 +96,19 @@ export default  class MemPool extends DBSchema{
 
                     //this._scope.logger.info(this, "subscription", message.name);
 
-                    if (message.name === "mem-pool/insert-tx"){
+                    if (message.name === "mem-pool-insert-tx"){
 
                         if (!this.transactions[ message.data.txId ])
                             await this._insertTransactionInMemPool(message.data.tx, false, false, false, true);
                     }
-                    else if (message.name === "mem-pool/remove-tx"){
+                    else if (message.name === "mem-pool-remove-tx"){
 
                         if (this.transactions[ message.data.txId ])
                             await this._removeTransactionFromMemPool(message.data.tx, false);
 
                     }
 
-                    // else if (message.name === "mem-pool/block-added-included-tx"){
+                    // else if (message.name === "mem-pool-block-added-included-tx"){
                     //
                     //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
                     //     const {txIdString, blockHeight} = message.data;
@@ -118,7 +118,7 @@ export default  class MemPool extends DBSchema{
                     //
                     //     this.transactions[ txIdString ]._memPoolIncluded = true;
                     // }
-                    // else if (message.name === "mem-pool/block-removed-removed-tx"){
+                    // else if (message.name === "mem-pool-block-removed-removed-tx"){
                     //
                     //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
                     //     const txId = message.data.txId;
@@ -352,7 +352,7 @@ export default  class MemPool extends DBSchema{
     //     this.transactions[ txIdString ]._memPoolIncluded = true;
     //
     //     if (this._scope.db.isSynchronized )
-    //         await this.subscribeMessage("mem-pool/block-added-included-tx", {
+    //         await this.subscribeMessage("mem-pool-block-added-included-tx", {
     //             txIdString,
     //             blockHeight: block.height,
     //             tx: transaction.toBuffer(),
@@ -371,7 +371,7 @@ export default  class MemPool extends DBSchema{
     //     delete this.transactions[ txIdString ]._memPoolIncluded;
     //
     //     if (this._scope.db.isSynchronized )
-    //         await this.subscribeMessage("mem-pool/block-removed-removed-tx", {
+    //         await this.subscribeMessage("mem-pool-block-removed-removed-tx", {
     //             txIdString,
     //             tx: transaction.toBuffer(),
     //         }, false);
@@ -498,7 +498,7 @@ export default  class MemPool extends DBSchema{
         }
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
-            await this.subscribeMessage("mem-pool/insert-tx", {
+            await this.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
             }, false);
@@ -555,7 +555,7 @@ export default  class MemPool extends DBSchema{
             }
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
-            await this.subscribeMessage("mem-pool/remove-tx", {
+            await this.subscribeMessage("mem-pool-remove-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
             }, false);

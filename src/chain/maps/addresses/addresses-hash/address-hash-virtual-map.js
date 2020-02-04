@@ -30,6 +30,7 @@ export default class AddressHashVirtualMap extends HashVirtualMap {
 
             },
 
+
         }, schema, false), data, type, creationOptions);
 
     }
