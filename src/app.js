@@ -203,12 +203,16 @@ export default class App extends Kernel.utils.App {
         });
 
 
-        this.events.on("master-cluster/started", async (masterCluster) => {
+        this.events.on("master-cluster/initialized", async (masterCluster) => {
 
             await this.createMainChain(  {
                 ...this._scope,
                 masterCluster: this._scope.masterCluster,
             },  );
+
+        });
+
+        this.events.on("master-cluster/started", async (masterCluster) => {
 
             if (this._scope.argv.forging.start)
                 await this._scope.forging.start();
