@@ -9,6 +9,7 @@ export default class TestNet{
         this._testnetWallets = [];
         this._testnetWalletsSent = false;
 
+        this._prevBlockEnd = -1;
     }
 
     async createTestNet(){
@@ -74,6 +75,8 @@ export default class TestNet{
     async createTestNetWallet(forced = false) {
 
         try{
+
+            this._prevBlockEnd = -1;
 
             if ( forced || !this._scope.wallet._initializedTestNetWallet ) {
                 await this._scope.wallet.clearWallet();
@@ -178,7 +181,10 @@ export default class TestNet{
 
         });
 
-        this._scope.mainChain.on("blocks/included", async ()=>{
+        this._scope.mainChain.on("blocks/included", async (  { end } )=>{
+
+            if (this._prevBlockEnd >= end) return;
+            this._prevBlockEnd = end;
 
             if ( this._scope.masterCluster.isMaster ) { //master
 
