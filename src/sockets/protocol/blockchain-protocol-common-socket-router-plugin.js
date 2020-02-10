@@ -318,8 +318,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
          */
 
         this.forkSubchainsList.sort(
-            (a, b) => a.data.ready && a.data.chainwork.sorts.worksort.filter.call(a) ? 0 : a.data.chainwork.sorts.worksort.score.call(a) -
-                                 b.data.ready && b.data.chainwork.sorts.worksort.filter.call(b) ? 0 : b.data.chainwork.sorts.worksort.score.call(b) );
+            (a, b) => a.data.ready && a.data._schema.fields.chainwork.sorts.worksort.filter.call(a) ? 0 : a.data._schema.fields.chainwork.sorts.worksort.score.call(a) -
+                                 b.data.ready && b.data._schema.fields.chainwork.sorts.worksort.filter.call(b) ? 0 : b.data._schema.fields.chainwork.sorts.worksort.score.call(b) );
 
         //getting the best subchain
         const forkSubchain = this.forkSubchainsList[0];

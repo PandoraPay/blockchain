@@ -181,7 +181,10 @@ export default class TestNet{
 
         });
 
-        this._scope.mainChain.on("blocks/included", async (  { end } )=>{
+        this._scope.mainChain.on("blocks/included", async (  { data } )=>{
+
+            const {end} = data;
+
 
             if (this._prevBlockEnd >= end) return;
             this._prevBlockEnd = end;
