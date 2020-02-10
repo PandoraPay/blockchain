@@ -28,7 +28,7 @@ Node parameters to set up a testnet network
 Run CLI command
 
 ```
-node start-node.js --masterCluster:serverCluster:httpServer:port 4005 --blockchain:genesisTestNet:createNewTestNet true --wallet:printWallet true --settings:networkType 1 --forging:start true
+node start-node.js --masterCluster:serverCluster:httpServer:port 8083 --blockchain:genesisTestNet:createNewTestNet true --wallet:printWallet true --settings:networkType 1 --forging:start true --dbPublic:redisDB:differentDatabase true
 ```
 
 1. Import your node private into the wallet.

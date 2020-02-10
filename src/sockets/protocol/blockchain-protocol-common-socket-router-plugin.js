@@ -126,7 +126,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
      */
     async _newBlock( req, res, socket){
 
-        this._scope.logger.info(this, "new block received", {end: this._scope.mainChain.data.end});
+        this._scope.logger.info(this, "new block received", {end: this._scope.mainChain.data.end, chainwork: req.chainwork });
 
         if (this._scope.mainChain.data.end < req.blocks - this._scope.argv.blockchain.maxForkAllowed ) return this._propagateNewBlock( socket );
 
@@ -318,8 +318,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
          */
 
         this.forkSubchainsList.sort(
-            (a, b) => a.data.ready && a.data._schema.fields.chainwork.sorts.worksort.filter.call(a) ? 0 : a.data._schema.fields.chainwork.sorts.worksort.score.call(a) -
-                                 b.data.ready && b.data._schema.fields.chainwork.sorts.worksort.filter.call(b) ? 0 : b.data._schema.fields.chainwork.sorts.worksort.score.call(b) );
+            (a, b) => a.data.ready && a.data._schema.fields.chainwork.sorts.worksort.filter.call(a.data) ? 0 : a.data._schema.fields.chainwork.sorts.worksort.score.call(a.data) -
+                                 b.data.ready && b.data._schema.fields.chainwork.sorts.worksort.filter.call(b.data) ? 0 : b.data._schema.fields.chainwork.sorts.worksort.score.call(b.data) );
 
         //getting the best subchain
         const forkSubchain = this.forkSubchainsList[0];
@@ -384,7 +384,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     }
 
     _propagateNewBlock(sock){
-        return sock.emit("blockchain-protocol/new-block", this._getBlockchainInfo() );
+        sock.emit("blockchain-protocol/new-block", this._getBlockchainInfo() );
+        return false;
     }
 
     _getBlockchainInfo(){

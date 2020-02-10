@@ -33,7 +33,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         const out = await this.findRadixLeaf(publicKeyHash);
 
         if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: out, id: out.id});
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!out, id: out.id});
 
         const balances = out ? out.data.balances : undefined;
 
@@ -58,7 +58,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         const out = await this.findRadixLeaf(publicKeyHash);
 
         if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: out, id: out.id});
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!out, id: out.id});
 
         const balances = out ? out.data.balances : undefined;
 
@@ -77,7 +77,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         const out = await this.findRadixLeaf(publicKeyHash);
         if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node, id: node.id});
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
 
         return out ? out.data.nonce : undefined;
 
@@ -96,7 +96,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         const node = out.result ? out.node : undefined;
 
         if (node && !node.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node, id: node.id});
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
 
         const balances = node ? node.data.balances : undefined;
 
@@ -184,7 +184,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         const node = out.result ? out.node : undefined;
 
         if (node && !node.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node, id: node.id});
+            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
 
 
         const prevValue = node ? node.data.nonce : undefined;
