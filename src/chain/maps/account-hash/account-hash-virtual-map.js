@@ -140,7 +140,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
 
                     }
 
-                    await this.updateMap(publicKeyHash, node);
+                    await this.updateMap(publicKeyHash, node.data );
 
                     return newAmount;
 
@@ -155,7 +155,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
             node.__changes.data = true;
             node.data.__changes.balances = true;
 
-            await this.updateMap(publicKeyHash, node);
+            await this.updateMap(publicKeyHash, node.data );
 
             return node.data.balance;
 
@@ -201,7 +201,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
                 return 0;
             }
 
-            await this.updateMap(publicKeyHash, node);
+            await this.updateMap(publicKeyHash, node.data );
 
             return node.data.nonce;
 
