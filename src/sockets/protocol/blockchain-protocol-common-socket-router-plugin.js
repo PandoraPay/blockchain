@@ -318,8 +318,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
          */
 
         this.forkSubchainsList.sort(
-            (a, b) => a.data.ready && a.data._schema.fields.chainwork.sorts.worksort.filter.call(a.data) ? 0 : a.data._schema.fields.chainwork.sorts.worksort.score.call(a.data) -
-                                 b.data.ready && b.data._schema.fields.chainwork.sorts.worksort.filter.call(b.data) ? 0 : b.data._schema.fields.chainwork.sorts.worksort.score.call(b.data) );
+            (a, b) => !a.data._schema.fields.chainwork.sorts.worksort.filter.call(a.data) ? a.data._schema.fields.chainwork.sorts.worksort.score.call(a.data) : 0 -
+                                 !b.data._schema.fields.chainwork.sorts.worksort.filter.call(b.data) ? b.data._schema.fields.chainwork.sorts.worksort.score.call(b.data) : 0 );
 
         //getting the best subchain
         const forkSubchain = this.forkSubchainsList[0];
@@ -333,7 +333,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 throw new Exception(this, "chainwork is less now");
 
             //Not ready
-            if (!forkSubchain.data.ready) return;
+            if (!forkSubchain.data.ready || forkSubchain.data.processing) return;
 
             //download first block
             const height = forkSubchain.data.forkStart + forkSubchain.data.listBlocks.length;
@@ -343,14 +343,16 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 if (this._scope.argv.debug.enabled)
                     this._scope.logger.log( this, "subchain downloaded successfully" );
 
+                forkSubchain.data.processing = true;
                 await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, forkSubchain.sockets );
 
                 // await forkSubchain.data.save();
                 // await forkSubchain.data.delete();
 
                 this._deleteForkSubchain(forkSubchain);
+                if (forkSubchain) await forkSubchain.data.delete();
 
-                return;
+                return true;
             }
 
             //selecting a socket
@@ -376,8 +378,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
             this._deleteForkSubchain(forkSubchain);
 
-            if (forkSubchain)
-                await forkSubchain.data.delete();
+            if (forkSubchain) await forkSubchain.data.delete();
         }
 
 

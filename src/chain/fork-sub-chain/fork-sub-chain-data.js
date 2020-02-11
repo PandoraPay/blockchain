@@ -21,6 +21,13 @@ export default class ForkSubChainData extends SubChainData{
                         position: 300,
                     },
 
+                    processing: {
+                        type: "boolean",
+                        default: false,
+
+                        position: 301,
+                    },
+
                     chainwork:{
 
                         sorts :{
@@ -28,7 +35,7 @@ export default class ForkSubChainData extends SubChainData{
                             worksort:{
 
                                 filter(){
-                                    return !this.ready;
+                                    return !this.ready && this.processing;
                                 },
 
                                 score(){
@@ -38,7 +45,7 @@ export default class ForkSubChainData extends SubChainData{
                             }
                         },
 
-                        position: 301,
+                        position: 302,
 
                     },
 
@@ -49,7 +56,7 @@ export default class ForkSubChainData extends SubChainData{
                             return forkStart >= this.start;
                         },
 
-                        position: 302,
+                        position: 303,
                     },
 
                     forkEnd:{
@@ -59,7 +66,7 @@ export default class ForkSubChainData extends SubChainData{
                             return forkEnd >= this.end;
                         },
 
-                        position: 303,
+                        position: 304,
                     },
 
                     timestamp: {
@@ -69,7 +76,7 @@ export default class ForkSubChainData extends SubChainData{
                             return scope.genesis.settings.getDateNow();
                         },
 
-                        position: 304,
+                        position: 305,
 
                     },
 

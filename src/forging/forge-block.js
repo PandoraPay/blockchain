@@ -1,3 +1,4 @@
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class ForgeBlock {
 
@@ -98,6 +99,7 @@ export default class ForgeBlock {
             //this._scope.logger.log(this, "forging: ", block.kernelHash().toString("hex") );
 
         }
+
 
     }
 
