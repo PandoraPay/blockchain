@@ -88,7 +88,7 @@ export default class BlockPoS extends DBSchema {
 
     async initializePOS(chain = this._scope.chain){
 
-        const out = await chain.data.accountTree.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        const out = await chain.data.accountHashMap.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);
 
@@ -121,7 +121,7 @@ export default class BlockPoS extends DBSchema {
         if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, this.stakeForgerPublicKey ) )
             throw new Exception(this, "POS signature is invalid");
 
-        const out = await chainData.accountTree.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        const out = await chainData.accountHashMap.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         if (out === undefined) throw new Exception(this, "Account not found", {
             forgerPublicKeyHash: this.stakeForgerPublicKeyHash,
@@ -159,7 +159,6 @@ export default class BlockPoS extends DBSchema {
                 target: true,
                 totalDifficulty: true,
                 transactionsMerkleTree: true,
-                accountTreeHash: true,
                 pos:{
                     fees: true,
                     stakingAmount: true,

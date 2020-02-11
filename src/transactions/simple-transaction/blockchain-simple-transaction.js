@@ -29,7 +29,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         /**
          * Check nonce and balances
          */
-        const nonce = await chainData.accountTree.getNonce( this.vin[0].publicKeyHash ) || 0;
+        const nonce = await chainData.accountHashMap.getNonce( this.vin[0].publicKeyHash ) || 0;
 
         if (nonce !== this.nonce) throw new Exception(this, "Nonce is invalid", {nonce, txNonce: this.nonce });
 
@@ -37,7 +37,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vin = this.vin[i];
 
-            const balance = await chainData.accountTree.getBalance( vin.publicKeyHash  ) || 0;
+            const balance = await chainData.accountHashMap.getBalance( vin.publicKeyHash  ) || 0;
 
             if (balance < vin.amount) throw new Exception(this, "Not Enough Funds", { publicKey: vin.publicKey, balance, txAmount: vin.amount }, )
 
@@ -84,7 +84,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         /**
          * Update nonce
          */
-        await chainData.accountTree.updateNonce( this.vin[0].publicKeyHash, 1);
+        await chainData.accountHashMap.updateNonce( this.vin[0].publicKeyHash, 1);
 
         /**
          * Update Senders' balances (-vin)
@@ -93,7 +93,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vin = this.vin[i];
 
-            const balance = await chainData.accountTree.updateBalance( vin.publicKeyHash, -vin.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, -vin.amount );
 
             if (balance < 0) throw new Exception(this, "Balance got negative", {publicKey: vin.publicKey, balance, txAmount: vin.amount });
         }
@@ -105,7 +105,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vout = this.vout[i];
 
-            const balance = await chainData.accountTree.updateBalance( vout.publicKeyHash, vout.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, vout.amount );
 
         }
 
@@ -152,7 +152,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vout = this.vout[i];
 
-            const balance = await chainData.accountTree.updateBalance( vout.publicKeyHash, -vout.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, -vout.amount );
 
             if (balance < 0) throw new Exception(this, "Balance got negative when tx removed", {publicKey: vout.publicKey, balance, txAmount: vout.amount });
 
@@ -166,7 +166,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vin = this.vin[i];
 
-            const balance = await chainData.accountTree.updateBalance( vin.publicKeyHash, +vin.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, +vin.amount );
 
         }
 
@@ -174,7 +174,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
          * Update nonce
          */
 
-        await chainData.accountTree.updateNonce( this.vin[0].publicKeyHash, -1);
+        await chainData.accountHashMap.updateNonce( this.vin[0].publicKeyHash, -1);
 
         return true;
 

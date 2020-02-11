@@ -8,7 +8,7 @@ import AddressHashVirtualMap from "src/chain/maps/addresses/addresses-hash/addre
 import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map";
 import BlockHashVirtualMap from "../maps/blocks/block-hash-map/block-hash-virtual-map";
 import HashBlockVirtualMap from "../maps/blocks/hash-block-map/hash-block-virtual-map";
-import AccountTreeVirtual from "../account-tree/account-tree-virtual";
+import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map";
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -150,7 +150,7 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.accountTree = new this._accountTreeClass({
+        this.accountHashMap = new this._accountHashMapClass({
             ...this._scope,
             chainData: this,
         })
@@ -177,8 +177,8 @@ export default class BaseChainData extends DBSchema {
         return HashBlockVirtualMap;
     }
 
-    get _accountTreeClass(){
-        return AccountTreeVirtual;
+    get _accountHashMapClass(){
+        return AccountHashVirtualMap;
     }
 
     async loadData(){
@@ -208,7 +208,7 @@ export default class BaseChainData extends DBSchema {
         this.addressTxHashMap.resetHashMap();
         this.blockHashMap.resetHashMap();
         this.hashBlockMap.resetHashMap();
-        this.accountTree.resetTree();
+        this.accountHashMap.resetHashMap();
     }
 
     /**

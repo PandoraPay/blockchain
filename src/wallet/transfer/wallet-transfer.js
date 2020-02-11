@@ -17,7 +17,7 @@ export default class WalletTransfer {
 
         for (const walletAddress of this.wallet.addresses){
             const publicKeyHash = walletAddress.decryptPublicKeyHash();
-            const balance = await this._scope.mainChain.data.accountTree.getBalance(publicKeyHash, token);
+            const balance = await this._scope.mainChain.data.accountHashMap.getBalance(publicKeyHash, token);
 
             if (balance && balance >= amount)
                 return walletAddress;
@@ -35,7 +35,7 @@ export default class WalletTransfer {
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
-        const foundFunds = await this._scope.mainChain.data.accountTree.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
         const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;

@@ -65,8 +65,6 @@ export default class BaseChain extends Events{
 
     async createBlock( height = this.data.end, chainData = this.data  ){
 
-        const lock = await chainData.lock( -1 );
-
         let block;
         try{
 
@@ -112,8 +110,6 @@ export default class BaseChain extends Events{
         }catch(err){
             this._scope.logger.error(this, "createBlock raised an error", err);
         }
-
-        if ( lock ) lock();
 
         return block;
     }

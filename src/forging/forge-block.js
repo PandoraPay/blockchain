@@ -55,14 +55,9 @@ export default class ForgeBlock {
 
             await this._scope.memPool.includeTransactions( block, createTransactionsCallback, chainData  );
 
-            //reset chainData
-            chainData = block._scope.chain.cloneData();
-
             block.pos.fees = await block.sumFees(); // in case it was changed
 
             block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
-
-            block.accountTreeHash = await block.calculateAccountTreeHash( block._scope.chain, chainData) ;
 
             await block.pos.signBlockUsingForgerPrivateKey( stakeForgerPrivateKey );
 

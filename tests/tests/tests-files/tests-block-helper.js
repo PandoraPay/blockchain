@@ -21,7 +21,7 @@ export default class TestsBlockHelper {
 
         for (let i=0; i < count; i++){
 
-            console.log( "account tree", chain.data.end, chain.data.accountTree.hash().toString("hex") );
+            console.log( "account tree", chain.data.end );
 
             const block = await chain._scope.forging.forgeBlock.createBlockForging( chain );
 

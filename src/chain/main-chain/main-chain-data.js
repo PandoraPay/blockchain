@@ -5,7 +5,6 @@ const {Helper, Exception} = global.kernel.helpers;
 const {MarshalData} = global.kernel.marshal;
 
 import BaseChainData from "./../base/base-chain-data";
-import AccountTreeNodeData from "./../../chain/account-tree/data/account-tree-node-data";
 
 export default class MainChainData extends BaseChainData {
 
@@ -80,7 +79,7 @@ export default class MainChainData extends BaseChainData {
 
     async clearData(){
 
-        //delete maps and accountTree
+        //delete maps
         const promises = [
 
             this.blockHashMap.clearHashMap(),
@@ -90,7 +89,7 @@ export default class MainChainData extends BaseChainData {
             this.addressHashMap.clearHashMap(),
             this.addressTxHashMap.clearHashMap(),
 
-            this.accountTree.clearTree(),
+            this.accountHashMap.clearHashMap(),
 
         ];
 
@@ -111,7 +110,7 @@ export default class MainChainData extends BaseChainData {
         await Promise.all(blockPromises);
         this._scope.logger.info(this, "Deleting block finished");
 
-        await this.accountTree.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
+        await this.accountHashMap.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
 
         await super.clearData(this);
 
@@ -132,7 +131,7 @@ export default class MainChainData extends BaseChainData {
             this.addressHashMap.saveVirtualMap(),
             this.addressTxHashMap.saveVirtualMap(),
 
-            this.accountTree.saveVirtualRadix(),
+            this.accountHashMap.saveVirtualMap(),
         ];
 
         await Promise.all(promises);

@@ -177,7 +177,7 @@ class Exchange extends DBSchema{
 
         }
 
-        const balances = await this._scope.mainChain.data.accountTree.getBalances( offer.publicKeyHash );
+        const balances = await this._scope.mainChain.data.accountHashMap.getBalances( offer.publicKeyHash );
         if (!balances) throw new Exception(this, "Empty accounts are not allowed to publish offers");
 
         if (result ){

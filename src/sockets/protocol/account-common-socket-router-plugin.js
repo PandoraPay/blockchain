@@ -77,8 +77,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         const publicKeyHash = address.publicKeyHash;
 
         let out;
-        if (token) out = await this._scope.mainChain.data.accountTree.getBalance( publicKeyHash, token );
-        else out = await this._scope.mainChain.data.accountTree.getBalances( publicKeyHash );
+        if (token) out = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, token );
+        else out = await this._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
 
         return out;
 
@@ -89,7 +89,7 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         const publicKeyHash = address.publicKeyHash;
 
-        const out = await this._scope.mainChain.data.accountTree.getNonce( publicKeyHash );
+        const out = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
 
         return out;
 
@@ -105,13 +105,13 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         let out;
         if (tokenCurrency){
-            out = await this._scope.mainChain.data.accountTree.getBalance( publicKeyHash, tokenCurrency );
+            out = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
             const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency)[tokenCurrency.toString("hex")] || 0;
             return out + memPoolOut;
         }
         else {
 
-            out = await this._scope.mainChain.data.accountTree.getBalances( publicKeyHash );
+            out = await this._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
             const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency);
 
             const already = {};
@@ -137,7 +137,7 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         const publicKeyHash = address.publicKeyHash;
 
-        const accountNonce = await this._scope.mainChain.data.accountTree.getNonce( publicKeyHash );
+        const accountNonce = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
 
         const nonce = this._scope.memPool.getMemPoolTransactionNonce(publicKeyHash, accountNonce );
 
@@ -159,8 +159,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (token) throw new Exception(this, "Token subscription is not supported right now");
 
         let out;
-        if (token) out = await this._scope.mainChain.data.accountTree.getBalance( publicKeyHash, token );
-        else out = await this._scope.mainChain.data.accountTree.getBalances( publicKeyHash );
+        if (token) out = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, token );
+        else out = await this._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
 
         socket.subscribe(`balance-changed/${publicKeyHash.toString("hex")}${ token ? '/'+token.toString("hex") : '' }`, notify );
 
@@ -175,7 +175,7 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         const publicKeyHash = address.publicKeyHash;
 
-        const out = await this._scope.mainChain.data.accountTree.getNonce( publicKeyHash );
+        const out = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
 
         return out;
 

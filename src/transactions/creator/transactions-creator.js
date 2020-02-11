@@ -29,7 +29,7 @@ export default class TransactionsCreator {
         }, "object" );
 
         if (nonce === undefined) {
-            nonce = await chain.data.accountTree.getNonce(tx.vin[0].publicKeyHash);
+            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
             nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
         }
 

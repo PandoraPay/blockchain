@@ -156,15 +156,6 @@ export default class Block extends DBSchema {
                         position: 108,
                     },
 
-                    accountTreeHash:{
-
-                        type: "buffer",
-                        fixedBytes: 32,
-
-                        position: 109
-
-                    },
-
                     pos:{
                         type: "object",
                         classObject: BlockPoS,
@@ -270,26 +261,7 @@ export default class Block extends DBSchema {
 
     }
 
-    /**
-     * Calculate Hash of Account Tree and revert it back
-     * @param chain
-     * @returns {Promise<void>}
-     */
-    async calculateAccountTreeHash(chain = this._scope.chain, chainData = chain.data){
-
-        if ( await this.addBlock(chain, chainData, false) !== true) throw new Exception(this, "calculateAccountTreeHash - addBlock raised an error");
-
-        const hash = chainData.accountTree.hash();
-
-        //console.log("account hash", hash.toString("hex") );
-
-        if ( await this.removeBlock(chain, chainData) !== true) throw new Exception(this, "calculateAccountTreeHash - removeBlock raised an error");
-
-        return hash;
-
-    }
-
-    async addBlock(chain = this._scope.chain, chainData = chain.data, verifyAccountTreeHash = true ){
+    async addBlock(chain = this._scope.chain, chainData = chain.data){
 
         //update transactions
         if (await this.transactionsMerkleTree.transactionsMerkleTreeInclude(chain, chainData, this) !== true) return false;
@@ -297,7 +269,7 @@ export default class Block extends DBSchema {
         //update miner balance with coinbase reward
         try{
 
-            await chainData.accountTree.updateBalance( this.pos.stakeForgerPublicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
+            await chainData.accountHashMap.updateBalance( this.pos.stakeForgerPublicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
 
         }catch(err){
 
@@ -308,25 +280,13 @@ export default class Block extends DBSchema {
         }
 
 
-        if (verifyAccountTreeHash){
-            const hash = chainData.accountTree.hash();
-
-            if ( !hash.equals(this.accountTreeHash) ){
-
-                if (this._scope.argv.debug.enabled)
-                    this._scope.logger.error(this, 'Block AccountTree Hash is not matching');
-
-                return false;
-            }
-        }
-
         return true;
 
     }
 
     async removeBlock(chain = this._scope.chain, chainData = chain.data){
 
-        await chainData.accountTree.updateBalance( this.pos.stakeForgerPublicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
+        await chainData.accountHashMap.updateBalance( this.pos.stakeForgerPublicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
 
         if ( await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this) !== true)  return false;
 

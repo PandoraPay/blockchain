@@ -97,11 +97,11 @@ export default function run () {
 
             this.expect(result2, true);
 
-            const nonce = await chain.data.accountTree.getNonce( outTx.tx.vin[0].publicKeyHash );
+            const nonce = await chain.data.accountHashMap.getNonce( outTx.tx.vin[0].publicKeyHash );
             this.expect(nonce, 2);
 
-            const balance1 = await chain.data.accountTree.getBalance( outTx.tx.vout[0].publicKeyHash );
-            const balance2 = await chain.data.accountTree.getBalance( outTx.tx.vout[1].publicKeyHash );
+            const balance1 = await chain.data.accountHashMap.getBalance( outTx.tx.vout[0].publicKeyHash );
+            const balance2 = await chain.data.accountHashMap.getBalance( outTx.tx.vout[1].publicKeyHash );
             this.expect(balance1, 334+333);
             this.expect(balance2, 666+666);
 

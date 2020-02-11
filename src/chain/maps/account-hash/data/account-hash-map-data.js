@@ -2,9 +2,9 @@ const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
 
-import AccountTreeNodeDataBalance from "./account-tree-node-data-balance";
+import AccountHashMapDataBalance from "./account-hash-map-data-balance";
 
-export default class AccountTreeNodeData extends DBSchema{
+export default class AccountHashMapData extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 
@@ -32,7 +32,7 @@ export default class AccountTreeNodeData extends DBSchema{
 
                 balances: {
                     type: "array",
-                    classObject: AccountTreeNodeDataBalance,
+                    classObject: AccountHashMapDataBalance,
 
                     minSize: 0,
                     maxSize: 65535,

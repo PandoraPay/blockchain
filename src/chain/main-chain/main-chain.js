@@ -23,21 +23,21 @@ export default class MainChain extends BaseChain {
     }
 
 
-    // cloneData(){
-    //
-    //     const data = super.cloneData();
-    //
-    //     data.blockHashMap._fallback = this.data.blockHashMap;
-    //     data.hashBlockMap._fallback = this.data.hashBlockMap;
-    //
-    //     data.txHashMap._fallback = this.data.txHashMap;
-    //     data.addressHashMap._fallback = this.data.addressHashMap;
-    //     data.addressTxHashMap._fallback = this.data.addressTxHashMap;
-    //
-    //     data.accountTree._fallback = this.data.accountTree;
-    //
-    //     return data;
-    // }
+    cloneData(){
+
+        const data = super.cloneData();
+
+        data.blockHashMap._fallback = this.data.blockHashMap;
+        data.hashBlockMap._fallback = this.data.hashBlockMap;
+
+        data.txHashMap._fallback = this.data.txHashMap;
+        data.addressHashMap._fallback = this.data.addressHashMap;
+        data.addressTxHashMap._fallback = this.data.addressTxHashMap;
+
+        data.accountHashMap._fallback = this.data.accountHashMap;
+
+        return data;
+    }
 
     /**
      * Initializing Main Chain
@@ -100,7 +100,7 @@ export default class MainChain extends BaseChain {
                     this.data.kernelHash = Buffer.from( message.data.kernelHash );
                     this.data.prevKernelHash = Buffer.from( message.data.prevKernelHash );
 
-                    //let's reset the virtual HashMaps and AccountTree
+                    //let's reset the virtual HashMaps
                     this.data.resetState();
 
                     this.emit("blocks/included", {

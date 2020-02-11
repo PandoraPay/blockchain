@@ -1,10 +1,18 @@
-const {RadixTreeVirtual} = global.kernel.dataStructures.radixTree;
-const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
+const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
 
-import AccountTreeRoot from "./account-tree-root";
+import AddressHashMapElement from "./account-hash-map-element"
 
-export default class AccountTreeVirtual extends RadixTreeVirtual {
+/**
+ * Required for consensus. Used only for explorer
+ * Stores info related to a Transaction
+ *
+ * info like: TransactionsCount associated with an address
+ *
+ */
+
+export default class AccountHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 
@@ -12,28 +20,36 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
             fields: {
 
-                id: {
-                    default: "accTree",
-                    fixedBytes: 7,
+                table: {
+                    default: "accountMap",
+                    fixedBytes: 10,
                 },
 
-                root: {
-                    classObject: AccountTreeRoot,
+                element: {
+                    classObject: AddressHashMapElement,
                 },
 
             },
+
 
         }, schema, false), data, type, creationOptions);
 
     }
 
+    processLeafLabel(label){
+
+        if (Buffer.isBuffer(label)) label = label.toString("hex");
+        if (typeof label !== "string" || label.length === 0) throw new Exception(this, "label length is invalid");
+
+        if (label.length !== 40) throw "label is not leaf";
+
+        return label;
+    }
+
     async getBalances( publicKeyHash ){
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
-        const out = await this.findRadixLeaf(publicKeyHash);
-
-        if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!out, id: out.id});
+        const out = await this.getMap(publicKeyHash);
 
         const balances = out ? out.data.balances : undefined;
 
@@ -55,10 +71,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
         if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
-        const out = await this.findRadixLeaf(publicKeyHash);
-
-        if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!out, id: out.id});
+        const out = await this.getMap(publicKeyHash);
 
         const balances = out ? out.data.balances : undefined;
 
@@ -75,9 +88,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
-        const out = await this.findRadixLeaf(publicKeyHash);
-        if (out && !out.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
+        const out = await this.getMap(publicKeyHash);
 
         return out ? out.data.nonce : undefined;
 
@@ -92,11 +103,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
-        const out = await this.findRadix(publicKeyHash);
-        const node = out.result ? out.node : undefined;
-
-        if (node && !node.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
+        const node = await this.getMap(publicKeyHash);
 
         const balances = node ? node.data.balances : undefined;
 
@@ -126,15 +133,14 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
                         if ( node.data.isDataEmpty() ){
 
-                            await this.deleteRadix(publicKeyHash);
+                            await this.deleteMap(publicKeyHash);
                             return 0;
 
                         }
 
                     }
 
-                    await node.propagateHashChange(); //refresh hash
-                    await this._saveNode(node);
+                    await this.updateMap(publicKeyHash, node.data);
 
                     return newAmount;
 
@@ -149,8 +155,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
             node.__changes.data = true;
             node.data.__changes.balances = true;
 
-            await node.propagateHashChange(); //refresh hash
-            await this._saveNode(node);
+            await this.updateMap(publicKeyHash, node.data);
 
             return node.data.balance;
 
@@ -158,7 +163,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
             if (!this._scope.argv.transactions.coins.validateCoins(value) ) throw new Exception(this, "Balance would become negative #2", {publicKeyHash: publicKeyHash, value } );
 
-            await this.addRadix(publicKeyHash, {
+            await this.updateMap(publicKeyHash, {
 
                 nonce: 0,
                 balances: [{
@@ -180,12 +185,7 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
-        const out = await this.findRadix(publicKeyHash);
-        const node = out.result ? out.node : undefined;
-
-        if (node && !node.data)
-            this._scope.logger.warn(this, "Strange error, node.data doesn't exist", {publicKeyHash: publicKeyHash, node: !!node, id: node.id});
-
+        const node = await this.getMap(publicKeyHash);
 
         const prevValue = node ? node.data.nonce : undefined;
 
@@ -197,12 +197,11 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
             node.__changes.data = true;
 
             if ( node.data.isDataEmpty() ){
-                await this.deleteRadix(publicKeyHash);
+                await this.deleteMap(publicKeyHash);
                 return 0;
             }
 
-            await node.propagateHashChange(); //refresh hash
-            await this._saveNode(node);
+            await this.updateMap(publicKeyHash, node.data);
 
             return node.data.nonce;
 
@@ -215,3 +214,4 @@ export default class AccountTreeVirtual extends RadixTreeVirtual {
 
 
 }
+

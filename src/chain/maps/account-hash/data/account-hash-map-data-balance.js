@@ -3,7 +3,7 @@ const {Helper, Exception, EnumHelper} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
-export default class AccountTreeNodeDataBalance extends DBSchema{
+export default class AccountHashMapDataBalance extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 
@@ -34,8 +34,9 @@ export default class AccountTreeNodeDataBalance extends DBSchema{
 
                     validation(value){
 
-                        let tokenCurrencyString = value.toString("hex");
+                        const tokenCurrencyString = value.toString("hex");
                         return EnumHelper.validateEnum(tokenCurrencyString, TransactionTokenCurrencyTypeEnum );
+
                     },
 
                     position: 101,

@@ -12,10 +12,10 @@ const BlockVersionEnum = require('src/block/block-version-enum').default;
 const TransactionsMerkleTree = require('src/block/transactions/merkle-tree/transactions-merkle-tree').default;
 const TransactionsMerkleTreeNode = require('src/block/transactions/merkle-tree/transactions-merkle-tree-node').default;
 const TransactionsMerkleTreeRoot = require('src/block/transactions/merkle-tree/transactions-merkle-tree-root').default;
-const AccountTreeNode = require("src/chain/account-tree/account-tree-node").default;
-const AccountTreeVirtual = require("src/chain/account-tree/account-tree-virtual").default;
-const AccountTreeRoot = require("src/chain/account-tree/account-tree-root").default;
-const AccountTreeNodeData = require("src/chain/account-tree/data/account-tree-node-data").default;
+const AccountHashVirtualMap = require("src/chain/maps/account-hash/account-hash-virtual-map").default;
+const AccountHashMapElement = require("src/chain/maps/account-hash/account-hash-map-element").default;
+const AccountHashMapData = require("src/chain/maps/account-hash/data/account-hash-map-data").default;
+const AccountHashMapDataBalance = require("src/chain/maps/account-hash/data/account-hash-map-data-balance").default;
 const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
 const Genesis = require('src/block/genesis/genesis').default;
 const MainChain = require('src/chain/main-chain/main-chain').default;
@@ -66,10 +66,10 @@ const library = {
             },
 
             accountTree:{
-                AccountTreeNode,
-                AccountTreeRoot,
-                AccountTreeVirtual,
-                AccountTreeNodeData,
+                AccountHashVirtualMap,
+                AccountHashMapElement,
+                AccountHashMapData,
+                AccountHashMapDataBalance,
             }
 
         },

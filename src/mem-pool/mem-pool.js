@@ -291,7 +291,7 @@ export default  class MemPool extends DBSchema{
 
             const array = this.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
 
-            let nonce =  ( await chainData.accountTree.getNonce( vin0PublicKeyHash ) ) || 0;
+            let nonce =  ( await chainData.accountHashMap.getNonce( vin0PublicKeyHash ) ) || 0;
 
             const nonces = [];
             for (const tx of array)
