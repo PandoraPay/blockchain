@@ -124,14 +124,14 @@ export default class MainChainData extends BaseChainData {
          */
 
         const promises = [
-            this.blockHashMap.saveVirtualMap(),
-            this.hashBlockMap.saveVirtualMap(),
+            this.blockHashMap.saveVirtualMap(true),
+            this.hashBlockMap.saveVirtualMap(true),
 
-            this.txHashMap.saveVirtualMap(),
-            this.addressHashMap.saveVirtualMap(),
-            this.addressTxHashMap.saveVirtualMap(),
+            this.txHashMap.saveVirtualMap(true),
+            this.addressHashMap.saveVirtualMap(true),
+            this.addressTxHashMap.saveVirtualMap(true),
 
-            this.accountHashMap.saveVirtualMap(),
+            this.accountHashMap.saveVirtualMap(true),
         ];
 
         await Promise.all(promises);
