@@ -279,6 +279,19 @@ export default class BaseChainData extends DBSchema {
 
     }
 
+    setFallbacks(mainChainData){
+
+        this.blockHashMap._fallback = mainChainData.blockHashMap;
+        this.hashBlockMap._fallback = mainChainData.hashBlockMap;
+
+        this.txHashMap._fallback = mainChainData.txHashMap;
+        this.addressHashMap._fallback = mainChainData.addressHashMap;
+        this.addressTxHashMap._fallback = mainChainData.addressTxHashMap;
+
+        this.accountHashMap._fallback = mainChainData.accountHashMap;
+
+    }
+
     async getTransactionByHash(hash){
         throw new Exception(this, "Not implemented");
     }

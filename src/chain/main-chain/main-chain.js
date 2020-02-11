@@ -22,19 +22,10 @@ export default class MainChain extends BaseChain {
 
     }
 
-
     cloneData(){
 
         const data = super.cloneData();
-
-        data.blockHashMap._fallback = this.data.blockHashMap;
-        data.hashBlockMap._fallback = this.data.hashBlockMap;
-
-        data.txHashMap._fallback = this.data.txHashMap;
-        data.addressHashMap._fallback = this.data.addressHashMap;
-        data.addressTxHashMap._fallback = this.data.addressTxHashMap;
-
-        data.accountHashMap._fallback = this.data.accountHashMap;
+        data.setFallbacks(this.data);
 
         return data;
     }
@@ -157,7 +148,7 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.warn(this, 'Locking...', blocks.map( it => it.height ));
 
-        const lock= await this.data.lock( -1,  );
+        const lock = await this.data.lock( -1,  );
 
         this._scope.logger.warn(this, 'Lock obtained', blocks.map( it => it.height ));
 
@@ -278,6 +269,7 @@ export default class MainChain extends BaseChain {
             //saving it
             //a lock is necessary to avoid sending corrupted data to other nodes like a block from previous chain.data and a block from the new block.data
             this.data = newData;
+            this.data.setFallbacks({});
 
             /**
              * Successful
@@ -379,6 +371,8 @@ export default class MainChain extends BaseChain {
         subChain.data.start = this.data.start;
         subChain.data.end = this.data.end;
         subChain.data.chainwork = this.data.chainwork;
+
+        subChain.data.setFallbacks(this.data);
 
         return subChain;
 
