@@ -31,16 +31,20 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         });
 
         //disconnected, remove socket because it got disconnected
-        this._scope.events.on("sockets/disconnected", (socket)=>{
+        this._scope.events.on("sockets/disconnected", ({socket}) =>{
 
-            for (let i=this.forkSubchainsList.length-1; i >= 0 ; i--){
+            for (let i=this.forkSubchainsList.length-1; i>=0; i--){
 
                 const forkSubchain = this.forkSubchainsList[i];
-                delete forkSubchain.sockets[socket.id];
-                forkSubchain.socketsList.splice(i, 1);
+                if ( forkSubchain.sockets[socket.id] ) {
 
-                if (forkSubchain.socketsList.length === 0) //no more sockets
-                    this._deleteForkSubchain(forkSubchain);
+                    delete forkSubchain.sockets[socket.id];
+                    forkSubchain.socketsList.splice(forkSubchain.socketsList.indexOf(socket), 1);
+
+                    if (forkSubchain.socketsList.length === 0) //no more sockets
+                        this._deleteForkSubchain(forkSubchain);
+
+                }
 
             }
 
@@ -203,7 +207,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
             do {
 
-                const socket = this._getForkSubchainSocket(forkSubchain.data.id);
+                const socket = this._getForkSubchainSocket(forkSubchain);
 
                 let hash, kernelHash;
 
@@ -319,7 +323,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
             }
 
             //selecting a socket
-            const socket = this._getForkSubchainSocket( forkSubchain.data.id);
+            const socket = this._getForkSubchainSocket( forkSubchain );
 
             this._scope.logger.log(this, "Download height", height);
 
@@ -384,19 +388,15 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         if (!this.forkSubchains[id]) {
 
-            this.forkSubchains[id] = {
-                subchain: forkSubchain,
-                sockets: {},
-                socketsList: [],
-            };
-
+            this.forkSubchains[id] = forkSubchain;
             this.forkSubchainsList.push( forkSubchain );
+
 
         }
 
         if (!forkSubchain.sockets[socket.id]){
             forkSubchain.sockets[socket.id] = socket;
-            forkSubchain.socketsList.push( socket.id );
+            forkSubchain.socketsList.push( socket  );
         }
 
 
@@ -406,18 +406,17 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         if (typeof forkSubchainId === "object") forkSubchainId = forkSubchainId.data.id;
 
-        this.forkSubchainsList.splice(  this.forkSubchainsList.indexOf( this.forkSubchains[forkSubchainId] ), 1 );
-        delete this.forkSubchains[forkSubchainId];
+        if (this.forkSubchains[forkSubchainId]) {
+            this.forkSubchainsList.splice( this.forkSubchainsList.indexOf(this.forkSubchains[forkSubchainId]), 1);
+            delete this.forkSubchains[forkSubchainId];
+        }
 
     }
 
-    _getForkSubchainSocket(forkSubchainId){
+    _getForkSubchainSocket(forkSubchain){
 
-        if (typeof forkSubchainId === "object") forkSubchainId = forkSubchainId.data.id;
-
-        const socketIndex = Math.floor( Math.random() * this.forkSubchains[forkSubchainId].socketsList.length );
-        const socketId = this.forkSubchains[forkSubchainId].socketsList[socketIndex];
-        return this.forkSubchains[forkSubchainId].sockets[socketId];
+        const socketIndex = Math.floor( Math.random() * forkSubchain.socketsList.length );
+        return forkSubchain.socketsList[socketIndex];
     }
 
     _getForkSubchainSockets(forkSubchainId){
@@ -430,7 +429,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     _getForkSubchainByBlockHash(blockHash){
 
         for (let i=0; i < this.forkSubchainsList.length; i++)
-            if (this.forkSubchainsList[i].hashes[blockHash])
+            if (this.forkSubchainsList[i].data.hashes[blockHash])
                 return this.forkSubchainsList[i];
 
 
