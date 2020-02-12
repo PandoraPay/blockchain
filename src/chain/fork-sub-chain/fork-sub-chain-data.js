@@ -87,9 +87,7 @@ export default class ForkSubChainData extends SubChainData{
             },
             schema, false), data, type, creationOptions);
 
-
-        if (!this.hashes) this.hashes = {};
-        if (!this.kernelHashes) this.kernelHashes = {};
+        this.errorDownload = 0;
 
     }
 

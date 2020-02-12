@@ -144,54 +144,38 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         let forkSubchain;
         try{
 
-            forkSubchain = this._scope.mainChain.createForkSubChain();
+            forkSubchain = this._getForkSubchainByBlockHash(req.hash);
+            if (!forkSubchain) {
 
-            forkSubchain.data.unmarshal({
-                forkStart: req.blocks-1,
-                forkEnd: req.blocks,
-                listHashes: [ {
-                    buffer: req.hash,
-                } ],
-                listKernelHashes: [ {
-                    buffer: req.kernelHash,
-                } ],
-                chainwork: chainwork,
-            }, "object", undefined, {
-                onlyFields:{
-                    forkStart: true,
-                    forkEnd: true,
-                    listHashes: true,
-                    listKernelHashes: true,
-                    listSockets: true,
-                    chainwork: true,
-                },
-            });
+
+                //TODO first asking other clusters if they already met this req.hash
+
+                forkSubchain = this._scope.mainChain.createForkSubChain();
+
+                forkSubchain.data.unmarshal({
+                    forkStart: req.blocks - 1,
+                    forkEnd: req.blocks,
+                    listHashes: [{
+                        buffer: req.hash,
+                    }],
+                    listKernelHashes: [{
+                        buffer: req.kernelHash,
+                    }],
+                    chainwork: chainwork,
+                }, "object", undefined, {
+                    onlyFields: {
+                        forkStart: true,
+                        forkEnd: true,
+                        listHashes: true,
+                        listKernelHashes: true,
+                        listSockets: true,
+                        chainwork: true,
+                    },
+                });
+
+            }
 
             //this._scope.logger.log(this, "chainwork", { "initial value": chainwork.toString(), "data.chainwork": subchain.data.chainwork.toString() } );
-
-            /**
-             * if hash or kernelHash exists already saved, it means a duplicate fork was already been detected and it will return a unique error
-             *
-             */
-
-            try{
-                await forkSubchain.data.save();
-            } catch(err){
-
-                if (err instanceof Exception && err.message === "There is already an object with the same key" ){
-
-                    /**
-                     * Enabling to solve the subchain on multiple instances
-                     * TODO support multi threading - allowing other instances to download the blocks
-                     */
-                    // subchain.id = err.data.found;
-                    // this._fillSocketForkSubchain( subchain, socket );
-
-                    return true;
-                }
-
-                throw err;
-            }
 
             this._fillSocketForkSubchain( forkSubchain, socket );
 
@@ -204,18 +188,19 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                 let hash, kernelHash;
 
-                if ( forkHeight === req.blocks-1 ) {
+                //download hash and kernelHash
+                if ( forkHeight === req.blocks-1 ) { //last block, no download
                     hash = req.hash;
                     kernelHash = req.kernelHash;
                 }
-                else {
+                else { //download hash & kernelHash
                     const blockHashes = await socket.emitAsync('blockchain/get-block-hashes', {index: forkHeight});
                     hash =  blockHashes.hash;
                     kernelHash =  blockHashes.kernelHash;
                 }
 
-                if (!hash || !Buffer.isBuffer(hash))
-                    throw new Exception(this, "Hash was not received");
+                if (!hash || !Buffer.isBuffer(hash) || !kernelHash || !Buffer.isBuffer(kernelHash))
+                    throw new Exception(this, "Hash or KernelHash was not received");
 
                 if (this._scope.mainChain.data.end > forkHeight){
 
@@ -223,77 +208,37 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                     if (forkSubchainHash && hash && hash.equals( forkSubchainHash )) {
                         forkHeight++;
-                        console.log("FORK IDENTIFIED", forkHeight);
+                        this._scope.logger.log(this, "FORK IDENTIFIED", forkHeight);
                         break;
                     }
 
                 }
 
+                //TODO asking if this hash/kernel was already found somewhere else
+                //if yes propagate the list
+
                 forkSubchain.data.forkStart = forkHeight ;
 
-                if ( !forkSubchain.data.listHashes.reduce( (res, listHash) => res || listHash.buffer.equals( hash ), false ) )
-                    forkSubchain.data.pushArray("listHashes", { buffer: hash }, "object" );
+                if ( !forkSubchain.data.hashes[hash.toString("hex")]  ) {
+                    forkSubchain.data.pushArray("listHashes", {buffer: hash}, "object");
+                    forkSubchain.data.hashes[ hash.toString("hex") ] = true;
+                }
 
-                if ( !forkSubchain.data.listKernelHashes.reduce( (res, listKernelHash) => res || listKernelHash.buffer.equals( kernelHash ), false ) )
-                    forkSubchain.data.pushArray("listKernelHashes", { buffer: kernelHash }, "object" );
-
-                /**
-                 * TODO update only listHashes and listKernelHashes
-                 */
-
-                try{
-                    await forkSubchain.data.save();
-                }catch(err){
-
-                    if (err instanceof Exception && err.message === "There is already an object with the same key" ){
-
-                        const newHashes = [], newKernelHashes = [];
-
-                        forkSubchain.data.listHashes.map( listHash => newHashes.push( listHash ));
-                        forkSubchain.data.listKernelHashes.map( listKernelHash => newKernelHashes.push(listKernelHash ));
-
-                        //delete the previous subchain id
-                        this._deleteForkSubchain(forkSubchain);
-
-                        this._scope.mainChain.dataSubscription.subscribeMessage("delete-chain", {
-                            forkSubchain: forkSubchain.data.id,
-                        });
-
-                        await forkSubchain.delete();
-
-                        forkSubchain.data.id = err.data.found;
-                        await forkSubchain.data.load();
-
-                        /**
-                         * Notify others
-                         */
-
-                        if (this._scope.db.isSynchronized)
-                            this._scope.mainChain.dataSubscription.subscribeMessage("new-hash", {
-                                forkSubchain:  err.data.found,
-                                forkEnd: forkSubchain.forkEnd,
-                                forkStart: forkSubchain.forkStart,
-                                newListHashes: newHashes,
-                                newKernelHashes: newKernelHashes,
-                            });
-
-                        return true;
-                    }
-
-                    throw err;
+                if ( !forkSubchain.data.kernelHashes[kernelHash.toString("hex")] ) {
+                    forkSubchain.data.pushArray("listKernelHashes", {buffer: kernelHash}, "object");
+                    forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
                 }
 
                 forkHeight--;
 
-            } while ( forkHeight >= 0 &&  forkHeight >= this._scope.mainChain.data.end - this._scope.argv.blockchain.maxForkAllowed);
+            } while ( forkHeight >= 0 &&  forkHeight >= this._scope.mainChain.data.end - this._scope.argv.blockchain.maxForkAllowed); //there are is still sockets
 
             /**
              * TODO update only ready
              */
             forkSubchain.data.ready = true;
-            await forkSubchain.data.save();
 
-            console.log("fork found", forkSubchain.data.forkStart);
+            this._scope.logger.log(this, "fork found", forkSubchain.data.forkStart);
 
         }catch(err){
 
@@ -301,7 +246,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 this._scope.logger.error(this, '_newBlock raised an error', err );
 
             if (forkSubchain)
-                await forkSubchain.data.delete();
+                this._deleteForkSubchain(forkSubchain);
 
             throw err;
         }
@@ -316,6 +261,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         /**
          * Sort by chainwork
          */
+
+        this._scope.logger.log(this, "Subchains count", this.forkSubchainsList.length );
 
         this.forkSubchainsList.sort(
             (a, b) => !a.data._schema.fields.chainwork.sorts.worksort.filter.call(a.data) ? a.data._schema.fields.chainwork.sorts.worksort.score.call(a.data) : 0 -
@@ -346,26 +293,23 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 forkSubchain.data.processing = true;
                 await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, forkSubchain.sockets );
 
-                // await forkSubchain.data.save();
-                // await forkSubchain.data.delete();
-
+                //success
                 this._deleteForkSubchain(forkSubchain);
-                if (forkSubchain) await forkSubchain.data.delete();
-
                 return true;
+
             }
 
             //selecting a socket
             const socket = this._getForkSubchainSocket( forkSubchain.data.id);
 
-            console.log("download height", height);
+            this._scope.logger.log(this, "Download height", height);
 
             //requesting block
             const blockBuffer = await socket.emitAsync( 'blockchain/get-block-by-height', {index: height} );
 
-            if (!Buffer.isBuffer(blockBuffer)) throw new Exception(this, "block received is invalid", {index: height});
+            if (!blockBuffer || !Buffer.isBuffer(blockBuffer)) throw new Exception(this, "block received is invalid", {index: height});
 
-            const block = await forkSubchain.createBlock( height )  ;
+            const block = await forkSubchain.createBlock( height );
             block.fromBuffer(blockBuffer);
             block.height = height;
 
@@ -376,9 +320,19 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, 'solveForkSubchains raised an error', err );
 
-            this._deleteForkSubchain(forkSubchain);
+            if (forkSubchain) {
 
-            if (forkSubchain) await forkSubchain.data.delete();
+                if (err.message === "block received is invalid") {
+
+                    forkSubchain.data.errorDownload += 1;
+                    if (forkSubchain.data.errorDownload > 10)
+                        this._deleteForkSubchain(forkSubchain);
+
+                }else
+                this._deleteForkSubchain(forkSubchain);
+
+            }
+
         }
 
 
@@ -462,6 +416,15 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         if (typeof forkSubchainId === "object") forkSubchainId = forkSubchainId.data.id;
 
         return this.forkSubchains[forkSubchainId].sockets;
+    }
+
+    _getForkSubchainByBlockHash(blockHash){
+
+        for (let i=0; i < this.forkSubchainsList.length; i++)
+            if (this.forkSubchainsList[i].hashes[blockHash])
+                return this.forkSubchainsList[i];
+
+
     }
 
 }
