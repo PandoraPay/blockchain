@@ -144,7 +144,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         let forkSubchain;
         try{
 
-            forkSubchain = this._getForkSubchainByBlockHash(req.hash);
+            forkSubchain = this._getForkSubchainByBlockHash(req.hash.toString("hex") );
             if (!forkSubchain) {
 
 
