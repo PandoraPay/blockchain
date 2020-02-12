@@ -29,14 +29,6 @@ export default class SubChainData extends BaseChainData{
                         maxSize: scope.argv.blockchain.maxForkAllowed,
                         classObject: Block,
 
-                        preprocessor(list){
-
-                            this.blocks = {};
-                            list.map( it => this.blocks[it.height] = it );
-
-                            return list;
-                        },
-
                         position: 200,
                     },
 
@@ -46,15 +38,6 @@ export default class SubChainData extends BaseChainData{
 
                         classObject: SubChainDataHashUnique,
 
-
-                        preprocessor(list){
-
-                            this.hashes = {};
-                            list.map( it => this.hashes[ it.toString("hex") ] = true );
-
-                            return list;
-                        },
-
                         position: 201,
                     },
 
@@ -62,14 +45,6 @@ export default class SubChainData extends BaseChainData{
                         type: "array",
                         maxSize: scope.argv.blockchain.maxForkAllowed,
                         classObject: SubChainDataKernelHashUnique,
-
-                        preprocessor(list){
-
-                            this.kernelHashes = {};
-                            list.map( it => this.kernelHashes[ it.toString("hex") ] = true );
-
-                            return list;
-                        },
 
                         position: 202,
                     },

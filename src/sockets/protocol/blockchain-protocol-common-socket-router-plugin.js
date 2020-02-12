@@ -191,10 +191,12 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                         forkEnd: true,
                         listHashes: true,
                         listKernelHashes: true,
-                        listSockets: true,
                         chainwork: true,
                     },
                 });
+
+                forkSubchain.data.hashes[ req.hash.toString("hex") ] = true;
+                forkSubchain.data.listKernelHashes[ req.kernelHash.toString("hex") ] = true;
 
             }
 
@@ -225,6 +227,46 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 if (!hash || !Buffer.isBuffer(hash) || !kernelHash || !Buffer.isBuffer(kernelHash))
                     throw new Exception(this, "Hash or KernelHash was not received");
 
+                //TODO asking if this hash/kernel was already found somewhere else
+                //if yes propagate the list
+
+                //let's verify with all other forks, if they match, then we should merge them
+                const forkSubchain2 = this._getForkSubchainByBlockHash(hash.toString("hex"));
+                if (forkSubchain2 && forkSubchain2 !== forkSubchain){
+
+                    if (forkSubchain2.processing){
+                        break;
+                    }else {
+
+                        //saving hashes at the end of the forkSubchain2
+                        for (let i=0; i < forkSubchain.data.listHashes.length; i++  ){
+
+                            const hash = forkSubchain.data.listHashes[i];
+                            const kernelHash = forkSubchain.data.listKernelHashes[i];
+
+                            if ( !forkSubchain2.data.hashes[hash.toString("hex")]  ) {
+                                forkSubchain2.data.pushArray("listHashes", hash, "object" ); //at the end
+                                forkSubchain2.data.hashes[ hash.toString("hex") ] = true;
+                            }
+
+                            if ( !forkSubchain2.data.kernelHashes[kernelHash.toString("hex")] ) {
+                                forkSubchain2.data.pushArray("listKernelHashes", kernelHash, "object"); //at the end
+                                forkSubchain2.data.kernelHashes[ kernelHash.toString("hex") ] = true;
+                            }
+
+                        }
+
+                        forkSubchain2.data.forkEnd = forkSubchain.data.forkEnd;
+                        forkSubchain2.data.hash = forkSubchain.data.hash;
+                        forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
+                        forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
+
+                        this._deleteForkSubchain(forkSubchain);
+                        break;
+                    }
+
+                }
+
                 if (this._scope.mainChain.data.end > forkHeight){
 
                     const forkSubchainHash = await forkSubchain.data.getBlockHash(forkHeight);
@@ -237,18 +279,15 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                 }
 
-                //TODO asking if this hash/kernel was already found somewhere else
-                //if yes propagate the list
-
                 forkSubchain.data.forkStart = forkHeight ;
 
                 if ( !forkSubchain.data.hashes[hash.toString("hex")]  ) {
-                    forkSubchain.data.pushArray("listHashes", {buffer: hash}, "object");
+                    forkSubchain.data.pushArray("listHashes", hash, "object", undefined, 0);
                     forkSubchain.data.hashes[ hash.toString("hex") ] = true;
                 }
 
                 if ( !forkSubchain.data.kernelHashes[kernelHash.toString("hex")] ) {
-                    forkSubchain.data.pushArray("listKernelHashes", {buffer: kernelHash}, "object");
+                    forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, 0);
                     forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
                 }
 

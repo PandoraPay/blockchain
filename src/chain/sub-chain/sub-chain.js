@@ -51,22 +51,8 @@ export default class SubChain extends BaseChain{
             const block = blocks[i];
 
             if ( await block.validateBlock(this)  === false) throw new Exception(this, "Block is invalid", block.height );
-            
-            let insertPosition;
 
-            if (!this.data.blocks[block.height]) {
-
-                for (let j=0; j < this.data.listBlocks.length-1; j++)
-                    if (this.data.listBlocks[j].height < block.height && this.data.listBlocks[j+1].height > block.height ){
-                        insertPosition = j;
-                        break;
-                    }
-                
-            }
-
-            this.data.pushArray( "listHashes", block.hash(), undefined, undefined, insertPosition );
-            this.data.pushArray( "listKernelHashes", block.kernelHash(), undefined, undefined, insertPosition );
-            this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
+            this.insertBlock(block);
 
             if (this.data.start > block.height)
                 this.data.start = block.height;
@@ -82,6 +68,26 @@ export default class SubChain extends BaseChain{
         }
 
         return true;
+    }
+
+    insertBlock(block){
+
+        let insertPosition;
+
+        if (!this.data.blocks[block.height]) {
+
+            for (let j=0; j < this.data.listBlocks.length-1; j++)
+                if (this.data.listBlocks[j].height < block.height && this.data.listBlocks[j+1].height > block.height ){
+                    insertPosition = j;
+                    break;
+                }
+
+        }
+
+        this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
+        this.data.blocks[block.height] = block;
+
+
     }
 
     async validateChain(){
