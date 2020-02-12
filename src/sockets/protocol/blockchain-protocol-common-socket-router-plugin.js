@@ -30,7 +30,26 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         });
 
+        //disconnected, remove socket because it got disconnected
+        this._scope.events.on("sockets/disconnected", (socket)=>{
+
+            for (let i=this.forkSubchainsList.length-1; i >= 0 ; i--){
+
+                const forkSubchain = this.forkSubchainsList[i];
+                delete forkSubchain.sockets[socket.id];
+                forkSubchain.socketsList.splice(i, 1);
+
+                if (forkSubchain.socketsList.length === 0) //no more sockets
+                    this._deleteForkSubchain(forkSubchain);
+
+            }
+
+
+
+        });
+
         this._scope.events.on("master-cluster/started", ()=> this.initializePluginMasterCluster() );
+
 
     }
 
@@ -375,21 +394,11 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         }
 
-        if (!this.forkSubchains[id].sockets[socket.id]){
-            this.forkSubchains[id].sockets[socket.id] = socket;
-            this.forkSubchains[id].socketsList.push( socket.id );
+        if (!forkSubchain.sockets[socket.id]){
+            forkSubchain.sockets[socket.id] = socket;
+            forkSubchain.socketsList.push( socket.id );
         }
 
-        socket.on("disconnect", ()=>{
-
-            delete this.forkSubchains[id].sockets[socket.id];
-            const index = this.forkSubchains[id].socketsList.indexOf(socket.id);
-            this.forkSubchains[id].socketsList.splice(index, 1);
-
-            if (this.forkSubchains[id].socketsList.length === 0)
-                this._deleteForkSubchain(forkSubchain);
-
-        });
 
     }
 
