@@ -31,7 +31,7 @@ export default class WalletEncryption {
         }
 
         const mnemonicBuff = this.wallet.mnemonic.decryptKey(password);
-        const mnemonic = mnemonicBuff.toString("ascii");
+        const mnemonic = mnemonicBuff.toString("utf8");
 
         if ( !this._scope.cryptography.addressGenerator.bip39.validateMnemonic( mnemonic ) ) throw new Exception(this, "Password is invalid" );
 
@@ -118,7 +118,7 @@ export default class WalletEncryption {
         this.decryptWallet(password);
 
         const mnemonic = this.wallet.mnemonic.decryptKey();
-        return  mnemonic.toString("ascii").split(' ');
+        return  mnemonic.toString("utf8").split(' ');
 
     }
 

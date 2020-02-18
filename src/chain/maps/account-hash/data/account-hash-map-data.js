@@ -1,8 +1,10 @@
+
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
 
 import AccountHashMapDataBalance from "./account-hash-map-data-balance";
+import AccountHashMapDataDelegate from "./account-hash-map-data-delegate";
 
 export default class AccountHashMapData extends DBSchema{
 
@@ -40,6 +42,12 @@ export default class AccountHashMapData extends DBSchema{
                     position: 102,
                 },
 
+                delegate: {
+                    type: "object",
+                    classObject: AccountHashMapDataDelegate,
+
+                    position: 103,
+                },
 
             },
 

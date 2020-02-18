@@ -64,11 +64,11 @@ export default class WalletManager{
         this.wallet.mnemonic = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonic", {
 
             encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
-            value: Buffer.from( mnemonicString, "ascii"),
+            value: Buffer.from( mnemonicString, "utf8"),
 
         }, "object" );
 
-        const checksum = CryptoHelper.dkeccak256Buffer( Buffer.from( mnemonicString, "ascii") );
+        const checksum = CryptoHelper.dkeccak256Buffer( Buffer.from( mnemonicString, "utf8" ) );
 
         this.wallet.mnemonicChecksum = checksum;
 

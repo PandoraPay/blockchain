@@ -213,6 +213,9 @@ export default class ExchangeOffer extends DBSchema {
         if (this.height < this._scope.mainChain.data.end - this._scope.argv.exchange.maximumLifeSpan )
             return true;
 
+        if (this.height > this._scope.mainChain.data.end)
+            return false;
+
         return false;
 
     }
