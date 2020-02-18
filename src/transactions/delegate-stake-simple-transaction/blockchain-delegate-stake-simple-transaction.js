@@ -28,11 +28,18 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                     maxSize: 0,
                 },
 
-                delegate: {
+                delegateOld:{
                     type: "object",
                     classObject: AccountHashMapDataDelegate,
 
                     position: 2000,
+                },
+
+                delegate: {
+                    type: "object",
+                    classObject: AccountHashMapDataDelegate,
+
+                    position: 2001,
                 },
 
             }

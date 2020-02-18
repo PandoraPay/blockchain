@@ -8,4 +8,6 @@ export default {
     stakingMinimumStake: 1000, //coins
     stakingMinimumStakeEffect: 100,
 
+    delegateStakingFeePercentage: 10000,
+
 }

@@ -94,6 +94,16 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
 
     }
 
+    async getDelegate( publicKeyHash ){
+
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+
+        const out = await this.getMap(publicKeyHash);
+
+        return out ? out.data.delegate : undefined;
+
+    }
+
     async updateBalance( publicKeyHash, value, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
@@ -182,6 +192,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
     async updateNonce( publicKeyHash, value){
 
         if (value === 0) throw new Exception(this, "Value needs to be different than 0");
+        if (value > 1 || value < -1) throw new Exception(this, "Value is bigger than 0 or less than zero");
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
@@ -207,7 +218,42 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
 
         } else {
 
-            throw new Exception(this, "Update nonce but account doesn't exist", {publicKeyHash: publicKeyHash, value });
+            throw new Exception(this, "updateNonce error - account doesn't exist", {publicKeyHash: publicKeyHash, value });
+
+        }
+    }
+
+    async updateDelegate( publicKeyHash, delegateNonce, delegatePublicKey, delegateFee ){
+
+        if (delegateNonce > 1 || delegateNonce < -1) throw new Exception(this, "Value is bigger than 0 or less than zero");
+        if (delegateFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateFee is larger than percentage fee ", {delegateFee});
+
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+
+        const node = await this.getMap(publicKeyHash);
+
+        const prevDelegate = node ? node.data.delegate : undefined;
+
+        if (prevDelegate !== undefined ){
+
+            node.data.delegate.delegateNonce = delegateNonce;
+            node.data.delegate.delegatePublicKey = delegatePublicKey;
+            node.data.delegate.delegateFee = delegateFee;
+
+            node.__changes.data = true;
+
+            if ( node.data.isDataEmpty() ){
+                await this.deleteMap(publicKeyHash);
+                return node.data.delegate;
+            }
+
+            await this.updateMap(publicKeyHash, node );
+
+            return node.data.delegate;
+
+        } else {
+
+            throw new Exception(this, "updateDelegate error - account doesn't exist", {publicKeyHash: publicKeyHash, delegateNonce, delegatePublicKey, delegateFee });
 
         }
     }
