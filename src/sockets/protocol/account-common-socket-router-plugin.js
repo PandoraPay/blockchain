@@ -15,6 +15,13 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         return {
 
+            "account/get-account":{
+                handle:  this._getAccount,
+                maxCallsPerSecond:  50,
+                descr: "If [account] is not specified, returns the server's account.\n" +
+                    "If [account] is specified, returns the account. "
+            },
+
             "account/get-balance":{
                 handle:  this._getBalance,
                 maxCallsPerSecond:  50,
@@ -27,6 +34,13 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
                 maxCallsPerSecond:  50,
                 descr: "If [account] is not specified, returns the server's nonce.\n" +
                     "If [account] is specified, returns the nonce in the account. "
+            },
+
+            "account/get-delegate":{
+                handle:  this._getDelegate,
+                maxCallsPerSecond:  50,
+                descr: "If [account] is not specified, returns the server's delegate.\n" +
+                    "If [account] is specified, returns the delegate in the account. "
             },
 
             "account/get-balance-including-mem-pool":{
@@ -71,6 +85,17 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
     }
 
+    async _getAccount({account }){
+
+        const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        const publicKeyHash = address.publicKeyHash;
+
+
+        const out = await this._scope.mainChain.data.accountHashMap.getMap( publicKeyHash);
+        if (out) return out.data.toJSON();
+
+
+    }
     async _getBalance({account, token}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
@@ -90,6 +115,17 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         const publicKeyHash = address.publicKeyHash;
 
         const out = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
+
+        return out;
+
+    }
+
+    async _getDelegate({account}){
+
+        const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        const publicKeyHash = address.publicKeyHash;
+
+        const out = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
 
         return out;
 

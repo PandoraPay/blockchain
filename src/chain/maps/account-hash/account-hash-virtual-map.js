@@ -192,7 +192,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
     async updateNonce( publicKeyHash, value){
 
         if (value === 0) throw new Exception(this, "Value needs to be different than 0");
-        if (value > 1 || value < -1) throw new Exception(this, "Value is bigger than 0 or less than zero");
+        if (value > 1 || value < -1) throw new Exception(this, "Value is bigger than 1 or less than -1");
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
@@ -223,9 +223,9 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
         }
     }
 
-    async updateDelegate( publicKeyHash, delegateNonce, delegatePublicKey, delegateFee ){
+    async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKey, delegateFee ){
 
-        if (delegateNonce > 1 || delegateNonce < -1) throw new Exception(this, "Value is bigger than 0 or less than zero");
+        if (delegateNonceUpdate > 1 || delegateNonceUpdate < -1) throw new Exception(this, "Value is bigger than 1 or less than -1");
         if (delegateFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateFee is larger than percentage fee ", {delegateFee});
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
