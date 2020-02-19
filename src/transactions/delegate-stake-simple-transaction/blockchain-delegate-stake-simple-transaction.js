@@ -23,6 +23,11 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                     }
                 },
 
+                vin:{
+                    minSize: 0,
+                    maxSize: 1,
+                },
+
                 vout:{
                     minSize: 0,
                     maxSize: 0,

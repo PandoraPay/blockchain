@@ -72,7 +72,7 @@ export default class AccountHashMapData extends DBSchema{
 
     isDataEmpty(){
 
-        if (this.balances.length === 0 && this.nonce === 0 ) return true;
+        if (this.balances.length === 0 && this.nonce === 0 && this.delegate.isDataEmpty() ) return true;
 
         return false;
     }

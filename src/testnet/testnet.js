@@ -123,6 +123,9 @@ export default class TestNet{
             this._scope.genesis.settings.stakes.publicKeyHash = publicKeyHash;
             this._scope.genesis.settings.timestamp = timestamp;
 
+            this._scope.genesisSettings.timestamp = timestamp;
+            this._scope.genesisSettings.stakes.publicKeyHash = publicKeyHash;
+
             this._scope.logger.log(this, "testing - wallet initialization", {
                 publicKeyHash: this._scope.genesis.settings.stakes.publicKeyHash.toString("hex"),
             }  );
