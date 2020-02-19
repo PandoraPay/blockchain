@@ -68,7 +68,7 @@ export default class WalletManager{
 
         }, "object" );
 
-        const checksum = CryptoHelper.dkeccak256Buffer( Buffer.from( mnemonicString, "utf8" ) );
+        const checksum = CryptoHelper.dkeccak256( Buffer.from( mnemonicString, "utf8" ) );
 
         this.wallet.mnemonicChecksum = checksum;
 
