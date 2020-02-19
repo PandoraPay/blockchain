@@ -10,7 +10,7 @@ export default class TransactionsCreator {
         this._scope = scope;
     }
 
-    async createDelegaSimpleTransaction( { vin, vout, privateKeys, nonce, tokenCurrency }, chain = this._scope.chain ){
+    async createSimpleTransaction( { vin, vout, privateKeys, nonce, tokenCurrency }, chain = this._scope.chain ){
 
         if (!Array.isArray(vin)) vin = [vin];
         if (!Array.isArray(vout)) vout = [vout];
@@ -44,10 +44,9 @@ export default class TransactionsCreator {
 
     }
 
-    async createDelegateSimpleTransaction( { vin, privateKeys, nonce, tokenCurrency, delegateOld, delegate }, chain = this._scope.chain ){
+    async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegateOld, delegate }, chain = this._scope.chain ){
 
         if (!Array.isArray(vin)) vin = [vin];
-        if (!Array.isArray(vout)) vout = [vout];
 
         if (vin.length === 0) throw new Exception(this, "Vin is empty");
 
@@ -59,7 +58,6 @@ export default class TransactionsCreator {
             vin: input,
             vout: [],
             nonce,
-            tokenCurrency,
             delegateOld,
             delegate,
 

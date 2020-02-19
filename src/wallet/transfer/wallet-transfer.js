@@ -23,12 +23,50 @@ export default class WalletTransfer {
                 return walletAddress;
         }
 
-        //return undefined
+    }
+
+    async changeDelegate({address, fee, nonce, delegateOld, delegate, memPoolValidateTxData, password, networkByte }){
+
+        const tokenCurrency = Buffer.from( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, "hex");
+
+        const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        if (!foundFunds) throw new Exception(this, "Not enough funds");
+
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+
+        //calculate fee
+        if (fee === undefined){
+            fee = 0;
+            //TODO CALCULATE FEE
+        }
+
+        if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
+
+        const txOut =  await this._scope.mainChain.transactionsCreator.createDelegateSimpleTransaction( {
+            vin: [{
+                publicKey: walletAddress.decryptPublicKey(),
+                amount: fee,
+            }],
+            vout: [],
+            privateKeys: [ {
+                privateKey: walletAddress.decryptPrivateKey()
+            } ],
+            nonce,
+            delegateOld,
+            delegate,
+        } );
+
+        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
+
+        return txOut;
+
     }
 
     async transferSimple( { address, txDsts, fee, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
 
-        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        if ( typeof tokenCurrency === "string" && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
 
         const requiredFunds = this._calculateRequiredFunds(txDsts);
@@ -70,15 +108,7 @@ export default class WalletTransfer {
         return txOut;
 
     }
-    
-    async transferFunds( {address, txDsts, fee, paymentId, decoyCount, tokenCurrency} ){
 
-        const requiredFunds = this._calculateRequiredFunds(txDsts);
-
-        let foundFunds = 0;
-
-
-    }
 
 
     _calculateRequiredFunds(txDsts){
