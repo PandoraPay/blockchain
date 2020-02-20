@@ -24,8 +24,10 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                 },
 
                 vin:{
-                    minSize: 0,
+                    minSize: 1,
                     maxSize: 1,
+                    fixedBytes: 1,
+                    specifyLength: false,
                 },
 
                 tokenCurrency: {
@@ -42,6 +44,9 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                 vout:{
                     minSize: 0,
                     maxSize: 0,
+                    fixedBytes: 0,
+                    specifyLength: false,
+                    emptyAllowed: true,
                 },
 
                 delegateOld:{
@@ -61,6 +66,46 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
             }
 
         }, schema, false), data, type, creationOptions);
+
+    }
+
+    async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
+
+        const out = await super.validateTransaction(chain, chainData, block);
+        if (!out) return false;
+
+        const balance = await chainData.accountHashMap.getBalance( this.vin[0].publicKeyHash  ) || 0;
+        if (balance <= this.vin[0].amount ) throw new Exception(this, "resulting balance would be zero" );
+
+        const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
+        if (!delegate) throw new Exception(this, "delegate doesn't exist");
+
+        if (delegate.delegateNonce !== this.delegateOld.delegateNonce ) throw new Exception(this, "delegateOld.delegateNonce is not matching" );
+        if ( !delegate.delegatePublicKey.equals( this.delegateOld.delegatePublicKey) ) throw new Exception(this, "delegateOld.delegatePublickey is not matching" );
+        if ( delegate.delegateFee !== this.delegateOld.delegateFee ) throw new Exception(this, "delegateOld.delegateFee is not matching" );
+
+        if ( this.delegate.delegateNonce < delegate.delegateNonce   ) throw new Exception(this, "Delegate.delegateNonce should be greater or equal with the previous value");
+        if ( this.delegate.delegateNonce > delegate.delegateNonce+1   ) throw new Exception(this, "Delegate.delegateNonce shouldn't that much big");
+
+        return true;
+    }
+
+    async transactionAdded(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
+
+        await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
+
+        const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegate ? prevDelegate.delegateNonce : 0, this.delegate.delegatePublicKey, this.delegate.delegateFee );
+
+        return true;
+    }
+
+    async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
+
+        const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegate ? prevDelegate.delegateNonce : 0 - this.delegateOld.delegateNonce, this.delegateOld.delegatePublicKey, this.delegateOld.delegateFee );
+
+        return super.transactionRemoved(chain, chainData);
 
     }
 

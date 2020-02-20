@@ -236,7 +236,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
 
         if (prevDelegate !== undefined ){
 
-            node.data.delegate.delegateNonce = delegateNonce;
+            node.data.delegate.delegateNonce = prevDelegate.delegateNonce + delegateNonceUpdate;
             node.data.delegate.delegatePublicKey = delegatePublicKey;
             node.data.delegate.delegateFee = delegateFee;
 

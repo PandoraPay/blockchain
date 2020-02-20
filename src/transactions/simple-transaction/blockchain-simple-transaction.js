@@ -113,7 +113,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
     }
 
-    async transactionRemoved(chain = this._scope.chain, chainData = chain.data,){
+    async transactionRemoved(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){
 
         /**
          * Remove txId from HashMap

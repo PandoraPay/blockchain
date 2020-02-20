@@ -157,7 +157,7 @@ export default class TransactionsMerkleTree extends MerkleTree {
                 if (!leaves[i].pruned) {
                     const tx = leaves[i].transaction;
 
-                    await tx.transactionRemoved(chain, chainData);
+                    await tx.transactionRemoved(chain, chainData, block, leaves[i].height, i);
                 }
 
         }catch(err){

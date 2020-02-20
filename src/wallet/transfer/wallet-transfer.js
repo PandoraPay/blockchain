@@ -1,5 +1,6 @@
 const {Exception, StringHelper, BufferHelper, EnumHelper} = global.kernel.helpers;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {MarshalFields} = global.kernel.marshal;
 
 export default class WalletTransfer {
 
@@ -30,6 +31,18 @@ export default class WalletTransfer {
         const tokenCurrency = Buffer.from( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, "hex");
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+
+        if (delegateOld && typeof delegateOld.delegatePublicKey === "string" && StringHelper.isHex(delegateOld.delegatePublicKey) )
+            delegateOld.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegateOld.delegatePublicKey, "hex"), {
+                removeLeadingZeros: true,
+                fixedBytes: 33,
+            }, "delegatePublicKey", ()=>{}, "object", {}  );
+
+        if (delegate && typeof delegate.delegatePublicKey === "string" && StringHelper.isHex(delegate.delegatePublicKey) )
+            delegate.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKey, "hex"), {
+                removeLeadingZeros: true,
+                fixedBytes: 33,
+            }, "delegatePublicKey", ()=>{}, "object", {}  );
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");

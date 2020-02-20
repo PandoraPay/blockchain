@@ -15,6 +15,7 @@ const TransactionsMerkleTreeRoot = require('src/block/transactions/merkle-tree/t
 const AccountHashVirtualMap = require("src/chain/maps/account-hash/account-hash-virtual-map").default;
 const AccountHashMapElement = require("src/chain/maps/account-hash/account-hash-map-element").default;
 const AccountHashMapData = require("src/chain/maps/account-hash/data/account-hash-map-data").default;
+const AccountHashMapDataDelegate = require ("src/chain/maps/account-hash/data/account-hash-map-data-delegate").default;
 const AccountHashMapDataBalance = require("src/chain/maps/account-hash/data/account-hash-map-data-balance").default;
 const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
 const Genesis = require('src/block/genesis/genesis').default;
@@ -70,6 +71,7 @@ const library = {
                 AccountHashMapElement,
                 AccountHashMapData,
                 AccountHashMapDataBalance,
+                AccountHashMapDataDelegate,
             }
 
         },
