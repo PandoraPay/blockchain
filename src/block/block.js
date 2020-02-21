@@ -266,18 +266,7 @@ export default class Block extends DBSchema {
         //update transactions
         if (await this.transactionsMerkleTree.transactionsMerkleTreeInclude(chain, chainData, this) !== true) return false;
 
-        //update miner balance with coinbase reward
-        try{
-
-            await chainData.accountHashMap.updateBalance( this.pos.stakeForgerPublicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
-
-        }catch(err){
-
-            if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, 'Error Updating reward balance');
-
-            return false;
-        }
+        if (await this.pos.addBlockPOS(chain, chainData, this) !== true) return false;
 
 
         return true;
@@ -286,7 +275,7 @@ export default class Block extends DBSchema {
 
     async removeBlock(chain = this._scope.chain, chainData = chain.data){
 
-        await chainData.accountHashMap.updateBalance( this.pos.stakeForgerPublicKeyHash, - this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height ) );
+        if (await this.pos.removeBlockPOS(chain, chainData, this) !== true ) return false;
 
         if ( await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this) !== true)  return false;
 

@@ -46,6 +46,15 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
         return label;
     }
 
+    async getAccountNode(publicKeyHash ){
+
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+        const out = await this.getMap(publicKeyHash);
+
+        return out ? out.data : undefined;
+
+    }
+
     async getBalances( publicKeyHash ){
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
@@ -224,6 +233,8 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
     }
 
     async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKey, delegateFee ){
+
+        if (!Buffer.isBuffer(delegatePublicKey) && StringHelper.isHex(delegatePublicKey) ) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
 
         if (delegateNonceUpdate > 1 || delegateNonceUpdate < -1) throw new Exception(this, "Value is bigger than 1 or less than -1");
         if (delegateFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateFee is larger than percentage fee ", {delegateFee});

@@ -86,6 +86,33 @@ export default class BlockPoS extends DBSchema {
 
     }
 
+    async _getStakeForgerPublicKeys(){
+
+        const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash);
+        if (!accountNode) throw new Exception(this, "Account was not found");
+
+        let stakeForgerPublicKey, stakeForgerPublicKeyHash;
+
+        let delegated;
+        if (accountNode.delegate.delegatePublicKey.equals( Buffer.alloc(33) ) || accountNode.delegate.delegatePublicKey.equals( this.stakeForgerPublicKey ) ) { //empty no delegation
+            stakeForgerPublicKey = this.stakeForgerPublicKey;
+            stakeForgerPublicKeyHash = this.stakeForgerPublicKeyHash;
+            delegated = false;
+        }
+        else {
+            stakeForgerPublicKey = accountNode.delegate.delegatePublicKey;
+            stakeForgerPublicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( stakeForgerPublicKey );
+            delegated = true;
+        }
+
+        return {
+            stakeForgerPublicKey,
+            stakeForgerPublicKeyHash,
+            delegated,
+            accountNode,
+        }
+    }
+
     async initializePOS(chain = this._scope.chain){
 
         const out = await chain.data.accountHashMap.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
@@ -118,19 +145,95 @@ export default class BlockPoS extends DBSchema {
         if (this.fees !== await this.block.sumFees() )
             throw new Exception(this, "fees are invalid", );
 
-        if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, this.stakeForgerPublicKey ) )
+        const stakeForger = await this._getStakeForgerPublicKeys();
+
+        if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, stakeForger.stakeForgerPublicKey ) )
             throw new Exception(this, "POS signature is invalid");
 
-        const out = await chainData.accountHashMap.getBalance(this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        const out = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         if (out === undefined) throw new Exception(this, "Account not found", {
             forgerPublicKeyHash: this.stakeForgerPublicKeyHash,
             stakeForgerPublicKey: this.stakeForgerPublicKey
         });
 
-        if (out !== this.stakingAmount) throw new Exception(this, "Account balance is not right", {balance: out, stakingAmount: this.stakingAmount});
+        if (out !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: out, stakingAmount: this.stakingAmount });
 
         return true;
+    }
+
+    async _getRewardDistribution(chain = this._scope.chain, chainData = chain.data){
+
+        const fees = this.block.sumFees();
+        const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height );
+
+        const sum = fees + coinbase;
+
+        const stakeForger = await this._getStakeForgerPublicKeys();
+        let distribution1, distribution2;
+
+        if ( !stakeForger.delegated ){ //me
+            distribution1 = 1;
+            distribution2 = 0;
+        } else { //delegated
+            const percent = stakeForger.accountNode.delegate.delegateFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+            if (percent < 0 || percent > 1) throw new Exception(this, "Percent is invalid", {percent});
+
+            distribution2 = Math.round( sum * percent );
+            distribution1 = sum - distribution2;
+        }
+
+        return {distribution1, distribution2, owner: this.stakeForgerPublicKeyHash,  delegator: stakeForger.stakeForgerPublicKeyHash };
+
+    }
+
+    async addBlockPOS(chain = this._scope.chain, chainData = chain.data, block){
+
+        //update miner balance with coinbase reward and fee
+        try{
+
+            const {distribution1, distribution2, owner, delegator} = await this._getRewardDistribution(chain, chainData);
+
+            if (distribution1 > 0)
+                await chainData.accountHashMap.updateBalance( owner, distribution1 );
+
+            if (distribution2 > 0)
+                await chainData.accountHashMap.updateBalance( delegator, distribution2 );
+
+        }catch(err){
+
+            if (this._scope.argv.debug.enabled)
+                this._scope.logger.error(this, 'Error Updating reward balance');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    async removeBlock(chain = this._scope.chain, chainData = chain.data, block){
+
+        //update miner balance with coinbase reward and fee
+        try{
+
+            const {distribution1, distribution2, owner, delegator} = await this._getRewardDistribution(chain, chainData);
+
+            if (distribution2 > 0)
+                await chainData.accountHashMap.updateBalance( delegator, - distribution2 );
+
+            if (distribution1 > 0)
+                await chainData.accountHashMap.updateBalance( owner, - distribution1 );
+
+        }catch(err){
+
+            if (this._scope.argv.debug.enabled)
+                this._scope.logger.error(this, 'Error Updating reward balance');
+
+            return false;
+        }
+
+        return true;
+
     }
 
     signBlockUsingForgerPrivateKey(privateKey){

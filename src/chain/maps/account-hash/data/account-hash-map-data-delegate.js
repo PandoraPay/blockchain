@@ -27,6 +27,10 @@ export default class AccountHashMapDataDelegate extends DBSchema{
                 delegateFee: {
                     type: "number",
 
+                    validation(delegateFee){
+                        return delegateFee <= scope.argv.transactions.staking.delegateStakingFeePercentage;
+                    },
+
                     position: 102,
                 },
 

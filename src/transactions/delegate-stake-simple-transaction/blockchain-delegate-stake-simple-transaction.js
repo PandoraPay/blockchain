@@ -95,7 +95,8 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegate ? prevDelegate.delegateNonce : 0, this.delegate.delegatePublicKey, this.delegate.delegateFee );
+        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegateNonce, this.delegate.delegatePublicKey, this.delegate.delegateFee );
 
         return true;
     }
@@ -103,7 +104,9 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegate ? prevDelegate.delegateNonce : 0 - this.delegateOld.delegateNonce, this.delegateOld.delegatePublicKey, this.delegateOld.delegateFee );
+        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
+
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - this.delegateOld.delegateNonce, this.delegateOld.delegatePublicKey, this.delegateOld.delegateFee );
 
         return super.transactionRemoved(chain, chainData);
 
