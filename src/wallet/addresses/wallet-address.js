@@ -107,27 +107,12 @@ export default class WalletAddress extends DBSchema {
     /**
      * Decrypt delegate private key
      */
-    decryptDelegatePrivateAddress(delegateNonce, password){
-
-        if (typeof delegateNonce !== "number") throw new Exception(this, "DelegateNonce is missing");
+    decryptDelegateStakePrivateAddress(delegateNonce, password){
 
         const privateKey = this.decryptPrivateKey(password);
-        const publicKey = this.decryptPublicKey(password);
+        const privateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
 
-        let delegateNonceHex = delegateNonce.toString(16);
-        if (delegateNonceHex.length % 2 === 1) delegateNonceHex = "0"+delegateNonceHex;
-
-        let delegatePrivateKey = CryptoHelper.dkeccak256( "50524956" + privateKey.toString("hex") + publicKey.toString("hex") + "44454c4547415445" );               //dkeccak256( PRIV + privateKey + publicKey + DELEGATE ) => delegatePrivateKey
-        delegatePrivateKey = delegatePrivateKey.toString("hex") + delegateNonceHex;                                                                                 //delegatePrivateKey + delegateNonceHex      => delegatePrivateKey
-
-        delegatePrivateKey = CryptoHelper.dkeccak256(delegatePrivateKey);                                                                                           //dkeccak256( delegatePrivateKey )           => delegatePrivateKey
-        delegatePrivateKey = CryptoHelper.dsha256( "5354414b45" + delegatePrivateKey.toString("hex") + "534543524554" );                                            //STAKE + delegatePrivateKey + SECRET        => delegatePrivateKey
-
-        // dsha256( STAKE + dkeccak256( dkeccak256( PRIV + privateKey + publicKey + DELEGATE) + NONCE ) + SECRET )
-
-        const delegatePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(delegatePrivateKey);
-
-        return delegatePrivateAddress;
+        return privateAddress.getDelegateStakePrivateAddress(delegateNonce);
     }
 
     /**

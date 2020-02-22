@@ -1,4 +1,5 @@
 const {Helper, Exception} = global.kernel.helpers;
+const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 export default class ForgeBlock {
 
@@ -7,7 +8,26 @@ export default class ForgeBlock {
 
         this._hashrate = 0
     }
-    
+
+    async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
+
+        const out = await chain.data.accountHashMap.getBalance( block.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+
+        //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);
+
+        if (out === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: block.stakeForgerPublicKeyHash,  stakeForgerPublicKey: block.stakeForgerPublicKey });
+
+        if (block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && out < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+            throw new Exception(this, "not enough coins for staking");
+
+        if (out < this._scope.argv.transactions.coinbase.getBlockRewardAt(0) ) throw new Exception(this, "for staking it requires at least 1 coin");
+
+        this.stakingAmount = out;
+
+        this.fees = await block.sumFees();
+
+    }
+
     async createBlockForging(chain = this._scope.mainChain){
 
         try{
@@ -24,7 +44,7 @@ export default class ForgeBlock {
 
     }
 
-    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPrivateKey, stakeForgerPublicKey, chain = this._scope.mainChain ){
+    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePublicKey, stakeForgerDelegatePrivateKey, chain = this._scope.mainChain ){
 
 
         block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
@@ -32,8 +52,12 @@ export default class ForgeBlock {
         //fill POS information into block
 
         try{
-            await block.pos.initializePOS();
+
+            //initialize block pos
+            await this._initializeBlockPOS(block);
+
         }catch(err){
+
             // if (this._scope.argv.debug.enabled)
             //     this._scope.logger.error(this, "foreBlock initializePOS raised an error", err);
 
@@ -60,7 +84,7 @@ export default class ForgeBlock {
 
             block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
 
-            await block.pos.signBlockUsingForgerPrivateKey( stakeForgerPrivateKey );
+            await block.pos.signBlockUsingForgerPrivateKey( stakeForgerDelegatePrivateKey );
 
             chainData = block._scope.chain.cloneData();
 
@@ -84,7 +108,7 @@ export default class ForgeBlock {
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPrivateKey(), availableStakeAddress.decryptPublicKey()  );
+                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey()  );
 
                 if (out)
                     return {
