@@ -86,7 +86,7 @@ export default class BlockPoS extends DBSchema {
 
     }
 
-    async _getStakeForgerPublicKeys(){
+    async _getStakeForgerPublicKeys(chain = this._scope.chain, chainData = chain.data){
 
         const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash);
         if (!accountNode) throw new Exception(this, "Account was not found");
@@ -145,7 +145,7 @@ export default class BlockPoS extends DBSchema {
         if (this.fees !== await this.block.sumFees() )
             throw new Exception(this, "fees are invalid", );
 
-        const stakeForger = await this._getStakeForgerPublicKeys();
+        const stakeForger = await this._getStakeForgerPublicKeys(chain, chainData);
 
         if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, stakeForger.stakeForgerPublicKey ) )
             throw new Exception(this, "POS signature is invalid");
@@ -164,23 +164,24 @@ export default class BlockPoS extends DBSchema {
 
     async _getRewardDistribution(chain = this._scope.chain, chainData = chain.data){
 
-        const fees = this.block.sumFees();
+        const fees = await this.fees;
         const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height );
 
         const sum = fees + coinbase;
 
-        const stakeForger = await this._getStakeForgerPublicKeys();
-        let distribution1, distribution2;
+        const stakeForger = await this._getStakeForgerPublicKeys(chain, chainData);
+        let distribution1, //owner
+            distribution2; //delegator
 
         if ( !stakeForger.delegated ){ //me
-            distribution1 = 1;
-            distribution2 = 0;
+            distribution1 = sum; //owner
+            distribution2 = 0;   //delegator
         } else { //delegated
-            const percent = stakeForger.accountNode.delegate.delegateFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
-            if (percent < 0 || percent > 1) throw new Exception(this, "Percent is invalid", {percent});
+            const percentFee = stakeForger.accountNode.delegate.delegateFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+            if (percentFee < 0 || percentFee > 1) throw new Exception(this, "Percent is invalid", {percent});
 
-            distribution2 = Math.round( sum * percent );
-            distribution1 = sum - distribution2;
+            distribution2 = Math.round( sum * percentFee ); //delegator
+            distribution1 = sum - distribution2;               //owner
         }
 
         return {distribution1, distribution2, owner: this.stakeForgerPublicKeyHash,  delegator: stakeForger.stakeForgerPublicKeyHash };
@@ -211,7 +212,7 @@ export default class BlockPoS extends DBSchema {
         return true;
     }
 
-    async removeBlock(chain = this._scope.chain, chainData = chain.data, block){
+    async removeBlockPOS(chain = this._scope.chain, chainData = chain.data, block){
 
         //update miner balance with coinbase reward and fee
         try{
