@@ -110,7 +110,7 @@ export default class App extends Kernel.utils.App {
                     case NetworkTypeEnum.NETWORK_TEST_NET:
                         this._scope.logger.log(this, "NETWORK TEST NET");
                         genesisSettings = this._scope.argv.blockchain.genesisTestNet;
-                        genesisSettings.timestamp = Math.floor( new Date().getTime() / 1000 );
+                        genesisSettings.timestamp = Math.round( new Date().getTime() / 1000 / 30 ) *30;
                         break;
 
                     default:

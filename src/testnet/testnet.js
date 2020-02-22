@@ -88,7 +88,6 @@ export default class TestNet{
             }
 
             const addressWallet = this._scope.wallet.addresses[0];
-
             if (!addressWallet) throw new Exception(this, "wallet doesn't contain at least one wallet");
 
             let publicKeyHash, timestamp;
@@ -131,7 +130,7 @@ export default class TestNet{
             }  );
 
         }catch(err){
-            console.error(err);
+            this._scope.logger.error(this, "createTestNetWallet raised an error", err);
         }
 
     }
