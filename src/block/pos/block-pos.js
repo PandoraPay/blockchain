@@ -12,12 +12,6 @@ export default class BlockPoS extends DBSchema {
 
                 fields:{
 
-                    fees:{
-                        type: "number",
-
-                        position: 100,
-                    },
-
                     stakeForgerPublicKey: {
                         type: "buffer",
                         fixedBytes: 33,
@@ -133,9 +127,6 @@ export default class BlockPoS extends DBSchema {
 
         if (this.stakingAmount < this._scope.argv.transactions.coinbase.getBlockRewardAt(0)) throw new Exception(this, "for staking it requires at least 1 coin");
 
-        if (this.fees !== await this.block.sumFees() )
-            throw new Exception(this, "fees are invalid", );
-
         const out = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         if (out === undefined) throw new Exception(this, "Account not found", {
@@ -156,7 +147,7 @@ export default class BlockPoS extends DBSchema {
 
     async _getRewardDistribution(chain = this._scope.chain, chainData = chain.data){
 
-        const fees = await this.fees;
+        const fees = await this.block.sumFees();
         const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height );
 
         const sum = fees + coinbase;
@@ -178,7 +169,7 @@ export default class BlockPoS extends DBSchema {
             distribution1 = sum - distribution2;               //owner
         }
 
-        return {distribution1, distribution2, owner: this.stakeForgerPublicKeyHash,  delegator: delegateStakeForgerPublicKeyHash };
+        return {distribution1, distribution2 };
 
     }
 
@@ -187,12 +178,12 @@ export default class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const {distribution1, distribution2, owner, delegator} = await this._getRewardDistribution(chain, chainData);
+            const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
 
-            if (distribution1 > 0)
-                await chainData.accountHashMap.updateBalance( owner, distribution1 );
+            if (distribution1 > 0) //owner
+                await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, distribution1 );
 
-            if (distribution2 > 0)
+            if (distribution2 > 0) //reward delegator
                 await chainData.accountHashMap.updateBalance( this.stakeDelegateRewardPublicKeyHash, distribution2 );
 
         }catch(err){
@@ -211,13 +202,13 @@ export default class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const {distribution1, distribution2, owner, delegator} = await this._getRewardDistribution(chain, chainData);
+            const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
 
             if (distribution2 > 0)
                 await chainData.accountHashMap.updateBalance( this.stakeDelegateRewardPublicKeyHash, - distribution2 );
 
             if (distribution1 > 0)
-                await chainData.accountHashMap.updateBalance( owner, - distribution1 );
+                await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, - distribution1 );
 
         }catch(err){
 
@@ -258,7 +249,6 @@ export default class BlockPoS extends DBSchema {
                 totalDifficulty: true,
                 transactionsMerkleTree: true,
                 pos:{
-                    fees: true,
                     stakingAmount: true,
                     stakeForgerPublicKey: true,
                     stakeDelegateRewardPublicKeyHash: true,

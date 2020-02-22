@@ -279,7 +279,7 @@ export default  class MemPool extends DBSchema{
     }
 
     //block.ChainData is being locked already
-    async includeTransactions( block, createTransactionsCallback, chainData ){
+    async includeTransactions( block, createTransactionsCallback, chain = block._scope.chain, chainData = chain.data ){
 
         /**
          * TODO order the transactions to be sorted

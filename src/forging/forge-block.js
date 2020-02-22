@@ -11,7 +11,7 @@ export default class ForgeBlock {
 
     async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
 
-        const out = await chain.data.accountHashMap.getBalance( block.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        const out = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);
 
@@ -22,9 +22,7 @@ export default class ForgeBlock {
 
         if (out < this._scope.argv.transactions.coinbase.getBlockRewardAt(0) ) throw new Exception(this, "for staking it requires at least 1 coin");
 
-        this.stakingAmount = out;
-
-        this.fees = await block.sumFees();
+        block.pos.stakingAmount = out;
 
     }
 
@@ -34,8 +32,6 @@ export default class ForgeBlock {
 
             const block = await chain.createBlock();
 
-            block.pos.fees = await block.sumFees();
-
             return block;
 
         }catch(err){
@@ -44,10 +40,11 @@ export default class ForgeBlock {
 
     }
 
-    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePublicKey, stakeForgerDelegatePrivateKey, chain = this._scope.mainChain ){
+    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
 
 
         block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
+
 
         //fill POS information into block
 
@@ -75,12 +72,16 @@ export default class ForgeBlock {
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
+            const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeys();
+
+            if ( delegated && delegateFee )
+                block.pos.stakeDelegateRewardPublicKeyHash = walletStakeDelegateRewardPublicKeyHash;
+
+
             //create a local chainData
             let chainData = block._scope.chain.cloneData();
 
-            await this._scope.memPool.includeTransactions( block, createTransactionsCallback, chainData  );
-
-            block.pos.fees = await block.sumFees(); // in case it was changed
+            await this._scope.memPool.includeTransactions( block, createTransactionsCallback, block._scope.chain, chainData  );
 
             block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
 
@@ -102,13 +103,15 @@ export default class ForgeBlock {
 
         const networkTimestampDrift = this._scope.genesis.settings.getDateNow() + this._scope.argv.block.timestamp.timestampDriftMaximum;
 
+        const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].decryptPublicKey();
+
         while (block.timestamp < networkTimestampDrift && !this._scope.forging._reset){
 
             for (let i=0; i < this._scope.wallet.addresses.length && !this._scope.forging._reset; i++){
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey()  );
+                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
