@@ -7,6 +7,7 @@ const {Helper, Exception, BufferHelper} = global.kernel.helpers;
 import Argv from "bin/argv/argv"
 import MainChain from "src/chain/main-chain/main-chain";
 import Wallet from "src/wallet/wallet"
+import WalletStakes from "src/wallet-stakes/wallet-stakes"
 import Forging from "src/forging/forging"
 
 import Genesis from "src/block/genesis/genesis"
@@ -71,6 +72,7 @@ export default class App extends Kernel.utils.App {
 
             if ( !this._scope.MainChain ) this._scope.MainChain = MainChain;
             if ( !this._scope.Wallet ) this._scope.Wallet = Wallet;
+            if ( !this._scope.WalletStakes ) this._scope.WalletStakes = WalletStakes;
             if ( !this._scope.Forging ) this._scope.Forging = Forging;
             if ( !this._scope.Genesis ) this._scope.Genesis = Genesis;
             if ( !this._scope.MemPool) this._scope.MemPool = MemPool;
@@ -146,7 +148,8 @@ export default class App extends Kernel.utils.App {
                 }, undefined, undefined, undefined, { emptyObject: true } );
 
                 try{
-                    await this._scope.wallet.loadWallet();
+
+                    if ( await this._scope.wallet.loadWallet() !== true) throw new Exception(this, "loadWallet is not true");
 
                     if (this._scope.argv.wallet.printWallet)
                         this._scope.wallet.manager.printWallet();
@@ -155,6 +158,25 @@ export default class App extends Kernel.utils.App {
                 }catch(err){
                     this._scope.logger.error(this, "Error Loading Wallet", err );
                     await this._scope.events.emit("wallet/loaded-error", err );
+                }
+
+            }
+
+            if (!this._scope.walletStakes){
+
+                this._scope.walletStakes = new this._scope.WalletStakes({
+                    ...this,_scope,
+                    db: this._scope.dbPrivate,
+                });
+
+                try{
+
+                    if (await this._scope.walletStakes.loadWalletStakes !== true) throw new Exception(this, "loadWalletStakes is no true");
+
+                    await this._scope.events.emit("wallet-stakes/loaded", this._scope.walletStakes);
+                }catch(err){
+                    this._scope.logger.error(this, "Error Loading WalletStakes", err );
+                    await this._scope.events.emit("wallet-stakes/loaded-error", err );
                 }
 
             }

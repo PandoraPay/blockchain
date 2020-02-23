@@ -134,6 +134,7 @@ export default class Wallet extends DBSchema {
         if (this.addresses.length === 0)
             await this.manager.createNewAddress();
 
+        return true;
     }
 
     async createNewWallet(save = true){
