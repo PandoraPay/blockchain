@@ -16,6 +16,7 @@ import AccountCommonSocketRouterPlugin from "src/sockets/protocol/account-common
 import BlockchainCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-common-socket-router-plugin"
 import TransactionsCommonSocketRouterPlugin from "src/sockets/protocol/transactions-common-socket-router-plugin"
 import WalletCommonSocketRouterPlugin from "src/sockets/protocol/wallet-common-socket-router-plugin"
+import WalletStakesCommonSocketRouterPlugin from "src/sockets/protocol/wallet-stakes-common-socket-router-plugin"
 import ForgingCommonSocketRouterPlugin from "src/sockets/protocol/forging-common-socket-router-plugin"
 import BlockchainProtocolCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-protocol-common-socket-router-plugin"
 import MemPoolCommonSocketRouterPlugin from "src/sockets/protocol/mem-pool-common-socket-router-plugin"
@@ -46,6 +47,9 @@ export default class App extends Kernel.utils.App {
 
         if ( await scope.mainChain.initializeChain()  === false)
             throw new Exception(this, "MainChain couldn't be initialized");
+
+        if ( await this._scope.walletStakes.initializeWalletStakes() === false)
+            throw new Exception(this, "WalletStakes couldn't be initialized");
 
         if ( await this._scope.memPool.initializeMemPool() === false)
             throw new Exception(this, "MemPool couldn't be initialized");
@@ -165,13 +169,13 @@ export default class App extends Kernel.utils.App {
             if (!this._scope.walletStakes){
 
                 this._scope.walletStakes = new this._scope.WalletStakes({
-                    ...this,_scope,
+                    ...this._scope,
                     db: this._scope.dbPrivate,
                 });
 
                 try{
 
-                    if (await this._scope.walletStakes.loadWalletStakes !== true) throw new Exception(this, "loadWalletStakes is no true");
+                    if (await this._scope.walletStakes.loadWalletStakes() !== true) throw new Exception(this, "loadWalletStakes is no true");
 
                     await this._scope.events.emit("wallet-stakes/loaded", this._scope.walletStakes);
                 }catch(err){
@@ -212,6 +216,7 @@ export default class App extends Kernel.utils.App {
                     checkPlugin(commonSocketRouterPlugins, BlockchainProtocolCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, TransactionsCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, WalletCommonSocketRouterPlugin),
+                    checkPlugin(commonSocketRouterPlugins, WalletStakesCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, ForgingCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, MemPoolCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, ExchangeCommonSocketRouterPlugin),

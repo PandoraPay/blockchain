@@ -55,25 +55,20 @@ export default class DelegatedStake extends DBSchema {
                     amount:{
 
                         type: "number",
-
-                        sorts :{
-
-                            amountsort:{
-
-                                score(){
-                                    return this.amount;
-                                },
-
-                            }
-                        },
-
                         position: 104,
+
+                    },
+
+                    error: {
+                        type: "boolean",
+                        position: 105,
                     },
 
                     date: {
-                        type: "number",
 
-                        position: 105,
+                        type: "number",
+                        position: 106,
+
                     },
 
                 },
