@@ -115,6 +115,13 @@ export default class WalletAddress extends DBSchema {
         return privateAddress.getDelegateStakePrivateAddress(delegateNonce);
     }
 
+    decryptDelegatorStakePrivateAddress(publicKey, password){
+        const privateKey = this.decryptPrivateKey(password);
+        const privateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
+
+        return privateAddress.getDelegatorStakePrivateAddress(publicKey);
+    }
+
     /**
      * extracting public key
      */

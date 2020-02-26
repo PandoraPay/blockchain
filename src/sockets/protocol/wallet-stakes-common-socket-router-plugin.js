@@ -1,5 +1,5 @@
 const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, BufferHelper, StringHelper} = global.kernel.helpers;
+const {Helper, BufferHelper, StringHelper, Exception} = global.kernel.helpers;
 
 export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterPlugin {
 
@@ -47,20 +47,34 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
         if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
 
-        if (!Buffer.isBuffer(publicKey) || publicKey.length !== 33) throw "public key is invalid";
-        if (!Buffer.isBuffer(signature) || signature.length !== 64) throw "signature is invalid";
-        if (!Buffer.isBuffer(delegatePublicKey) || delegatePublicKey.length !== 64) throw "delegatePublicKey is invalid";
-        if (!Buffer.isBuffer(delegatePrivateKey) || delegatePrivateKey.length !== 64) throw "delegatePrivateKey is invalid";
+        if (!Buffer.isBuffer(publicKey) || publicKey.length !== 33) throw new Exception(this, "public key is invalid", publicKey);
+        if (!Buffer.isBuffer(signature) || signature.length !== 65) throw new Exception(this, "signature is invalid", signature);
+        if (!Buffer.isBuffer(delegatePublicKey) || delegatePublicKey.length !== 33) throw new Exception(this, "delegatePublicKey is invalid", delegatePublicKey);
+        if ( Buffer.isBuffer(delegatePrivateKey) && delegatePrivateKey.length !== 32) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
+
 
         const concat = Buffer.concat([
+            this._challenge,
             publicKey,
             delegatePublicKey,
-            delegatePrivateKey,
-            this._challenge,
+            delegatePrivateKey ? delegatePrivateKey : Buffer.alloc(0),
         ]);
 
         const verify = this._scope.cryptography.cryptoSignature.verify( concat, signature, publicKey );
-        if (!verify) throw "Signature is invalid";
+        if (!verify) throw new Exception(this, "Signature is invalid");
+
+        if (!this._scope.argv.walletStakes.allowDelegatingPrivateKey) {
+            delegatePrivateKey = undefined;
+        }
+
+        if ( !delegatePrivateKey ){
+
+            const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].decryptDelegatorStakePrivateAddress(publicKey);
+            if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKey) )
+                throw new Exception(this, "You need to set as delegate public key", delegatorStakePrivateAddress.publicKey );
+
+            delegatePrivateKey = delegatorStakePrivateAddress.privateKey;
+        }
 
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
         await this._scope.walletStakes.addWalletStake({publicKeyHash, delegatePublicKey, delegatePrivateKey});
