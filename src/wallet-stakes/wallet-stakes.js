@@ -20,7 +20,7 @@ export default class WalletStakes extends DBSchema {
 
         }, schema, false), data, type, creationOptions);
 
-        this.dataSubscription = new DBSchema(this._scope);
+        this.dataSubscription = new DBSchema(this._scope, { fields: {  table: { default: "walletStakes", fixedBytes: 12 } }});
 
         this._initialized = false;
 
@@ -39,16 +39,15 @@ export default class WalletStakes extends DBSchema {
 
                 this._scope.logger.warn(this, "check-delegate-stake", message.data.end - 1);
 
-                const {publicKeyHash, delegatePublicKey, delegatePrivateKey} = message.data;
-
                 try {
+
+                    const {publicKeyHash, delegatePublicKey, delegatePrivateKey} = message.data;
 
                     const oldDelegateStake = this.delegatedStakesMap[publicKeyHash];
                     if (oldDelegateStake) {
 
-                        if (oldDelegateStake.delegatePublicKey.equals(delegatePublicKey) && oldDelegateStake.delegatePrivateKey.equals(delegatePrivateKey))
+                        if (oldDelegateStake.delegatePublicKey.toString("hex") === delegatePublicKey && oldDelegateStake.delegatePrivateKey.toString("hex") === delegatePrivateKey )
                             return true;
-
 
                         oldDelegateStake.delegatePublicKey = delegatePublicKey;
                         oldDelegateStake.delegatePrivateKey = delegatePrivateKey;
@@ -61,8 +60,9 @@ export default class WalletStakes extends DBSchema {
                     return false;
 
                 } catch (err) {
-
+                    this._scope.logger.error(this, "update-delegate-stake raised an error", err);
                 }
+
 
             }
 
@@ -79,17 +79,25 @@ export default class WalletStakes extends DBSchema {
         if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
 
-        const lock = this.lock(-1, publicKeyHash.toString("hex") );
+        const lock = await this.lock(-1, publicKeyHash.toString("hex") );
+
+        let result = false;
 
         try{
 
             const exists = await this.dataSubscription.subscribeMessage("update-delegate-stake", {
-                publicKeyHash, delegatePublicKey, delegatePrivateKey
-            }, true);
+                publicKeyHash: publicKeyHash.toString("hex"),
+                delegatePublicKey: delegatePublicKey.toString("hex"),
+                delegatePrivateKey: delegatePrivateKey.toString("hex"),
+            }, true );
+
+            console.log("exists", exists);
 
             for (let i=0; i < exists.length; i++)
-                if ( exists[i] )
+                if ( exists[i] ){
+                    if (typeof lock === "function") lock();
                     return true;
+                }
 
             const delegateStake = new DelegatedStake(this._scope,undefined, {
                 id: publicKeyHash.toString("hex"),
@@ -98,15 +106,26 @@ export default class WalletStakes extends DBSchema {
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),
             });
 
-        }finally{
-            lock();
+            this.delegatedStakes.push(delegateStake);
+            this.delegatedStakesMap[delegateStake.id] = delegateStake;
+
+            await delegateStake.save();
+
+            result = true;
+        }catch(err){
+            result = false;
+        }finally {
+            if (typeof lock === "function") lock();
         }
 
+        return result;
     }
 
     async clearWalletStakes(save = true){
 
         await this.delete();
+
+        await this._scope.db.deleteAll( DelegatedStake );
 
         if (save)
             await this.save();

@@ -18,7 +18,7 @@ export default class MainChain extends BaseChain {
         this._init = false;
         this.isMainChain = true;
 
-        this.dataSubscription = new DBSchema(this._scope);
+        this.dataSubscription = new DBSchema(this._scope, { fields: {  table: { default: "mainChain", fixedBytes: 9 } }});
 
     }
 

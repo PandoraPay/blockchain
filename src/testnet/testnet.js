@@ -75,6 +75,12 @@ export default class TestNet{
     async createTestNetWallet(forced = false) {
 
         try{
+            await this._scope.walletStakes.clearWalletStakes(true);
+        }catch(err){
+            this._scope.logger.error(this, "createTestNetWallet raised an error", err);
+        }
+
+        try{
 
             this._prevBlockEnd = -1;
 

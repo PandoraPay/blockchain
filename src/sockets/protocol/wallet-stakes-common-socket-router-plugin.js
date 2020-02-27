@@ -77,7 +77,10 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
         }
 
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
-        await this._scope.walletStakes.addWalletStake({publicKeyHash, delegatePublicKey, delegatePrivateKey});
+
+        const out = await this._scope.walletStakes.addWalletStake({publicKeyHash, delegatePublicKey, delegatePrivateKey});
+
+        return out;
 
     }
 
