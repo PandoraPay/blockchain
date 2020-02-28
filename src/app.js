@@ -175,6 +175,9 @@ export default class App extends Kernel.utils.App {
 
                 try{
 
+                    if (this._scope.argv.walletStakes.deleteWalletStakes)
+                        await this.clearWalletStakes(true);
+
                     if (await this._scope.walletStakes.loadWalletStakes() !== true) throw new Exception(this, "loadWalletStakes is no true");
 
                     await this._scope.events.emit("wallet-stakes/loaded", this._scope.walletStakes);

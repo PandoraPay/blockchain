@@ -1,6 +1,5 @@
 const {SocketRouterPlugin} = global.networking.sockets.protocol;
 const {Helper, Exception} = global.kernel.helpers;
-const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
 const {MarshalData} = global.kernel.marshal;
 
 /**
@@ -72,7 +71,10 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     async _started(){
 
         //this._scope.logger.log(this, "started");
-        this._solveChainsInterval = setAsyncInterval( this._solveForkSubchains.bind(this), 100 );
+
+        if (!this._scope.heartBeat.existsProcess("solveChains"))
+            this._scope.heartBeat.addProcessAndTask("solveChains", this._solveForkSubchains.bind(this), 1, "default", false);
+
     }
 
     async initializePluginMasterCluster(){
@@ -127,7 +129,10 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         if (this._scope.mainChain.dataSubscription.subscription)
             await this._scope.mainChain.dataSubscription.subscription.off();
 
-        await clearAsyncInterval(this._solveChainsInterval);
+        await Promise.all([
+            this._scope.heartBeat.removeProcess( "solveChains" ),
+        ]);
+
     }
 
     getOneWayRoutes(){

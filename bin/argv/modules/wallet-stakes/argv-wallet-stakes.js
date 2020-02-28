@@ -6,5 +6,9 @@ export default {
 
     minimumFeePercentage: 0,
 
-    maximumStakeDelegates: 5000,
+    maximumDelegates: 5000,
+
+
+    deleteWalletStakes: false,
+
 }

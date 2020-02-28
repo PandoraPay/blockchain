@@ -42,6 +42,9 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
 
     async _importWalletStake({ publicKey, signature, delegatePublicKey, delegatePrivateKey }){
 
+        if (!this._scope.argv.walletStakes.allowDelegating)
+            throw new Exception(this, "Delegating Stakes is not allowed");
+
         if (typeof publicKey === "string" && StringHelper.isHex(publicKey)) publicKey = Buffer.from(publicKey, "hex");
         if (typeof signature === "string" && StringHelper.isHex(signature)) signature = Buffer.from(signature, "hex");
         if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");

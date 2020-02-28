@@ -83,6 +83,14 @@ export default class DelegatedStake extends DBSchema {
 
     }
 
+    async checkAmount(){
+
+        //let's check balance
+
+        if (this.amount < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+            throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
+
+    }
 
 
 }

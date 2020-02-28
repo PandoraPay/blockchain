@@ -1,5 +1,6 @@
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception, BufferHelper, StringHelper} = global.kernel.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
 
 import DelegatedStake from "./delegated-stake/delegated-stake"
 
@@ -26,11 +27,13 @@ export default class WalletStakes extends DBSchema {
 
         this.delegatedStakes = []; //sorted by amount
         this.delegatedStakesMap = {};
+
     }
 
     async initializeWalletStakes() {
 
         if (this._initialized) return true;
+
 
         await this.dataSubscription.subscribe();
         this.dataSubscription.subscription.on( async message => {
@@ -68,6 +71,8 @@ export default class WalletStakes extends DBSchema {
 
         });
 
+        this._sortDelegatedStakesInterval = setInterval( this._sortDelegatedStakes.bind(this), 60*1000 );
+
         this._initialized = true;
         return true;
 
@@ -78,6 +83,10 @@ export default class WalletStakes extends DBSchema {
         if (typeof publicKeyHash === "string" && StringHelper.isHex(publicKeyHash)) publicKeyHash = Buffer.from(publicKeyHash, "hex");
         if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
+
+        let stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
+        if (stakingAmount < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+            throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
 
         const lock = await this.lock(-1, publicKeyHash.toString("hex") );
 
@@ -95,15 +104,20 @@ export default class WalletStakes extends DBSchema {
 
             for (let i=0; i < exists.length; i++)
                 if ( exists[i] ){
-                    if (typeof lock === "function") lock();
+                    lock();
                     return true;
                 }
+
+            if (this.delegatedStakes.length >= this._scope.argv.walletStakes.maximumDelegates)
+                throw new Exception(this, "Node is full of stake delegates ");
 
             const delegateStake = new DelegatedStake(this._scope,undefined, {
                 id: publicKeyHash.toString("hex"),
                 publicKeyHash: publicKeyHash.toString("hex"),
                 delegatePublicKey: delegatePublicKey.toString("hex"),
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),
+                amount: stakingAmount,
+                error: 0,
             });
 
             this.delegatedStakes.push(delegateStake);
@@ -113,11 +127,11 @@ export default class WalletStakes extends DBSchema {
 
             result = true;
         }catch(err){
-            result = false;
-        }finally {
-            if (typeof lock === "function") lock();
+            lock();
+            throw err;
         }
 
+        lock();
         return result;
     }
 
@@ -126,6 +140,8 @@ export default class WalletStakes extends DBSchema {
         await this.delete();
 
         await this._scope.db.deleteAll( DelegatedStake );
+        this.delegatedStakes = [];
+        this.delegatedStakesMap = {};
 
         if (save)
             await this.save();
@@ -138,10 +154,13 @@ export default class WalletStakes extends DBSchema {
 
     async loadWalletStakes(){
 
+        if (await this.exists() )
+            await this.load();
+
 
         const out = await this._scope.db.findAll( DelegatedStake );
 
-        console.log("loadWalletStakes out", out);
+        this._scope.logger.log(this, "loadWalletStakes out", out);
 
 
         if (out){
@@ -157,7 +176,7 @@ export default class WalletStakes extends DBSchema {
         return true;
     }
 
-    sortDelegatedStakes(){
+    _sortDelegatedStakes(){
         return this.delegatedStakes.sort( (a,b) => a.amount - b.amount );
     }
 

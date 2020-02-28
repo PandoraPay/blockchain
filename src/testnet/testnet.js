@@ -17,7 +17,7 @@ export default class TestNet{
         if (BROWSER) return; //no support for browser right now
 
         if (this._scope.argv.blockchain.genesisTestNet.createNewTestNetGenesisAndWallet)
-            await this.createTestNetWallet();
+            await this.createTestNetGenesisAndWallet();
 
 
         if (this._scope.argv.blockchain.genesisTestNet.createNewTestNet)
@@ -72,13 +72,9 @@ export default class TestNet{
      * For slave processes, the genesis stackable keys are being shared
      */
 
-    async createTestNetWallet(forced = false) {
+    async createTestNetGenesisAndWallet(forced = false) {
 
-        try{
-            await this._scope.walletStakes.clearWalletStakes(true);
-        }catch(err){
-            this._scope.logger.error(this, "createTestNetWallet raised an error", err);
-        }
+
 
         try{
 
