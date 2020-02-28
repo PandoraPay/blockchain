@@ -356,7 +356,7 @@ export default  class MemPool extends DBSchema{
     //             txIdString,
     //             blockHeight: block.height,
     //             tx: transaction.toBuffer(),
-    //         }, false);
+    //         }, true, false);
     //
     //
     // }
@@ -374,7 +374,7 @@ export default  class MemPool extends DBSchema{
     //         await this.subscribeMessage("mem-pool-block-removed-removed-tx", {
     //             txIdString,
     //             tx: transaction.toBuffer(),
-    //         }, false);
+    //         }, true, false);
     //
     // }
 
@@ -501,7 +501,7 @@ export default  class MemPool extends DBSchema{
             await this.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
-            }, false);
+            }, true, false);
 
         return true;
     }
@@ -558,7 +558,7 @@ export default  class MemPool extends DBSchema{
             await this.subscribeMessage("mem-pool-remove-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
-            }, false);
+            }, true, false);
 
         await this._scope.mainChain.emit("mem-pool/tx-removed", {
             data: { tx: transaction, txId: txIdString},

@@ -1,6 +1,7 @@
 const {SocketRouterPlugin} = global.networking.sockets.protocol;
 const {Helper, Exception} = global.kernel.helpers;
 const {MarshalData} = global.kernel.marshal;
+const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
@@ -71,10 +72,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     async _started(){
 
         //this._scope.logger.log(this, "started");
-
-        if (!this._scope.heartBeat.existsProcess("solveChains"))
-            this._scope.heartBeat.addProcessAndTask("solveChains", this._solveForkSubchains.bind(this), 1, "default", false);
-
+        this._solveChainsInterval = setAsyncInterval( this._solveForkSubchains.bind(this), 100 );
     }
 
     async initializePluginMasterCluster(){
@@ -129,10 +127,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         if (this._scope.mainChain.dataSubscription.subscription)
             await this._scope.mainChain.dataSubscription.subscription.off();
 
-        await Promise.all([
-            this._scope.heartBeat.removeProcess( "solveChains" ),
-        ]);
-
+        await clearAsyncInterval(this._solveChainsInterval);
     }
 
     getOneWayRoutes(){

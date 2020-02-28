@@ -200,7 +200,7 @@ class Exchange extends DBSchema{
         if (propagateOfferMasterCluster && this._scope.db.isSynchronized ){
             await this.subscribeMessage("exchange/insert-offer", {
                 offer: offer.toBuffer(),
-            }, false);
+            }, true, false);
         }
 
         if (propagateToSockets)

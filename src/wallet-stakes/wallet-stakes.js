@@ -38,13 +38,13 @@ export default class WalletStakes extends DBSchema {
         await this.dataSubscription.subscribe();
         this.dataSubscription.subscription.on( async message => {
 
+            this._scope.logger.warn(this, "wallet-stakes-message", message.name);
+
             if (message.name === "update-delegate-stake") {
 
-                this._scope.logger.warn(this, "check-delegate-stake", message.data.end - 1);
-
                 try {
-
                     const {publicKeyHash, delegatePublicKey, delegatePrivateKey} = message.data;
+
 
                     const oldDelegateStake = this.delegatedStakesMap[publicKeyHash];
                     if (oldDelegateStake) {
@@ -66,12 +66,20 @@ export default class WalletStakes extends DBSchema {
                     this._scope.logger.error(this, "update-delegate-stake raised an error", err);
                 }
 
+            } else
+            if (message.name === "get-delegator-stake-private-key") { //used to get the master
+
+                const {publicKey} = message.data;
+
+                const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].decryptDelegatorStakePrivateAddress( publicKey );
+                return delegatorStakePrivateAddress.privateKey.toString("hex");
 
             }
 
         });
 
         this._sortDelegatedStakesInterval = setInterval( this._sortDelegatedStakes.bind(this), 60*1000 );
+        this._updateDelegatedStakesAmountInterval = setAsyncInterval( this._updateDelegatedStakesAmount.bind(this), 60*1000 );
 
         this._initialized = true;
         return true;
@@ -98,9 +106,9 @@ export default class WalletStakes extends DBSchema {
                 publicKeyHash: publicKeyHash.toString("hex"),
                 delegatePublicKey: delegatePublicKey.toString("hex"),
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),
-            }, true );
+            }, true, true );
 
-            console.log("exists", exists);
+            //this._scope.logger.log(this, "exists", exists);
 
             for (let i=0; i < exists.length; i++)
                 if ( exists[i] ){
@@ -177,7 +185,23 @@ export default class WalletStakes extends DBSchema {
     }
 
     _sortDelegatedStakes(){
-        return this.delegatedStakes.sort( (a,b) => a.amount - b.amount );
+        return this.delegatedStakes.sort( (a,b) => b.amount - a.amount ); //from max to min
+    }
+
+    async _updateDelegatedStakesAmount(){
+
+        if (!this.delegatedStakes.length) return;
+
+        const index = Math.floor( Math.random() * this.delegatedStakes.length );
+        const delegatedStake = this.delegatedStakes[index];
+
+        let stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
+
+        if (delegatedStake.amount !== stakingAmount) {
+            delegatedStake.amount = stakingAmount;
+            await delegatedStake.save();
+        }
+
     }
 
 }

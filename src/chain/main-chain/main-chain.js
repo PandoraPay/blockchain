@@ -294,7 +294,7 @@ export default class MainChain extends BaseChain {
                     prevHash: newData.prevHash,
                     kernelHash: newData.kernelHash,
                     prevKernelHash: newData.prevKernelHash,
-                }, false);
+                }, true, false);
 
             this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
 

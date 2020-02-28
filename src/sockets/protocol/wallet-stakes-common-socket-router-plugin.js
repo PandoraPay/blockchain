@@ -72,7 +72,12 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
 
         if ( !delegatePrivateKey ){
 
-            const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].decryptDelegatorStakePrivateAddress(publicKey);
+            const privateKey = await this._scope.walletStakes.dataSubscription.subscribeMessage("get-delegator-stake-private-key", {
+                publicKey: publicKey.toString("hex"),
+            }, false, false );
+
+            const delegatorStakePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
+
             if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKey) )
                 throw new Exception(this, "You need to set as delegate public key", delegatorStakePrivateAddress.publicKey );
 

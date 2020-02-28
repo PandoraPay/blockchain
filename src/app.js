@@ -144,7 +144,7 @@ export default class App extends Kernel.utils.App {
             if (!this._scope.exchange) this._scope.exchange = new this._scope.Exchange(this._scope,);
             await this._scope.exchange.reload();
 
-            if (!this._scope.wallet){
+            if (!this.wallet){
 
                 this._scope.wallet = new this._scope.Wallet({
                     ...this._scope,
@@ -153,10 +153,10 @@ export default class App extends Kernel.utils.App {
 
                 try{
 
-                    if ( await this._scope.wallet.loadWallet() !== true) throw new Exception(this, "loadWallet is not true");
+                    if ( await this.wallet.loadWallet() !== true) throw new Exception(this, "loadWallet is not true");
 
                     if (this._scope.argv.wallet.printWallet)
-                        this._scope.wallet.manager.printWallet();
+                        this.wallet.manager.printWallet();
 
                     await this._scope.events.emit("wallet/loaded", this._scope.wallet);
                 }catch(err){
@@ -166,7 +166,7 @@ export default class App extends Kernel.utils.App {
 
             }
 
-            if (!this._scope.walletStakes){
+            if (!this.walletStakes){
 
                 this._scope.walletStakes = new this._scope.WalletStakes({
                     ...this._scope,
@@ -176,7 +176,7 @@ export default class App extends Kernel.utils.App {
                 try{
 
                     if (this._scope.argv.walletStakes.deleteWalletStakes)
-                        await this.clearWalletStakes(true);
+                        await this.walletStakes.clearWalletStakes(true);
 
                     if (await this._scope.walletStakes.loadWalletStakes() !== true) throw new Exception(this, "loadWalletStakes is no true");
 
@@ -266,6 +266,7 @@ export default class App extends Kernel.utils.App {
     get cryptography(){ return this._scope.cryptography }
 
     get wallet(){ return this._scope.wallet }
+    get walletStakes(){ return this._scope.walletStakes }
     get forging(){ return this._scope.forging }
     get mainChain(){ return this._scope.mainChain }
     get genesis(){ return this._scope.genesis }
