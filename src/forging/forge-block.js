@@ -103,7 +103,7 @@ export default class ForgeBlock {
 
         const networkTimestampDrift = this._scope.genesis.settings.getDateNow() + this._scope.argv.block.timestamp.timestampDriftMaximum;
 
-        const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].decryptPublicKey();
+        const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].decryptPublicKeyHash();
 
         while (block.timestamp < networkTimestampDrift && !this._scope.forging._reset){
 
