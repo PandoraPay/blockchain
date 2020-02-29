@@ -86,15 +86,26 @@ export default class WalletStakes extends DBSchema {
 
     }
 
-    async addWalletStake({publicKeyHash, delegatePublicKey, delegatePrivateKey}){
+    async addWalletStake({publicKey, delegatePublicKey, delegatePrivateKey}){
 
-        if (typeof publicKeyHash === "string" && StringHelper.isHex(publicKeyHash)) publicKeyHash = Buffer.from(publicKeyHash, "hex");
+        if (typeof publicKey === "string" && StringHelper.isHex(publicKey)) publicKey = Buffer.from(publicKey, "hex");
         if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
 
-        let stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
-        if (stakingAmount < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+        const delegatorStakePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(delegatePrivateKey);
+
+        if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKey) )
+            throw new Exception(this, "You need to set as delegate public key", delegatorStakePrivateAddress.publicKey );
+
+        const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
+
+        const stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
+        if ( (stakingAmount || 0 ) < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
             throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
+
+        const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
+        if (!delegate || !delegate.delegatePublicKey.equals( delegatePublicKey ))
+            throw new Exception(this, "You need to set as delegate public key or the node is not sync", delegatePublicKey );
 
         const lock = await this.lock(-1, publicKeyHash.toString("hex") );
 
@@ -121,6 +132,7 @@ export default class WalletStakes extends DBSchema {
 
             const delegateStake = new DelegatedStake(this._scope,undefined, {
                 id: publicKeyHash.toString("hex"),
+                publicKey: publicKey.toString("hex"),
                 publicKeyHash: publicKeyHash.toString("hex"),
                 delegatePublicKey: delegatePublicKey.toString("hex"),
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),

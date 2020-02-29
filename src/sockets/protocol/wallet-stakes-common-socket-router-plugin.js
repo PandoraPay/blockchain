@@ -76,17 +76,11 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
                 publicKey: publicKey.toString("hex"),
             }, false, false );
 
-            const delegatorStakePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
+            delegatePrivateKey = privateKey;
 
-            if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKey) )
-                throw new Exception(this, "You need to set as delegate public key", delegatorStakePrivateAddress.publicKey );
-
-            delegatePrivateKey = delegatorStakePrivateAddress.privateKey;
         }
 
-        const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
-
-        const out = await this._scope.walletStakes.addWalletStake({publicKeyHash, delegatePublicKey, delegatePrivateKey});
+        const out = await this._scope.walletStakes.addWalletStake({publicKey, delegatePublicKey, delegatePrivateKey});
 
         return out;
 
@@ -94,11 +88,17 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
 
     _listWalletStakes(){
 
+        const out = [];
+
         const delegatedStakes = this._scope.walletStakes.delegatedStakes;
         for (let i=0; i < delegatedStakes.length; i++){
-
+            out.push({
+                publicKeyHash: delegatedStakes.publicKeyHash,
+                delegatePublicKey: delegatedStakes.delegatePublicKey,
+            });
         }
 
+        return out;
     }
 
 }

@@ -31,25 +31,32 @@ export default class DelegatedStake extends DBSchema {
                         position: 100,
                     },
 
+                    publicKey:{
+                        type: "buffer",
+                        fixedBytes: 33,
+
+                        position: 101,
+                    },
+
                     publicKeyHash:{ //same as id
                         type: "buffer",
                         fixedBytes: 20,
 
-                        position: 101,
+                        position: 102,
                     },
 
                     delegatePublicKey:{
                         type: "buffer",
                         fixedBytes: 33,
 
-                        position: 102,
+                        position: 103,
                     },
 
                     delegatePrivateKey:{
                         type: "buffer",
                         fixedBytes: 32,
 
-                        position: 103,
+                        position: 104,
                     },
 
                     amount:{

@@ -40,7 +40,7 @@ export default class ForgeBlock {
 
     }
 
-    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
+    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
 
 
         block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
@@ -107,17 +107,34 @@ export default class ForgeBlock {
 
         while (block.timestamp < networkTimestampDrift && !this._scope.forging._reset){
 
+            //my own addresses
             for (let i=0; i < this._scope.wallet.addresses.length && !this._scope.forging._reset; i++){
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
                         result: true,
                         block,
                         availableStakeAddress,
+                    };
+
+            }
+
+            //delegatedStakes to coldStaking
+            for (let i=0; i < this._scope.walletStakes.delegatedStakes.length && !this._scope.forging._reset; i++){
+
+                const delegatedStake = this._scope.walletStakes.delegatedStakes[i];
+
+                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
+
+                if (out)
+                    return {
+                        result: true,
+                        block,
+                        delegatedStake,
                     };
 
             }

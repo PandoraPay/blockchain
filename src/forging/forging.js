@@ -93,9 +93,9 @@ export default class Forging  {
                 this._reset = false;
             }
 
-            const out = await this.forgeBlock.forgeBlockWithWallet( this._work.block);
+            const mined = await this.forgeBlock.forgeBlockWithWallet( this._work.block);
 
-            if (out && !this._scope._reset){
+            if (mined && !this._scope._reset){
 
                 this._scope.logger.info( this, "BLOCK FORGED", { block: this._work.block.height, timestamp: this._work.block.timestamp, totalDifficulty: this._work.block.totalDifficulty.toString(), target: this._work.block.target.toString("hex") } );
                 this._scope.logger.info( this, "target", { target: this._work.block.target.toString("hex") } );
