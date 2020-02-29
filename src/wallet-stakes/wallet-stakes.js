@@ -213,7 +213,7 @@ export default class WalletStakes extends DBSchema {
         if (delegatedStake.amount !== stakingAmount)
             delegatedStake.amount = stakingAmount;
 
-        const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
+        const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( delegatedStake.publicKeyHash );
         if (!delegate || !delegate.delegatePublicKey.equals( delegatedStake.delegatePublicKey ))
             delegatedStake.errorDelegatePrivateKeyChanged = true;
         else

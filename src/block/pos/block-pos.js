@@ -40,6 +40,11 @@ export default class BlockPoS extends DBSchema {
 
                         removeLeadingZeros: true,
 
+                        preprocessor(stakeDelegateRewardPublicKeyHash){
+                            delete this._stakeDelegateRewardAddress;
+                            return stakeDelegateRewardPublicKeyHash;
+                        },
+
                         position : 103
                     },
 
@@ -91,6 +96,18 @@ export default class BlockPoS extends DBSchema {
 
         return this._stakeForgerAddress;
 
+    }
+
+    get stakeDelegateRewardAddress(){
+
+        if (!this._stakeDelegateRewardAddress)
+            this._stakeDelegateRewardAddress = this._scope.cryptography.addressGenerator.generateAddressFromPublicKeyHash( this.stakeDelegateRewardPublicKeyHash ).calculateAddress();
+
+        return this._stakeDelegateRewardAddress;
+    }
+
+    get isStakeDelegateRewardPublicKeyHashEmpty(){
+        return this.stakeDelegateRewardPublicKeyHash.equals( Buffer.alloc(20) );
     }
 
     async _getStakeDelegateForgerPublicKeys(chain = this._scope.chain, chainData = chain.data){
