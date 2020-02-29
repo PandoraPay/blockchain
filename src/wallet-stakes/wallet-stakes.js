@@ -137,7 +137,7 @@ export default class WalletStakes extends DBSchema {
                 delegatePublicKey: delegatePublicKey.toString("hex"),
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),
                 amount: stakingAmount,
-                error: 0,
+                errorDelegatePrivateKeyChanged: false,
             });
 
             this.delegatedStakes.push(delegateStake);
@@ -197,7 +197,7 @@ export default class WalletStakes extends DBSchema {
     }
 
     _sortDelegatedStakes(){
-        return this.delegatedStakes.sort( (a,b) => b.amount - a.amount ); //from max to min
+        return this.delegatedStakes.sort( (a,b) => ( b.checkStake() ? b.amount : 0 ) - ( a.checkStake() ? a.amount : 0) ); //from max to min
     }
 
     async _updateDelegatedStakesAmount(){
@@ -207,12 +207,19 @@ export default class WalletStakes extends DBSchema {
         const index = Math.floor( Math.random() * this.delegatedStakes.length );
         const delegatedStake = this.delegatedStakes[index];
 
-        let stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
+        let stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( delegatedStake.publicKeyHash );
+        if (!stakingAmount) stakingAmount = 0;
 
-        if (delegatedStake.amount !== stakingAmount) {
+        if (delegatedStake.amount !== stakingAmount)
             delegatedStake.amount = stakingAmount;
-            await delegatedStake.save();
-        }
+
+        const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
+        if (!delegate || !delegate.delegatePublicKey.equals( delegatedStake.delegatePublicKey ))
+            delegatedStake.errorDelegatePrivateKeyChanged = true;
+        else
+            delegatedStake.errorDelegatePrivateKeyChanged = false;
+
+        await delegatedStake.save();
 
     }
 

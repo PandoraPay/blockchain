@@ -128,6 +128,8 @@ export default class ForgeBlock {
 
                 const delegatedStake = this._scope.walletStakes.delegatedStakes[i];
 
+                if ( !delegatedStake.checkStake() ) break; //they are all sorted
+
                 const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)

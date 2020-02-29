@@ -62,10 +62,15 @@ export default class DelegatedStake extends DBSchema {
                     amount:{
 
                         type: "number",
-                        position: 104,
+                        position: 105,
 
                     },
 
+                    errorDelegatePrivateKeyChanged:{
+                        type: "boolean",
+
+                        position: 106,
+                    }
 
                 },
 
@@ -90,5 +95,10 @@ export default class DelegatedStake extends DBSchema {
 
     }
 
+    checkStake(){
+
+        return (!this.errorDelegatePrivateKeyChanged) && this.checkAmount();
+
+    }
 
 }
