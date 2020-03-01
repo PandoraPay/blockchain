@@ -119,6 +119,12 @@ export default class ExchangeOffer extends DBSchema {
                     position: 111,
                 },
 
+                score:{
+                    type: "number",
+
+                    position: 112,
+                },
+
                 signature: {
                     type: "buffer",
                     fixedBytes: 65,
@@ -213,6 +219,13 @@ export default class ExchangeOffer extends DBSchema {
 
         return false;
 
+    }
+
+    async calculateScore(){
+        let balance = await this._scope.mainChain.data.accountHashMap.getBalances( this.publicKeyHash );
+        if (!balance) balance = 0;
+
+        return balance;
     }
 
 }

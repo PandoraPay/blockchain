@@ -5,7 +5,6 @@ import ExchangeOfferCreator from "./creator/exchange-offer-creator";
 import AvailablePayments from "./data/available-payments"
 import ExchangeOfferBuy from "./data/buy/exchange-offer-buy";
 import ExchangeOfferSell from "./data/sell/exchange-offer-sell";
-import DelegatedStake from "../wallet-stakes/delegated-stake/delegated-stake";
 
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception} = global.kernel.helpers;
@@ -59,7 +58,8 @@ class Exchange extends DBSchema{
 
         this._init = false;
 
-        this._removeExpiredExchangeOffersHashMapsInterval = setAsyncInterval( this._removeExpiredExchangeOffersHashMaps.bind(this), 60*60*1000 );
+        this._sortExchangeOffersInterval = setAsyncInterval( this._sortExchangeOffers.bind(this), 60*1000 );
+        this._updateExpiredExchangeOffersInterval = setAsyncInterval( this._updateExpiredExchangeOffers.bind(this), 60*1000 );
 
     }
 
@@ -187,9 +187,12 @@ class Exchange extends DBSchema{
         }
 
         schemaObject.fromJSON( offer.toJSON() );
+        schemaObject.score = await schemaObject.calculateScore();
 
         if (propagateOfferMasterCluster || !this._scope.db.isSynchronized )
             await schemaObject.save();
+        else
+            schemaObject._avoidSave = true;
 
         if ( ! exchangeData.map[ schemaObject.id ] ) {
             exchangeData.array.push(schemaObject);
@@ -211,28 +214,51 @@ class Exchange extends DBSchema{
         return true;
     }
 
-    async _removeExpiredExchangeOffersHashMaps(){
+    async _sortExchangeOffers(){
+
+        for (const item of this.exchangeData )
+            item.array.sort( (a,b) => ( b.score || 0 ) - ( a.score || 0 ) ); //from max to min
+
+    }
+
+    async _updateExpiredExchangeOffers(){
+
         try{
 
-            for (const item of this.exchangeData )
-                for (let i=item.array.length-1; i >= 0 ; i-- )
-                    if (item.array[i].isExpired()){
+            for (const item of this.exchangeData ) {
 
-                        const offer = item.array[i];
+                if (!item.array.length) continue;
+                const index = Math.floor( Math.random()  * item.array.length );
 
-                        item.array.splice(i, 1);
-                        delete item.map[ offer.id ];
+                const offer = item.array[index];
 
+                if (offer.isExpired()) {
+
+                    item.array.splice(index, 1);
+                    delete item.map[offer.id];
+
+                    if (!offer._avoidSave)
                         await offer.delete();
 
-                    }
+                    continue;
+                }
+
+                const newScore = await offer.calculateScore();
+                if (offer.score !== newScore) {
+                    offer.score = newScore;
+                    if (!offer._avoidSave)
+                        offer.save();
+                }
+
+            }
 
 
         }catch(err){
             if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, "Saving Exchange Offers raised an error", err);
+                this._scope.logger.error(this, "Update Expired Exchange Offers raised an error", err);
         }
     }
+
 
     getExchangeData(type){
         if (type === ExchangeOfferTypeEnum.EXCHANGE_OFFER_BUY) return this.exchangeData[0];
