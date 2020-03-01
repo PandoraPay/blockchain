@@ -85,6 +85,7 @@ export default class MainChain extends BaseChain {
 
                     this.data.end = message.data.end;
                     this.data.start = message.data.start;
+                    this.data.transactionsIndex = message.data.transactionsIndex;
                     this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( message.data.chainwork) );
                     this.data.hash = Buffer.from(message.data.hash );
                     this.data.prevHash = Buffer.from( message.data.prevHash );
@@ -164,6 +165,8 @@ export default class MainChain extends BaseChain {
 
             const newData = this.cloneData();
 
+            this._scope.logger.info(this, 'newData.transactionsIndex', {newDataTransactionsIndex: newData.transactionsIndex, oldDataTransactionsIndex: oldData. transactionsIndex});
+
             blocks = await this.filterIdenticalBlocks(blocks);
 
             //check if now we no longer have blocks
@@ -201,6 +204,7 @@ export default class MainChain extends BaseChain {
                     newData.transactionsHashesMap[tx.hash().toString("hex")] = tx;
 
                 newData.end = newData.end + 1;
+                newData.transactionsIndex = newData.transactionsIndex + block.txCount();
                 newData.chainwork = newData.chainwork.add(  block.work );
                 newData.hash = block.hash();
                 newData.prevHash = block.prevHash;
@@ -289,6 +293,7 @@ export default class MainChain extends BaseChain {
                 await this.dataSubscription.subscribeMessage("update-main-chain", {
                     start: newData.start,
                     end: newData.end,
+                    transactionsIndex: newData.transactionsIndex,
                     chainwork: newData.chainworkBuffer,
                     hash: newData.hash,
                     prevHash: newData.prevHash,
@@ -355,6 +360,7 @@ export default class MainChain extends BaseChain {
 
         forkSubChain.data.start = this.data.start;
         forkSubChain.data.end = this.data.end;
+        forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
 
         return forkSubChain;

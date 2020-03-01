@@ -184,14 +184,18 @@ export default class BlockchainCommonSocketRouterPlugin extends SocketRouterPlug
 
 
     async _getInfo(){
+
+        const chainData = this._scope.mainChain.data;
+
         return {
-            start: this._scope.mainChain.data.start,
-            blocks: this._scope.mainChain.data.end,
-            hash: this._scope.mainChain.data.hash,
-            kernelHash: this._scope.mainChain.data.kernelHash,
-            prevHash: this._scope.mainChain.data.prevHash,
-            prevKernelHash: this._scope.mainChain.data.prevKernelHash,
-            chainwork: this._scope.mainChain.data.chainworkBuffer,
+            start: chainData.start,
+            blocks: chainData.end,
+            transactionsIndex: chainData.transactionsIndex,
+            hash: chainData.hash,
+            kernelHash: chainData.kernelHash,
+            prevHash: chainData.prevHash,
+            prevKernelHash: chainData.prevKernelHash,
+            chainwork: chainData.chainworkBuffer,
             connections: this._scope.masterCluster.totalPeers.count,
         }
     }
