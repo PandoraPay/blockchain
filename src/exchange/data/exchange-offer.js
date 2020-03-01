@@ -14,7 +14,7 @@ export default class ExchangeOffer extends DBSchema {
             fields: {
 
                 id:{
-                    fixedBytes: 64, //publicKeyHash
+                    fixedBytes: 40, //publicKeyHash
                 },
 
                 table:{
@@ -126,11 +126,6 @@ export default class ExchangeOffer extends DBSchema {
                 },
 
             },
-
-            saving:{
-                storeDataNotId: true,
-            },
-
 
             options: {
                 hashing: {

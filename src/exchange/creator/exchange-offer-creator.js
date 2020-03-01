@@ -25,6 +25,7 @@ export default class ExchangeOfferCreator {
         };
 
         const offer = new ExchangeOffer(this._scope,undefined, data );
+        offer.id = offer.publicKeyHash.toString('hex');
 
         let signature;
         if (privateKey ) signature = offer.signOffer( privateKey );

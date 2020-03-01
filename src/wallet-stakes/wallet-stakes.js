@@ -180,9 +180,6 @@ export default class WalletStakes extends DBSchema {
 
         const out = await this._scope.db.findAll( DelegatedStake );
 
-        this._scope.logger.log(this, "loadWalletStakes out", out);
-
-
         if (out){
 
             for (const delegateStake in out) {

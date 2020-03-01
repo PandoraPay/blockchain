@@ -197,6 +197,9 @@ export default class BlockPoS extends DBSchema {
 
             const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
 
+            if (distribution2)
+                this._scope.logger.warn(this, 'addBlocKPOS Distribution', {distribution1, distribution2, sum: distribution1 + distribution2});
+
             if (distribution1 > 0) //owner
                 await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, distribution1 );
 
@@ -220,6 +223,9 @@ export default class BlockPoS extends DBSchema {
         try{
 
             const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
+
+            if (distribution2)
+                this._scope.logger.warn(this, 'removeBlockPOS Distribution', {distribution1, distribution2, sum: distribution1 + distribution2});
 
             if (distribution2 > 0)
                 await chainData.accountHashMap.updateBalance( this.stakeDelegateRewardPublicKeyHash, - distribution2 );

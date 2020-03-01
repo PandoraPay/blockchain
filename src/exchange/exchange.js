@@ -1,12 +1,11 @@
-import ExchangeOfferBuyHashVirtualMap from "./maps/exchange-offer-buy-hash-map/exchange-offer-buy-hash-virtual-map"
-import ExchangeOfferSellHashVirtualMap from "./maps/exchange-offer-sell-hash-map/exchange-offer-sell-hash-virtual-map"
-
 import ExchangeOfferTypeEnum from "./data/exchange-offer-type-enum"
 import ExchangeOfferValidator from "./validator/exchange-offer-validator";
 import ExchangeOfferCreator from "./creator/exchange-offer-creator";
 
 import AvailablePayments from "./data/available-payments"
-import ExchangeOffer from "./data/exchange-offer";
+import ExchangeOfferBuy from "./data/buy/exchange-offer-buy";
+import ExchangeOfferSell from "./data/sell/exchange-offer-sell";
+import DelegatedStake from "../wallet-stakes/delegated-stake/delegated-stake";
 
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception} = global.kernel.helpers;
@@ -30,8 +29,8 @@ class Exchange extends DBSchema{
         }) );
 
         if (!this._scope.AvailablePayments) this._scope.AvailablePayments = AvailablePayments;
-        if (!this._scope.ExchangeOfferBuyHashVirtualMap) this._scope.ExchangeOfferBuyHashVirtualMap = ExchangeOfferBuyHashVirtualMap;
-        if (!this._scope.ExchangeOfferSellHashVirtualMap) this._scope.ExchangeOfferSellHashVirtualMap = ExchangeOfferSellHashVirtualMap;
+        if (!this._scope.ExchangeOfferBuy) this._scope.ExchangeOfferBuy = ExchangeOfferBuy;
+        if (!this._scope.ExchangeOfferSell) this._scope.ExchangeOfferSell = ExchangeOfferSell;
 
         if (!this.availablePayments) this.availablePayments = new this._scope.AvailablePayments(this._scope);
 
@@ -39,22 +38,20 @@ class Exchange extends DBSchema{
         this.exchangeOfferValidator = new ExchangeOfferValidator(this._scope );
         this.exchangeOfferCreator = new ExchangeOfferCreator(this._scope );
 
-        this._exchangeOfferBuyHashMap = new this._scope.ExchangeOfferBuyHashVirtualMap(this._scope);
         this.exchangeOfferBuyMap = {};
         this.exchangeOfferBuyArray = [];
 
-        this._exchangeOfferSellHashMap = new this._scope.ExchangeOfferSellHashVirtualMap(this._scope);
         this.exchangeOfferSellMap = {};
         this.exchangeOfferSellArray = [];
 
         this.exchangeData = [
             {
-                hashMap: this._exchangeOfferBuyHashMap,
+                schema: this._scope.ExchangeOfferBuy,
                 map: this.exchangeOfferBuyMap,
                 array: this.exchangeOfferBuyArray,
             },
             {
-                hashMap: this._exchangeOfferSellHashMap,
+                schema: this._scope.ExchangeOfferSell,
                 map: this.exchangeOfferSellMap,
                 array: this.exchangeOfferSellArray
             },
@@ -62,7 +59,6 @@ class Exchange extends DBSchema{
 
         this._init = false;
 
-        this._saveExchangeOffersHashMapsInterval = setAsyncInterval( this._saveExchangeOffersHashMaps.bind(this), 5*60*1000 );
         this._removeExpiredExchangeOffersHashMapsInterval = setAsyncInterval( this._removeExpiredExchangeOffersHashMaps.bind(this), 60*60*1000 );
 
     }
@@ -73,8 +69,10 @@ class Exchange extends DBSchema{
 
         if (this._scope.argv.blockchain.genesisTestNet.createNewTestNet )
             if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
-                await this._exchangeOfferBuyHashMap.clearHashMap();
-                await this._exchangeOfferSellHashMap.clearHashMap();
+
+                await this._scope.db.deleteAll( this._scope.ExchangeOfferBuy, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true } );
+                await this._scope.db.deleteAll( this._scope.ExchangeOfferSell, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true } );
+
             }
 
         if ( this._scope.db.isSynchronized ) {
@@ -107,21 +105,22 @@ class Exchange extends DBSchema{
 
         try{
 
+
             for (const item of this.exchangeData ){
 
-                await item.hashMap.loadAllInVirtualMap();
-                const virtualMap = item.hashMap._virtualMap;
 
-                for (const key in virtualMap)
-                    if (virtualMap[key].type === "add" || virtualMap[key].type === "view" ) {
-                        item.array.push( virtualMap[key].element );
-                        item.map[ virtualMap[key].element.data.hash().toString("hex") ].array.push( virtualMap[key].element );
+                const out = await this._scope.db.findAll( item.schema, undefined, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true } );
+
+                if (out)
+                    for (const offer in out) {
+                        item.array.push(offer);
+                        item.map[offer.id] = offer;
                     }
 
             }
 
         }catch(err){
-
+            this._scope.logger.error(this, 'Error reloading exchange data', err);
         }
 
     }
@@ -132,7 +131,7 @@ class Exchange extends DBSchema{
 
         if (this._scope.db.isSynchronized) lock = await this.lock(-1);
 
-        let out;
+        let out, error;
 
         try{
 
@@ -140,10 +139,12 @@ class Exchange extends DBSchema{
 
 
         }catch(err){
-            this._scope.logger.error(this, "Error adding exchange offer ", err);
+            error = err;
+        }finally{
+            if (lock) lock();
         }
 
-        if (lock) lock();
+        if (error) throw error;
 
         return out;
     }
@@ -161,15 +162,15 @@ class Exchange extends DBSchema{
 
         const exchangeData = this.getExchangeData(offer.type);
 
-        const result = await exchangeData.hashMap.getMap( offer.publicKeyHash );
+        let schemaObject = exchangeData.map[ offer.publicKeyHash.toString('hex') ];
 
-        if (result){
+        if (schemaObject){
 
-            if (offer.height < result.data.height ) throw new Exception(this, "Height is less than the offer I have");
+            if (offer.height < schemaObject.height ) throw new Exception(this, "Height is less than the offer I have");
             else
-            if (result.data.height === offer.height ) {
+            if (offer.height === schemaObject.height ) {
 
-                const compare = result.data.hash().compare(offer.hash() );
+                const compare = schemaObject.hash().compare(offer.hash() );
                 if ( compare < 0) throw new Exception(this, "Previous Hash is better");
                 if ( compare === 0) return false; //it is the same
             }
@@ -180,26 +181,24 @@ class Exchange extends DBSchema{
         const balances = await this._scope.mainChain.data.accountHashMap.getBalances( offer.publicKeyHash );
         if (!balances) throw new Exception(this, "Empty accounts are not allowed to publish offers");
 
-        if (result ){
-
-            //let's delete the previous element
-            delete exchangeData.map[ result.data.hash().toString("hex") ];
-            for (let i=0; i < exchangeData.array.length; i++)
-                if (exchangeData.array[i] === result){
-                    exchangeData.array.splice(i, 1);
-                    break;
-                }
-
+        if ( !schemaObject ){
+            schemaObject = new exchangeData.schema( this._scope, undefined, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true }  );
+            schemaObject.id = offer.publicKeyHash.toString("hex");
         }
 
-        const out = await exchangeData.hashMap.updateMap(offer.publicKeyHash, offer );
+        schemaObject.fromJSON( offer.toJSON() );
 
-        exchangeData.array.push(out);
-        exchangeData.map[ offer.hash().toString("hex") ] = out;
+        if (propagateOfferMasterCluster || !this._scope.db.isSynchronized )
+            await schemaObject.save();
+
+        if ( ! exchangeData.map[ schemaObject.id ] ) {
+            exchangeData.array.push(schemaObject);
+            exchangeData.map[ schemaObject.id ] = schemaObject;
+        }
 
         if (propagateOfferMasterCluster && this._scope.db.isSynchronized ){
             await this.subscribeMessage("exchange/insert-offer", {
-                offer: offer.toBuffer(),
+                offer: schemaObject.toBuffer(),
             }, true, false);
         }
 
@@ -212,18 +211,6 @@ class Exchange extends DBSchema{
         return true;
     }
 
-    async _saveExchangeOffersHashMaps(){
-        try{
-
-            for (const item of this.exchangeData )
-                await item.hashMap.saveVirtualMap(false);
-
-        }catch(err){
-            if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, "Saving Exchange Offers raised an error", err);
-        }
-    }
-
     async _removeExpiredExchangeOffersHashMaps(){
         try{
 
@@ -231,8 +218,13 @@ class Exchange extends DBSchema{
                 for (let i=item.array.length-1; i >= 0 ; i-- )
                     if (item.array[i].isExpired()){
 
-                        item.splice(i, 1);
-                        delete item.map[item.array[i].hash().toString("hex")];
+                        const offer = item.array[i];
+
+                        item.array.splice(i, 1);
+                        delete item.map[ offer.id ];
+
+                        await offer.delete();
+
                     }
 
 

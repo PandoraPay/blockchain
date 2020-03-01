@@ -37,7 +37,11 @@ export default class ExchangeOfferValidator{
     validateExchangeOffer(input){
 
         const exchangeOfferClass = this.getExchangeOfferClass( input );
-        return new exchangeOfferClass( this._scope, undefined, input )
+        const offer = new exchangeOfferClass( this._scope, undefined, input )
+
+        offer.id = offer.publicKeyHash.toString('hex');
+
+        return offer;
 
     }
 

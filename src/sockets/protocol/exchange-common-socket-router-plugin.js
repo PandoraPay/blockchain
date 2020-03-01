@@ -93,8 +93,8 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
         for (let i=startIndex; i < index; i++){
 
-            const offer = array[i].data;
-            const hash = offer.hash().toString("hex");
+            const offer = array[i];
+            const hash = offer.id.toString("hex");
             out[hash] = true;
 
         }
@@ -117,7 +117,7 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
         for (const hash in ids.out){
 
-            const offer = map[hash].data;
+            const offer = map[hash];
             ids.out[hash] = offer.toType(type);
 
         }
@@ -153,11 +153,13 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
     async _getExchangeOffer({offerHash, offerType, type = "buffer" }, res, socket){
 
+        if (Buffer.isBuffer(offerHash)) offerHash = offerHash.toString('hex');
+
         const map = this._scope.exchange.getExchangeData(offerType).map;
 
         const out = map[offerHash];
 
-        if ( out ) return out.data.toType(type);
+        if ( out ) return out.toType(type);
 
     }
 
