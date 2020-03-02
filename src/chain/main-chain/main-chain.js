@@ -1,6 +1,6 @@
 import ForkSubChain from "../fork-sub-chain/fork-sub-chain";
 
-const {Exception} = global.kernel.helpers;
+const {Exception, Helper} = global.kernel.helpers;
 const {MarshalData} = global.kernel.marshal;
 const {DBSchema} = global.kernel.marshal.db;
 
@@ -164,8 +164,6 @@ export default class MainChain extends BaseChain {
         try{
 
             const newData = this.cloneData();
-
-            this._scope.logger.info(this, 'newData.transactionsIndex', {newDataTransactionsIndex: newData.transactionsIndex, oldDataTransactionsIndex: oldData. transactionsIndex});
 
             blocks = await this.filterIdenticalBlocks(blocks);
 
@@ -363,7 +361,7 @@ export default class MainChain extends BaseChain {
         forkSubChain.data.end = this.data.end;
         forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
-        forkSubChain.data._grindingLockedTransfersFunds = Helper.clone( {}, this.data._grindingLockedTransfersFunds, true );
+        forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
 
         return forkSubChain;
 

@@ -148,9 +148,12 @@ export default class BlockPoS extends DBSchema {
 
         if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: this.stakeForgerPublicKeyHash,  stakeForgerPublicKey: this.stakeForgerPublicKey});
 
-        funds = funds - await chainData.getGrindingLockedTransfersFunds(this.stakeForgerPublicKeyHash);
+        const lockedFunds = await chainData.getGrindingLockedTransfersFunds(this.stakeForgerPublicKeyHash);
+        funds = funds - lockedFunds;
 
-        if (funds !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: out, stakingAmount: this.stakingAmount });
+        this._scope.logger.info(this, 'validatePOS locked funds', {forger: this.stakeForgerPublicKeyHash.toString('hex'), lockedFunds } );
+
+        if (funds !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: funds, stakingAmount: this.stakingAmount });
 
         //verify signature
         const { delegateStakeForgerPublicKey } = await this._getStakeDelegateForgerPublicKeys(chain, chainData);

@@ -18,7 +18,8 @@ export default class ForgeBlock {
 
         if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: block.stakeForgerPublicKeyHash,  stakeForgerPublicKey: block.stakeForgerPublicKey });
 
-        funds = funds - await chainData.getGrindingLockedTransfersFunds(block.pos.stakeForgerPublicKeyHash);
+        const lockedFunds = await chainData.getGrindingLockedTransfersFunds(block.pos.stakeForgerPublicKeyHash);
+        funds = funds - lockedFunds;
 
         if (block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && funds < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
             throw new Exception(this, "not enough coins for staking");

@@ -5,11 +5,11 @@ const {Helper, Exception} = global.kernel.helpers;
 const {BN, BigNumber} = global.kernel.utils;
 const {StringHelper} = global.networking.sockets.protocol;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
 
 import TxHashVirtualMap from "src/chain/maps/txs/tx-hash/tx-hash-virtual-map";
 import AddressHashVirtualMap from "src/chain/maps/addresses/addresses-hash/address-hash-virtual-map";
 import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map";
-import BlockainSimpleTransaction from "../../transactions/simple-transaction/blockchain-simple-transaction";
 
 import BlockHashVirtualMap from "../maps/blocks/block-hash-map/block-hash-virtual-map";
 import HashBlockVirtualMap from "../maps/blocks/hash-block-map/hash-block-virtual-map";
@@ -361,14 +361,15 @@ export default class BaseChainData extends DBSchema {
     async _computeGrindingLockedTransfersFundsHeight(height){
 
         const txTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer; //native id;
-        const transfers = {};
 
         const block = await this.getBlock(height);
         if (!block) throw new Exception(this, `Block couldn't get retrieved`, {height } );
 
+        const transfers = {};
+
         const txs = await block.getTransactions();
         for (const tx of txs)
-            if (tx instanceof BlockainSimpleTransaction && tx.tokenCurrency.equals(txTokenCurrency) ) {
+            if (tx instanceof SimpleTransaction && tx.tokenCurrency.equals(txTokenCurrency) ) {
 
                 for (const vout of tx.vout)
                     transfers[vout.publicKeyHash.toString('hex')] =  (transfers[vout.publicKeyHash.toString('hex')] || 0) + vout.amount;
@@ -384,7 +385,7 @@ export default class BaseChainData extends DBSchema {
 
         const startHeight = Math.max(0, this.end-1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
 
-        for (let height = startHeight; height < this.end-1; height++){
+        for (let height = startHeight; height < this.end; height++){
 
             if (!this._grindingLockedTransfersFunds[height])
                 await this._computeGrindingLockedTransfersFundsHeight(height);
@@ -414,7 +415,7 @@ export default class BaseChainData extends DBSchema {
         const startHeight = Math.max(0, this.end-1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
 
         let sum = 0;
-        for (let height = startHeight; height < this.end-1; height++){
+        for (let height = startHeight; height < this.end; height++){
             const transfers = this._grindingLockedTransfersFunds[height];
             if (transfers[publicKeyHashHex])
                 sum += transfers[publicKeyHashHex];

@@ -34,7 +34,7 @@ export default class BaseChain extends Events{
     cloneData(){
         const data = this.createData();
         data.fromObject( this.data.toJSON() );
-        data._grindingLockedTransfersFunds = Helper.clone( {}, this.data._grindingLockedTransfersFunds, true );
+        data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
         return data;
     }
 
