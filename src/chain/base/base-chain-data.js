@@ -391,6 +391,13 @@ export default class BaseChainData extends DBSchema {
 
         }
 
+        //clear old ones
+        let height = startHeight-1;
+        while (height >= 0 && this._grindingLockedTransfersFunds[height] ){
+            delete this._grindingLockedTransfersFunds[height];
+            height--;
+        }
+
 
     }
 

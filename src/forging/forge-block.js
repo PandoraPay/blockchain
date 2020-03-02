@@ -11,18 +11,21 @@ export default class ForgeBlock {
 
     async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
 
-        const out = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
+        //showing the number of coins
         //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);
 
-        if (out === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: block.stakeForgerPublicKeyHash,  stakeForgerPublicKey: block.stakeForgerPublicKey });
+        if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: block.stakeForgerPublicKeyHash,  stakeForgerPublicKey: block.stakeForgerPublicKey });
 
-        if (block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && out < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+        funds = funds - await chainData.getGrindingLockedTransfersFunds(block.pos.stakeForgerPublicKeyHash);
+
+        if (block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && funds < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
             throw new Exception(this, "not enough coins for staking");
 
-        if (out < this._scope.argv.transactions.coinbase.getBlockRewardAt(0) ) throw new Exception(this, "for staking it requires at least 1 coin");
+        if (funds < this._scope.argv.transactions.coinbase.getBlockRewardAt(0) ) throw new Exception(this, "for staking it requires at least 1 coin");
 
-        block.pos.stakingAmount = out;
+        block.pos.stakingAmount = funds;
 
     }
 

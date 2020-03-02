@@ -144,14 +144,13 @@ export default class BlockPoS extends DBSchema {
 
         if (this.stakingAmount < this._scope.argv.transactions.coinbase.getBlockRewardAt(0)) throw new Exception(this, "for staking it requires at least 1 coin");
 
-        const out = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        let funds = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
-        if (out === undefined) throw new Exception(this, "Account not found", {
-            forgerPublicKeyHash: this.stakeForgerPublicKeyHash,
-            stakeForgerPublicKey: this.stakeForgerPublicKey
-        });
+        if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: this.stakeForgerPublicKeyHash,  stakeForgerPublicKey: this.stakeForgerPublicKey});
 
-        if (out !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: out, stakingAmount: this.stakingAmount });
+        funds = funds - await chainData.getGrindingLockedTransfersFunds(this.stakeForgerPublicKeyHash);
+
+        if (funds !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: out, stakingAmount: this.stakingAmount });
 
         //verify signature
         const { delegateStakeForgerPublicKey } = await this._getStakeDelegateForgerPublicKeys(chain, chainData);
