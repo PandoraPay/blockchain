@@ -57,7 +57,7 @@ export default class SubChain extends BaseChain{
             if (this.data.start > block.height)
                 this.data.start = block.height;
 
-            if (this.data.end < block.height+1 )
+            if (this.data.end === block.height )
                 this.data.end = block.height+1;
 
             const out = await block.addBlock(this, this.data);

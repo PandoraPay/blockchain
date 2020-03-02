@@ -210,6 +210,7 @@ export default class MainChain extends BaseChain {
                 newData.prevHash = block.prevHash;
                 newData.kernelHash = block.kernelHash();
                 newData.prevKernelHash = block.prevKernelHash;
+
                 successIndex = i;
 
                 this._scope.logger.warn(this, 'Block added', i );
@@ -362,6 +363,7 @@ export default class MainChain extends BaseChain {
         forkSubChain.data.end = this.data.end;
         forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
+        forkSubChain.data._grindingLockedTransfersFunds = Helper.clone( {}, this.data._grindingLockedTransfersFunds, true );
 
         return forkSubChain;
 

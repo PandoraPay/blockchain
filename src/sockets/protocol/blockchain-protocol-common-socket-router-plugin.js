@@ -2,6 +2,7 @@ const {SocketRouterPlugin} = global.networking.sockets.protocol;
 const {Helper, Exception} = global.kernel.helpers;
 const {MarshalData} = global.kernel.marshal;
 const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
+const {BN, BigNumber} = global.kernel.utils;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
@@ -184,7 +185,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                     listKernelHashes: [{
                         buffer: req.kernelHash,
                     }],
-                    chainwork: chainwork,
+                    chainwork,
                 }, "object", undefined, {
                     onlyFields: {
                         forkStart: true,
@@ -256,10 +257,12 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                         }
 
-                        forkSubchain2.data.forkEnd = Math.max( forkSubchain.data.forkEnd, forkSubchain2.data.forkEnd);
-                        forkSubchain2.data.hash = forkSubchain.data.hash;
-                        forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
-                        forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
+                        if (forkSubchain.data.chainwork.gt( forkSubchain2.data.chainwork) ) {
+                            forkSubchain2.data.forkEnd = forkSubchain.data.forkEnd;
+                            forkSubchain2.data.hash = forkSubchain.data.hash;
+                            forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
+                            forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
+                        }
 
                         this._deleteForkSubchain(forkSubchain);
                         return;

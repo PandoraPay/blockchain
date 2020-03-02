@@ -6,6 +6,7 @@ import TransactionsValidator from "../../transactions/validator/transactions-val
 const {BN} = global.kernel.utils;
 
 const {Events} = global.kernel.helpers.events;
+const {Helper, Exception} = global.kernel.helpers;
 
 export default class BaseChain extends Events{
 
@@ -33,6 +34,7 @@ export default class BaseChain extends Events{
     cloneData(){
         const data = this.createData();
         data.fromObject( this.data.toJSON() );
+        data._grindingLockedTransfersFunds = Helper.clone( {}, this.data._grindingLockedTransfersFunds, true );
         return data;
     }
 
