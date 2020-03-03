@@ -29,7 +29,7 @@ export default class ForgingCommonSocketRouterPlugin extends  SocketRouterPlugin
     }
 
     _getHashesPerSec(){
-        return this._scope.forging._started ? 1 : 0;
+        return this._scope.forging.forgeBlock._hashrate;
     }
 
 }

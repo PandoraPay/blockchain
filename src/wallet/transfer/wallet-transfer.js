@@ -28,7 +28,7 @@ export default class WalletTransfer {
 
     async changeDelegate({address, fee, nonce, delegateOld, delegate, memPoolValidateTxData, password, networkByte }){
 
-        const tokenCurrency = Buffer.from( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, "hex");
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 

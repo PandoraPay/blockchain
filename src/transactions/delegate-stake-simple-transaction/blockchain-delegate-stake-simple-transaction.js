@@ -32,7 +32,7 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
                 tokenCurrency: {
 
-                    default: Buffer.from(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, "hex"),
+                    default: TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 
                     validation(value) {
 

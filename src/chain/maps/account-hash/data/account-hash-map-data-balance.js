@@ -30,7 +30,7 @@ export default class AccountHashMapDataBalance extends DBSchema{
                     minSize: 1,
                     maxSize: 32,
 
-                    default: Buffer.from( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, "hex"),
+                    default: TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 
                     validation(value){
 
