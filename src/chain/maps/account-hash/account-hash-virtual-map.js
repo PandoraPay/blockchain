@@ -5,10 +5,8 @@ const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
 import AddressHashMapElement from "./account-hash-map-element"
 
 /**
- * Required for consensus. Used only for explorer
- * Stores info related to a Transaction
- *
- * info like: TransactionsCount associated with an address
+ * Required for consensus.
+ * Stores accounts, like balances, delegate
  *
  */
 

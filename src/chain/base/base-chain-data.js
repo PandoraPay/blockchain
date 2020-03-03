@@ -14,6 +14,7 @@ import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/
 import BlockHashVirtualMap from "../maps/blocks/block-hash-map/block-hash-virtual-map";
 import HashBlockVirtualMap from "../maps/blocks/hash-block-map/hash-block-virtual-map";
 import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map";
+import TokenHashVirtualMap from "../maps/tokens-hash/token-hash-virtual-map";
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -147,6 +148,11 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
+        this.tokenHashMap = new this._tokenHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
         this.addressTxHashMap = new this._addressTxHashMapClass({
             ...this._scope,
             chainData: this,
@@ -179,6 +185,10 @@ export default class BaseChainData extends DBSchema {
 
     get _addressHashMapClass(){
         return AddressHashVirtualMap;
+    }
+
+    get _tokenHashMapClass(){
+        return TokenHashVirtualMap;
     }
 
     get _addressTxHashMapClass(){
@@ -229,6 +239,7 @@ export default class BaseChainData extends DBSchema {
         this.blockHashMap.resetHashMap();
         this.hashBlockMap.resetHashMap();
         this.accountHashMap.resetHashMap();
+        this.tokenHashMap.resetHashMap();
     }
 
     /**
@@ -313,6 +324,8 @@ export default class BaseChainData extends DBSchema {
         this.addressTxHashMap._fallback = mainChainData.addressTxHashMap;
 
         this.accountHashMap._fallback = mainChainData.accountHashMap;
+        this.tokenHashMap._fallback = mainChainData.tokenHashMap;
+
         this._fallback = mainChainData;
 
     }
