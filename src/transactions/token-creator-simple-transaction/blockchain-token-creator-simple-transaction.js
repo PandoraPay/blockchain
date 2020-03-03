@@ -4,9 +4,9 @@ const {Helper, Exception} = global.kernel.helpers;
 const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
-import AccountHashMapDataDelegate from "../../chain/maps/account-hash/data/account-hash-map-data-delegate";
+import TokenHashMapData from "../../chain/maps/tokens-hash/data/token-hash-map-data";
 
-export default class BlockchainDelegateStakeSimpleTransaction extends BlockchainSimpleTransaction {
+export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainSimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 
@@ -16,10 +16,10 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
                 scriptVersion:{
 
-                    default: TransactionScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION,
+                    default: TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATOR_TRANSACTION,
 
                     validation(script){
-                        return script === TransactionScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION;
+                        return script === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATOR_TRANSACTION;
                     }
                 },
 
@@ -49,19 +49,20 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                     emptyAllowed: true,
                 },
 
-                delegateOld:{
-                    type: "object",
-                    classObject: AccountHashMapDataDelegate,
+                tokenPublicKeyHash:{
+                    type: "buffer",
+                    fixedBytes: 20,
 
                     position: 2000,
                 },
 
-                delegate: {
+                token:{
                     type: "object",
-                    classObject: AccountHashMapDataDelegate,
+                    classObject: TokenHashMapData,
 
                     position: 2001,
-                },
+                }
+
 
             }
 
@@ -79,15 +80,10 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
         if (balance <= this.vin[0].amount ) throw new Exception(this, "resulting balance would be zero" );
 
-        const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
-        if (!delegate) throw new Exception(this, "delegate doesn't exist");
+        const nonce = await chainData.accountHashMap.getNonce( this.vin[0].publicKeyHash ) || 0;
 
-        if (delegate.delegateNonce !== this.delegateOld.delegateNonce ) throw new Exception(this, "delegateOld.delegateNonce is not matching" );
-        if ( !delegate.delegatePublicKey.equals( this.delegateOld.delegatePublicKey) ) throw new Exception(this, "delegateOld.delegatePublickey is not matching" );
-        if ( delegate.delegateFee !== this.delegateOld.delegateFee ) throw new Exception(this, "delegateOld.delegateFee is not matching" );
-
-        if ( this.delegate.delegateNonce < delegate.delegateNonce   ) throw new Exception(this, "Delegate.delegateNonce should be greater or equal with the previous value");
-        if ( this.delegate.delegateNonce > delegate.delegateNonce+1   ) throw new Exception(this, "Delegate.delegateNonce shouldn't that much big");
+        const tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( this.vin[0].publicKeyHash, nonce );
+        if ( !tokenPublicKeyHash.equals(this.tokenPublicKeyHash) ) throw new Exception(this, 'tokenPublicKeyHash is not matching');
 
         return true;
     }
@@ -96,19 +92,12 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
-        const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegateNonce, this.delegate.delegatePublicKey, this.delegate.delegateFee );
+        //chainData.tokenHashMap
 
         return true;
     }
 
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
-
-        const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
-
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - this.delegateOld.delegateNonce, this.delegateOld.delegatePublicKey, this.delegateOld.delegateFee );
 
         return super.transactionRemoved(chain, chainData);
 

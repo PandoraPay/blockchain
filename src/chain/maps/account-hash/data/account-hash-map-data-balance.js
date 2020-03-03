@@ -18,7 +18,7 @@ export default class AccountHashMapDataBalance extends DBSchema{
 
                     default: 0,
 
-                    validate(version){
+                    validation(version){
                         return version === 0;
                     },
                     

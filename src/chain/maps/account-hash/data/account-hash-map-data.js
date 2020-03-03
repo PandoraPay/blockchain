@@ -19,7 +19,7 @@ export default class AccountHashMapData extends DBSchema{
                     fixedBytes: 1,
 
                     default: 0,
-                    validate(version){
+                    validation(version){
                         return version === 0;
                     },
                     position: 100,
