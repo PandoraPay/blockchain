@@ -207,7 +207,7 @@ export default function run () {
 
             await wallet.clearWallet();
 
-            if (this._scope.argv.blockchain.genesisTestNet.createNewTestNetGenesisAndWallet)
+            if (this._scope.argv.testnet.createNewTestNetGenesisAndWallet)
                 await this._scope.testnet.createTestNetWallet();
 
         },

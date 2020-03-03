@@ -79,7 +79,7 @@ export default  class MemPool extends DBSchema{
 
         if (this._init) return true;
 
-        if (this._scope.argv.blockchain.genesisTestNet.createNewTestNet )
+        if (this._scope.argv.testnet.createNewTestNet )
             if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
 
                 await this.clear();

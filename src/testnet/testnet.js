@@ -16,11 +16,11 @@ export default class TestNet{
 
         if (BROWSER) return; //no support for browser right now
 
-        if (this._scope.argv.blockchain.genesisTestNet.createNewTestNetGenesisAndWallet)
+        if (this._scope.argv.testnet.createNewTestNetGenesisAndWallet)
             await this.createTestNetGenesisAndWallet();
 
 
-        if (this._scope.argv.blockchain.genesisTestNet.createNewTestNet)
+        if (this._scope.argv.testnet.createNewTestNet)
             this._propagateTestNetWallet();
 
 

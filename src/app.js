@@ -102,27 +102,35 @@ export default class App extends Kernel.utils.App {
 
         this.events.on("start/args-processed", async ()=>{
 
+            if (this._scope.argv.testnet.activated)
+                Helper.import( this._scope.argv, this._scope.argv.testnet.argv );
+
             let genesisSettings;
 
             if (!this._scope.genesis){
+
+                genesisSettings = Helper.merge( {}, this._scope.argv.blockchain.genesis, true);
 
                 switch (this._scope.argv.settings.networkType){
 
                     case NetworkTypeEnum.NETWORK_MAIN_NET:
                         this._scope.logger.log(this, "NETWORK MAIN NET");
-                        genesisSettings = this._scope.argv.blockchain.genesis;
                         break;
 
                     case NetworkTypeEnum.NETWORK_TEST_NET:
                         this._scope.logger.log(this, "NETWORK TEST NET");
-                        genesisSettings = this._scope.argv.blockchain.genesisTestNet;
-                        genesisSettings.timestamp = Math.round( new Date().getTime() / 1000 / 30 ) *30;
+
+                        if (this._scope.argv.testnet.createNewTestNet )
+                            genesisSettings.timestamp = Math.trunc( new Date().getTime() / 1000 / 60 ) *60;
+
                         break;
 
                     default:
                         throw new Exception(this, "invalid network type", this._scope.argv.settings.networkType );
 
                 }
+
+                this._scope.logger.info(this, 'genesisSettings.timestamp', genesisSettings.timestamp);
 
                 /**
                  * Genesis is a block and it will use genesisSettings

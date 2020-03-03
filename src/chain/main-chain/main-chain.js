@@ -63,7 +63,7 @@ export default class MainChain extends BaseChain {
             this._scope.logger.error(this, "Error loading MainChain", err);
         }
 
-        if (this._scope.argv.blockchain.genesisTestNet.createNewTestNet )
+        if (this._scope.argv.testnet.createNewTestNet )
             if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
 
                 if (!cleared) {
