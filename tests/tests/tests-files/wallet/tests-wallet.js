@@ -100,7 +100,7 @@ export default function run () {
             await wallet.encryption.encryptWallet(undefined, password );
 
             this.expect( wallet.encrypted, true );
-            this.expect(wallet.mnemonic.value.length >= 160, true);
+            this.expect(wallet.mnemonic.value.length >= 100, true);
 
             mnemonicSequenceCounter = wallet.encryption.decryptMnemonicSequenceCounter();
             this.expect(mnemonicSequenceCounter, 1);
@@ -127,7 +127,7 @@ export default function run () {
 
 
             this.expect(wallet.encrypted, true);
-            this.expect(wallet.mnemonic.value.length >= 160, true);
+            this.expect(wallet.mnemonic.value.length >= 100, true);
 
             try{
                 wallet.encryption.decryptMnemonicSequenceCounter("123456");
@@ -208,7 +208,7 @@ export default function run () {
             await wallet.clearWallet();
 
             if (this._scope.argv.testnet.createNewTestNetGenesisAndWallet)
-                await this._scope.testnet.createTestNetWallet();
+                await this._scope.testnet.createTestNetGenesisAndWallet();
 
         },
 

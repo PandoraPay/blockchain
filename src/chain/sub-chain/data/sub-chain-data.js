@@ -82,7 +82,7 @@ export default class SubChainData extends BaseChainData{
         if (this.blocks[height])
             return this.blocks[height];
 
-        return this._scope.mainChain.data.getBlock(height);
+        return this._fallback.getBlock(height);
 
     }
 
@@ -93,7 +93,7 @@ export default class SubChainData extends BaseChainData{
         if (this.hashes[hash])
             return this.hashes[hash];
 
-        return this._scope.mainChain.data.getBlockByHash(hash);
+        return this._fallback.getBlockByHash(hash);
     }
 
 
@@ -102,7 +102,7 @@ export default class SubChainData extends BaseChainData{
         if (this.blocks[height])
             return this.blocks[height].hash();
 
-        return this._scope.mainChain.data.getBlockHash(height);
+        return this._fallback.getBlockHash(height);
 
     }
     

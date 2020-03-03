@@ -313,6 +313,7 @@ export default class BaseChainData extends DBSchema {
         this.addressTxHashMap._fallback = mainChainData.addressTxHashMap;
 
         this.accountHashMap._fallback = mainChainData.accountHashMap;
+        this._fallback = mainChainData;
 
     }
 

@@ -6,6 +6,8 @@ export default class TestsBlockHelper {
 
     async waitForgingBlockWithWallet(block, createTransactionsCallback){
 
+        this._scope.forging._reset = false;
+
         let out;
         while (!out){
             out = await block._scope.forging.forgeBlock.forgeBlockWithWallet(block, createTransactionsCallback);

@@ -10,7 +10,7 @@ export default function run () {
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true });
+            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
 
             await chain.clear();
 
@@ -21,7 +21,7 @@ export default function run () {
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true });
+            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
 
             await chain.clear();
 

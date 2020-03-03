@@ -7,7 +7,7 @@ export default function run () {
 
         'chain initialization': async function () {
 
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{} }, undefined, [ this.db ] );
+            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
 
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,

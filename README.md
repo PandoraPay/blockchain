@@ -22,13 +22,13 @@ To deploy your own test net, you need to configure a new test net and start forg
 
 Node parameters to set up a testnet network
 ```
---settings:networkType 1 --blockchain:genesisTestNet:createNewTestNet true --wallet:printWallet true --forging:enabled true
+testnet:activated true --testnet:createNewTestNet true --wallet:printWallet true --forging:start true --dbPublic:redisDB:differentDatabase true --walletStakes:deleteWalletStakes true
 ```
 
 Run CLI command
 
 ```
-node start-node.js --masterCluster:serverCluster:httpServer:port 8083 --blockchain:genesisTestNet:createNewTestNet true --wallet:printWallet true --settings:networkType 1 --forging:start true --dbPublic:redisDB:differentDatabase true
+node start-node.js --masterCluster:serverCluster:httpServer:port 8083 --testnet:activated true --testnet:createNewTestNet true --wallet:printWallet true --forging:start true --dbPublic:redisDB:differentDatabase true --walletStakes:deleteWalletStakes true
 ```
 
 1. Import your node private into the wallet.

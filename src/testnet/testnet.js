@@ -34,6 +34,8 @@ export default class TestNet{
             setTimeout( () => {
 
                 const wallets = this._scope.wallet.addresses.map( it => it.decryptPublicAddress( ).calculateAddress() );
+
+
                 this._scope.masterCluster.sendMessage("testnet-wallet", {wallets: wallets}, false );
 
                 this.createTestNetTransactionsToSlaveWallets();

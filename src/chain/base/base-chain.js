@@ -35,6 +35,7 @@ export default class BaseChain extends Events{
         const data = this.createData();
         data.fromObject( this.data.toJSON() );
         data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
+        data.setFallbacks(this.data);
         return data;
     }
 

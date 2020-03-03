@@ -22,13 +22,6 @@ export default class MainChain extends BaseChain {
 
     }
 
-    cloneData(){
-
-        const data = super.cloneData();
-        data.setFallbacks(this.data);
-
-        return data;
-    }
 
     /**
      * Initializing Main Chain
