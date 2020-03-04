@@ -4,8 +4,9 @@ const {BaseTransaction} = global.cryptography.transactions.base;
 
 const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helpers;
 
-import BlockchainSimpleTransaction from "src/transactions/simple-transaction/blockchain-simple-transaction"
-import BlockchainDelegateStakeSimpleTransaction from "src/transactions/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
+import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
+import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
+import BlockchainTokenCreatorSimpleTransaction from "./../token-creator-simple-transaction/blockchain-token-creator-simple-transaction"
 
 export default class TransactionsValidator{
     
@@ -50,6 +51,7 @@ export default class TransactionsValidator{
 
         if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return BlockchainSimpleTransaction;
         if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return BlockchainDelegateStakeSimpleTransaction;
+        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATOR_TRANSACTION ) return BlockchainTokenCreatorSimpleTransaction;
 
         throw new Exception(this, "Transaction class couldn't be identified by script version", scriptVersion);
             

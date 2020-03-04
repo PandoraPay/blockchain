@@ -34,4 +34,23 @@ export default class TokenHashVirtualMap extends HashVirtualMap {
 
     }
 
+    processLeafLabel(label){
+
+        if (Buffer.isBuffer(label)) label = label.toString("hex");
+        if (typeof label !== "string" || label.length === 0) throw new Exception(this, "label length is invalid");
+
+        if (label.length !== 40) throw "label is not leaf";
+
+        return label;
+    }
+
+    async getTokenNode( publicKeyHash ){
+
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+        const out = await this.getMap(publicKeyHash);
+
+        return out ? out.data : undefined;
+
+    }
+
 }

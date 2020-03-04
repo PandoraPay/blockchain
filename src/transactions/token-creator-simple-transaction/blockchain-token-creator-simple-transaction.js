@@ -56,7 +56,7 @@ export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainS
                     position: 2000,
                 },
 
-                token:{
+                tokenData:{
                     type: "object",
                     classObject: TokenHashMapData,
 
@@ -75,6 +75,8 @@ export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainS
         const out = await super.validateTransaction(chain, chainData, block);
         if (!out) return false;
 
+        if ( this.tokenData.supply !== 0) throw new Exception(this, 'TokenData supply needs to be zero');
+
         const balance = await chainData.accountHashMap.getBalance( this.vin[0].publicKeyHash  ) || 0;
         if ( !balance) throw new Exception(this, "account doesn't exist");
 
@@ -85,6 +87,9 @@ export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainS
         const tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( this.vin[0].publicKeyHash, nonce );
         if ( !tokenPublicKeyHash.equals(this.tokenPublicKeyHash) ) throw new Exception(this, 'tokenPublicKeyHash is not matching');
 
+        const exists = await chainData.tokenHashMap.getTokenNode( tokenPublicKeyHash );
+        if (exists) throw new Exception(this, 'Token already exists');
+
         return true;
     }
 
@@ -92,12 +97,14 @@ export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainS
 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
-        //chainData.tokenHashMap
+        await chainData.tokenHashMap.addMap(this.tokenPublicKeyHash, this.tokenData.toJSON() );
 
         return true;
     }
 
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
+
+        await chainData.tokenHashMap.deleteMap(this.tokenPublicKeyHash);
 
         return super.transactionRemoved(chain, chainData);
 
