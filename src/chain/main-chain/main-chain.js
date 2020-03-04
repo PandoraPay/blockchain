@@ -355,6 +355,7 @@ export default class MainChain extends BaseChain {
         forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
         forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
+        forkSubChain.data._fallback = this.data;
 
         return forkSubChain;
 

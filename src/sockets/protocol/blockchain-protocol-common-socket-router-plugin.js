@@ -221,6 +221,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 }
                 else { //download hash & kernelHash
                     const blockHashes = await socket.emitAsync('blockchain/get-block-hashes', {index: forkHeight});
+
+                    if (!blockHashes) throw new Exception(this, 'blockchain/get-block-hashes returned undefined');
                     hash =  blockHashes.hash;
                     kernelHash =  blockHashes.kernelHash;
                 }
@@ -239,32 +241,53 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                         break;
                     }else {
 
+                        let done = true, index;
+
                         //saving hashes at the end of the forkSubchain2
                         for (let i=0; i < forkSubchain.data.listHashes.length; i++  ){
 
                             const hash = forkSubchain.data.listHashes[i];
                             const kernelHash = forkSubchain.data.listKernelHashes[i];
 
-                            if ( !forkSubchain2.data.hashes[hash.toString("hex")]  ) {
-                                forkSubchain2.data.pushArray("listHashes", hash, "object" ); //at the end
+                            if (forkSubchain2.data.listHashes.length > this._scope.argv.blockchain.maxForkAllowed){
+                                done = false;
+                                index = i;
+                                break;
+                            }
+
+                            if ( !forkSubchain2.data.hashes[hash.toString("hex")] ) {
                                 forkSubchain2.data.hashes[ hash.toString("hex") ] = true;
+                                forkSubchain2.data.pushArray("listHashes", hash, "object" ); //at the end
                             }
 
                             if ( !forkSubchain2.data.kernelHashes[kernelHash.toString("hex")] ) {
-                                forkSubchain2.data.pushArray("listKernelHashes", kernelHash, "object"); //at the end
                                 forkSubchain2.data.kernelHashes[ kernelHash.toString("hex") ] = true;
+                                forkSubchain2.data.pushArray("listKernelHashes", kernelHash, "object"); //at the end
                             }
 
                         }
 
-                        if (forkSubchain.data.chainwork.gt( forkSubchain2.data.chainwork) ) {
-                            forkSubchain2.data.forkEnd = forkSubchain.data.forkEnd;
-                            forkSubchain2.data.hash = forkSubchain.data.hash;
-                            forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
-                            forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
+                        if (done){
+
+                            if (forkSubchain.data.chainwork.gt( forkSubchain2.data.chainwork) ) {
+                                forkSubchain2.data.forkEnd = forkSubchain.data.forkEnd;
+                                forkSubchain2.data.hash = forkSubchain.data.hash;
+                                forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
+                                forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
+                                this._deleteForkSubchain(forkSubchain);
+                            }
+
+                        } else {
+                            forkSubchain.data.forkStart = index;
+
+                            for (let i=0; i < index; i++){
+                                delete forkSubchain.data.hashes[ forkSubchain.data.listHashes[i].toString('hex') ];
+                                delete forkSubchain.data.kernelHashes[ forkSubchain.data.listKernelHashes[i].toString('hex') ];
+                            }
+                            forkSubchain.data.listHashes.splice(0, index);
+                            forkSubchain.data.listKernelHashes.splice(0, index);
                         }
 
-                        this._deleteForkSubchain(forkSubchain);
                         return;
                     }
 
