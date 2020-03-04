@@ -1,8 +1,9 @@
 const {Exception} = global.kernel.helpers;
 const {TransactionTypeEnum} = global.cryptography.transactions;
 
-import BlockchainSimpleTransaction from "src/transactions/simple-transaction/blockchain-simple-transaction"
-import BlockchainDelegateStakeSimpleTransaction from "src/transactions/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
+import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
+import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
+import BlockchainTokenCreatorSimpleTransaction from  "./../token-creator-simple-transaction/blockchain-token-creator-simple-transaction"
 
 export default class TransactionsCreator {
     
@@ -12,8 +13,8 @@ export default class TransactionsCreator {
 
     async createSimpleTransaction( { vin, vout, privateKeys, nonce, tokenCurrency }, chain = this._scope.chain ){
 
-        if (!Array.isArray(vin)) vin = [vin];
-        if (!Array.isArray(vout)) vout = [vout];
+        if (vin && !Array.isArray(vin)) vin = [vin];
+        if (vout && !Array.isArray(vout)) vout = [vout];
 
         if (vin.length === 0) throw new Exception(this, "Vin is empty");
 
@@ -46,9 +47,10 @@ export default class TransactionsCreator {
 
     async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegateOld, delegate }, chain = this._scope.chain ){
 
-        if (!Array.isArray(vin)) vin = [vin];
+        if (vin && !Array.isArray(vin)) vin = [vin];
 
         if (vin.length === 0) throw new Exception(this, "Vin is empty");
+        if (vin.length !== 1) throw new Exception(this, "Vin needs to have exactly one element");
 
         const input = [...vin];
         input.map( it => it.signature = Buffer.alloc(65) );
@@ -73,6 +75,46 @@ export default class TransactionsCreator {
         if ( !delegateOld ){
             delegateOld = await chain.data.accountHashMap.getDelegate(tx.vin[0].publicKeyHash);
             tx.delegateOld = delegateOld;
+        }
+
+        const signatures = tx.signTransaction(privateKeys);
+
+        return {
+            tx,
+            signatures,
+        }
+
+    }
+
+    async createTokenCreatorSimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
+
+        if (vin && !Array.isArray(vin)) vin = [vin];
+
+        if (vin.length === 0) throw new Exception(this, "Vin is empty");
+        if (vin.length !== 1) throw new Exception(this, "Vin needs to have exactly one element");
+
+        const input = [...vin];
+        input.map( it => it.signature = Buffer.alloc(65) );
+
+        const tx = new BlockchainTokenCreatorSimpleTransaction( this._scope, undefined, {
+
+            vin: input,
+            vout: [],
+            nonce,
+            tokenPublicKeyHash,
+            tokenData,
+
+        }, "object" );
+
+        if (nonce === undefined) {
+            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
+            nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
+            tx.nonce = nonce;
+        }
+
+        if (!tokenPublicKeyHash){
+            tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
+            tx.tokenPublicKeyHash = tokenPublicKeyHash;
         }
 
         const signatures = tx.signTransaction(privateKeys);
