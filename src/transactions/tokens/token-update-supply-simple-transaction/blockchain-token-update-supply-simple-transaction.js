@@ -1,6 +1,6 @@
 import BlockchainSimpleTransaction from "../../simple-transaction/blockchain-simple-transaction";
 
-export default class BlockchainTokenPrintSimpleTransaction extends BlockchainSimpleTransaction {
+export default class BlockchainTokenUpdateSupplySimpleTransaction extends BlockchainSimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 
@@ -10,10 +10,10 @@ export default class BlockchainTokenPrintSimpleTransaction extends BlockchainSim
 
                 scriptVersion:{
 
-                    default: TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_PRINT_TRANSACTION,
+                    default: TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_UPDATE_SUPPLY_TRANSACTION,
 
                     validation(script){
-                        return script === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_PRINT_TRANSACTION;
+                        return script === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_UPDATE_SUPPLY_TRANSACTION;
                     }
                 },
 
@@ -47,12 +47,18 @@ export default class BlockchainTokenPrintSimpleTransaction extends BlockchainSim
                     position: 2000,
                 },
 
+                supplySign:{
+                    type: "boolean",
+
+                    position: 2001,
+                },
+
                 supplyValue:{
                     type: "number",
                     minSize: 1,
 
-                    position: 2001,
-                }
+                    position: 2002,
+                },
 
 
             }

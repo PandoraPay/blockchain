@@ -4,7 +4,7 @@ const {TransactionTypeEnum} = global.cryptography.transactions;
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
 import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
 import BlockchainTokenCreateSimpleTransaction from  "./../tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction"
-import BlockchainTokenPrintSimpleTransaction from  "./../tokens/token-print-simple-transaction/blockchain-token-print-simple-transaction"
+import BlockchainTokenUpdateSupplySimpleTransaction from  "./../tokens/token-update-supply-simple-transaction/blockchain-token-update-supply-simple-transaction"
 
 export default class TransactionsCreator {
     
@@ -12,12 +12,22 @@ export default class TransactionsCreator {
         this._scope = scope;
     }
 
+    async _calculateNonce(nonce, tx){
+        if (nonce === undefined) {
+            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
+            nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
+            tx.nonce = nonce;
+        }
+        return nonce;
+    }
+
     async createSimpleTransaction( { vin, vout, privateKeys, nonce, tokenCurrency }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (vout && !Array.isArray(vout)) vout = [vout];
 
-        if (vin.length === 0) throw new Exception(this, "Vin is empty");
+        if (!vin || !vin.length ) throw new Exception(this, "Vin is empty");
+        if (!vout || !vout.length  ) throw new Exception(this, "Vout is empty");
 
         const input = [...vin];
         input.map( it => it.signature = Buffer.alloc(65) );
@@ -31,11 +41,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        if (nonce === undefined) {
-            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
-            nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
-            tx.nonce = nonce;
-        }
+        nonce = await this._calculateNonce(nonce, tx);
 
         const signatures = tx.signTransaction(privateKeys);
 
@@ -49,9 +55,7 @@ export default class TransactionsCreator {
     async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegateOld, delegate }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
-
-        if (vin.length === 0) throw new Exception(this, "Vin is empty");
-        if (vin.length !== 1) throw new Exception(this, "Vin needs to have exactly one element");
+        if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
 
         const input = [...vin];
         input.map( it => it.signature = Buffer.alloc(65) );
@@ -66,12 +70,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        if (nonce === undefined) {
-            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
-            nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
-            tx.nonce = nonce;
-        }
-
+        nonce = await this._calculateNonce(nonce, tx);
 
         if ( !delegateOld ){
             delegateOld = await chain.data.accountHashMap.getDelegate(tx.vin[0].publicKeyHash);
@@ -90,9 +89,7 @@ export default class TransactionsCreator {
     async createTokenCreateSimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
-
-        if (vin.length === 0) throw new Exception(this, "Vin is empty");
-        if (vin.length !== 1) throw new Exception(this, "Vin needs to have exactly one element");
+        if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
 
         const input = [...vin];
         input.map( it => it.signature = Buffer.alloc(65) );
@@ -107,15 +104,47 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        if (nonce === undefined) {
-            nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
-            nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
-            tx.nonce = nonce;
-        }
+        nonce = await this._calculateNonce(nonce, tx);
 
         if (!tokenPublicKeyHash){
             tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
-            console.log("tokenPublicKeyHash", tokenPublicKeyHash);
+            tx.tokenPublicKeyHash = tokenPublicKeyHash;
+        }
+
+        const signatures = tx.signTransaction(privateKeys);
+
+        return {
+            tx,
+            signatures,
+        }
+
+    }
+
+    async createTokenUpdateSupplySimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, supplySign, supplyValue }, chain = this._scope.chain ){
+
+        if (vin && !Array.isArray(vin)) vin = [vin];
+        if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
+
+        if (!supplyValue) throw new Exception(this, 'SupplyValue needs to be provided');
+
+        const input = [...vin];
+        input.map( it => it.signature = Buffer.alloc(65) );
+
+        const tx = new BlockchainTokenUpdateSupplySimpleTransaction( this._scope, undefined, {
+
+            vin: input,
+            vout: [],
+            nonce,
+            tokenPublicKeyHash,
+            supplySign,
+            supplyValue,
+
+        }, "object" );
+
+        nonce = await this._calculateNonce(nonce, tx);
+
+        if (!tokenPublicKeyHash){
+            tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
             tx.tokenPublicKeyHash = tokenPublicKeyHash;
         }
 

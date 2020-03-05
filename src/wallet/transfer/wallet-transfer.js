@@ -162,6 +162,46 @@ export default class WalletTransfer {
         return txOut;
     }
 
+    async tokenUpdateSupply({address, fee, nonce, tokenPublicKeyHash, supplySign, supplyValue, memPoolValidateTxData, paymentId, password, networkByte}){
+
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
+
+        const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        if (!foundFunds) throw new Exception(this, "Not enough funds");
+
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+
+        //calculate fee
+        if (fee === undefined){
+            fee = 0;
+            //TODO CALCULATE FEE
+        }
+
+        if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
+
+
+        const txOut =  await this._scope.mainChain.transactionsCreator.createTokenUpdateSupplySimpleTransaction( {
+            vin: [{
+                publicKey: walletAddress.decryptPublicKey(),
+                amount: fee,
+            }],
+            vout: [],
+            privateKeys: [ {
+                privateKey: walletAddress.decryptPrivateKey()
+            } ],
+            nonce,
+            tokenPublicKeyHash,
+            supplySign,
+            supplyValue,
+        } );
+
+        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
+
+        return txOut;
+    }
+
     _calculateRequiredFunds(txDsts){
 
         let requiredFunds = 0;
