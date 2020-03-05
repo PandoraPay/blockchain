@@ -53,4 +53,12 @@ export default class TokenHashVirtualMap extends HashVirtualMap {
 
     }
 
+    async updateTokenSupply(publicKeyHash, value){
+
+        publicKeyHash = this.processLeafLabel(publicKeyHash);
+
+        const out = await this.getMap(publicKeyHash);
+
+    }
+
 }

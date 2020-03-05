@@ -32,11 +32,8 @@ export default class AccountHashMapDataBalance extends DBSchema{
 
                     default: TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 
-                    validation(value){
-
-                        const tokenCurrencyString = value.toString("hex");
-                        return EnumHelper.validateEnum(tokenCurrencyString, TransactionTokenCurrencyTypeEnum );
-
+                    validation(value) {
+                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer );
                     },
 
                     position: 101,
