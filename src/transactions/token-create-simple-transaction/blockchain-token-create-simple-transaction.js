@@ -6,7 +6,7 @@ const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyT
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
 import TokenHashMapData from "../../chain/maps/tokens-hash/data/token-hash-map-data";
 
-export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainSimpleTransaction {
+export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 
@@ -16,10 +16,10 @@ export default class BlockchainTokenCreatorSimpleTransaction extends BlockchainS
 
                 scriptVersion:{
 
-                    default: TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATOR_TRANSACTION,
+                    default: TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATE_TRANSACTION,
 
                     validation(script){
-                        return script === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATOR_TRANSACTION;
+                        return script === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATE_TRANSACTION;
                     }
                 },
 

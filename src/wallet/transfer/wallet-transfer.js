@@ -124,7 +124,7 @@ export default class WalletTransfer {
 
     }
 
-    async tokensCreate({address, fee, nonce, tokenData, memPoolValidateTxData, paymentId, password, networkByte}){
+    async tokenCreate({address, fee, nonce, tokenData, memPoolValidateTxData, paymentId, password, networkByte}){
 
         const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
@@ -144,7 +144,7 @@ export default class WalletTransfer {
         if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
 
 
-        const txOut =  await this._scope.mainChain.transactionsCreator.createTokenCreatorSimpleTransaction( {
+        const txOut =  await this._scope.mainChain.transactionsCreator.createTokenCreateSimpleTransaction( {
             vin: [{
                 publicKey: walletAddress.decryptPublicKey(),
                 amount: fee,

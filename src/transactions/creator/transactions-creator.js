@@ -3,7 +3,7 @@ const {TransactionTypeEnum} = global.cryptography.transactions;
 
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
 import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
-import BlockchainTokenCreatorSimpleTransaction from  "./../token-creator-simple-transaction/blockchain-token-creator-simple-transaction"
+import BlockchainTokenCreateSimpleTransaction from  "./../token-create-simple-transaction/blockchain-token-create-simple-transaction"
 
 export default class TransactionsCreator {
     
@@ -86,7 +86,7 @@ export default class TransactionsCreator {
 
     }
 
-    async createTokenCreatorSimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
+    async createTokenCreateSimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
 
@@ -96,7 +96,7 @@ export default class TransactionsCreator {
         const input = [...vin];
         input.map( it => it.signature = Buffer.alloc(65) );
 
-        const tx = new BlockchainTokenCreatorSimpleTransaction( this._scope, undefined, {
+        const tx = new BlockchainTokenCreateSimpleTransaction( this._scope, undefined, {
 
             vin: input,
             vout: [],

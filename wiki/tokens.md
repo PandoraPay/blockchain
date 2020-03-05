@@ -18,7 +18,7 @@ var create = async () =>{
     const nonce = await PandoraConsensus.downloadNonceIncludingMemPool( mainAddress.address );
     if (nonce === undefined) throw {message: "The connection to the node was dropped"};
 
-    const out = await PandoraPay.wallet.transfer.tokensCreate({
+    const out = await PandoraPay.wallet.transfer.tokenCreate({
         address: mainAddress.address,
         fee: 1,
         nonce,
