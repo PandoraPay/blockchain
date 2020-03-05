@@ -44,20 +44,39 @@ export default class TokenHashVirtualMap extends HashVirtualMap {
         return label;
     }
 
-    async getTokenNode( publicKeyHash ){
+    async getTokenNode( tokenPublicKeyHash ){
 
-        publicKeyHash = this.processLeafLabel(publicKeyHash);
-        const out = await this.getMap(publicKeyHash);
+        tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
+        const out = await this.getMap(tokenPublicKeyHash);
 
         return out ? out.data : undefined;
 
     }
 
-    async updateTokenSupply(publicKeyHash, value){
+    async updateTokenSupply(tokenPublicKeyHash, value){
 
-        publicKeyHash = this.processLeafLabel(publicKeyHash);
+        if (value === 0) throw new Exception(this, "value needs to be different than zero");
 
-        const out = await this.getMap(publicKeyHash);
+        tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
+
+        const node = await this.getMap(tokenPublicKeyHash);
+
+        if (node){
+
+            const supply = node.data.supply;
+
+            if (supply + value < 0) throw new Exception(this, "supply would become negative", {supply, value});
+            if (supply + value > node.data.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
+
+            node.data.supply = supply + value;
+
+            node.save();
+
+            return node.data.supply;
+
+        } else {
+            throw new Exception(this, "Token doesn't exist", {tokenPublicKeyHash});
+        }
 
     }
 

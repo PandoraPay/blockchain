@@ -3,7 +3,8 @@ const {TransactionTypeEnum} = global.cryptography.transactions;
 
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
 import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
-import BlockchainTokenCreateSimpleTransaction from  "./../token-create-simple-transaction/blockchain-token-create-simple-transaction"
+import BlockchainTokenCreateSimpleTransaction from  "./../tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction"
+import BlockchainTokenPrintSimpleTransaction from  "./../tokens/token-print-simple-transaction/blockchain-token-print-simple-transaction"
 
 export default class TransactionsCreator {
     
