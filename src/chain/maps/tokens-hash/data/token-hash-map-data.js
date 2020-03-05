@@ -29,12 +29,10 @@ export default class TokenHashMapData extends DBSchema{
                     maxSize: 10,
 
                     /**
-                     * only lowercase and ascii is allowed.
-                     * @param name
-                     * @returns {*}
+                     * only lowercase ascii and one space between words is allowed.
                      */
                     validation(name){
-                        return StringHelper.validateLowerString(name);
+                        return /^([a-z]+ )+[a-z]+$|^[a-z]+$/.exec(name);
                     },
 
                     position: 101,
@@ -56,10 +54,10 @@ export default class TokenHashMapData extends DBSchema{
                     maxSize: 6,
 
                     /**
-                     * only lowercase, ascii is allowed. No space allowed
+                     * only lowercase ascii is allowed. No space allowed
                      */
                     validation(ticker){
-                        return StringHelper.validateLowerString(ticker) && ticker.indexOf(' ') < 0;
+                        return /^[a-z]+$/.exec(ticker)
                     },
 
                     position: 103,

@@ -26,7 +26,54 @@ export default class WalletTransfer {
 
     }
 
-    async changeDelegate({address, fee, nonce, delegateOld, delegate, memPoolValidateTxData, password, networkByte }){
+
+    async transferSimple( { address, txDsts, fee, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+
+        if ( typeof tokenCurrency === "string" && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
+
+        const requiredFunds = this._calculateRequiredFunds(txDsts);
+
+        const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        if (!foundFunds) throw new Exception(this, "Not enough funds");
+
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+
+        //calculate fee
+        if (fee === undefined){
+            fee = 0;
+            //TODO CALCULATE FEE
+        }
+
+        if (requiredFunds === 0) throw new Exception(this, "Amount needs to be positive");
+
+        if (foundFunds + memPoolPending < requiredFunds + fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, requiredFunds, fee });
+
+        const outs = this._processDstsAddresses(txDsts);
+
+        const txOut =  await this._scope.mainChain.transactionsCreator.createSimpleTransaction( {
+            vin: [{
+                publicKey: walletAddress.decryptPublicKey(),
+                amount: requiredFunds + fee,
+            }],
+            vout: outs,
+            privateKeys: [ {
+                privateKey: walletAddress.decryptPrivateKey()
+            } ],
+            nonce,
+            tokenCurrency,
+        } );
+
+        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
+
+        return txOut;
+
+    }
+
+
+    async changeDelegate({address, fee, nonce, delegateOld, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
 
         const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
@@ -77,12 +124,9 @@ export default class WalletTransfer {
 
     }
 
-    async transferSimple( { address, txDsts, fee, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+    async tokensCreate({address, fee, nonce, tokenData, memPoolValidateTxData, paymentId, password, networkByte}){
 
-        if ( typeof tokenCurrency === "string" && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
-
-        const requiredFunds = this._calculateRequiredFunds(txDsts);
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
@@ -97,32 +141,26 @@ export default class WalletTransfer {
             //TODO CALCULATE FEE
         }
 
-        if (requiredFunds === 0) throw new Exception(this, "Amount needs to be positive");
+        if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
 
-        if (foundFunds + memPoolPending < requiredFunds + fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, requiredFunds, fee });
 
-        const outs = this._processDstsAddresses(txDsts);
-
-        const txOut =  await this._scope.mainChain.transactionsCreator.createSimpleTransaction( {
+        const txOut =  await this._scope.mainChain.transactionsCreator.createTokenCreatorSimpleTransaction( {
             vin: [{
                 publicKey: walletAddress.decryptPublicKey(),
-                amount: requiredFunds + fee,
+                amount: fee,
             }],
-            vout: outs,
+            vout: [],
             privateKeys: [ {
                 privateKey: walletAddress.decryptPrivateKey()
             } ],
             nonce,
-            tokenCurrency,
+            tokenData,
         } );
 
         await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
 
         return txOut;
-
     }
-
-
 
     _calculateRequiredFunds(txDsts){
 

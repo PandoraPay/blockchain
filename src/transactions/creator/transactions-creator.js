@@ -114,6 +114,7 @@ export default class TransactionsCreator {
 
         if (!tokenPublicKeyHash){
             tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
+            console.log("tokenPublicKeyHash", tokenPublicKeyHash);
             tx.tokenPublicKeyHash = tokenPublicKeyHash;
         }
 
