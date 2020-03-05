@@ -28,12 +28,12 @@ export default class AccountHashMapDataBalance extends DBSchema{
                 tokenCurrency:{
                     type: "buffer",
                     minSize: 1,
-                    maxSize: 32,
+                    maxSize: 20,
 
                     default: TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 
                     validation(value) {
-                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer );
+                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ) || (value.length === 20);
                     },
 
                     position: 101,

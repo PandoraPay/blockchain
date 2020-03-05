@@ -1,6 +1,7 @@
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception, EnumHelper } = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
+const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 import ExchangeOfferPayment from "./exchange-offer-payment"
 import ExchangeOfferTypeEnum from "./exchange-offer-type-enum"
@@ -94,7 +95,11 @@ export default class ExchangeOffer extends DBSchema {
                 tokenCurrency:{
                     type: "buffer",
                     minSize: 1,
-                    maxSize: 32,
+                    maxSize: 20,
+
+                    validation(value) {
+                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ) || (value.length === 20);
+                    },
 
                     position:109,
                 },

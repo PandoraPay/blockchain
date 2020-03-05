@@ -80,8 +80,6 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
             //         "If [account] is specified, returns the balance in the account. "
             // },
 
-
-
         }
 
     }
@@ -138,21 +136,23 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
     async _getBalanceIncludingMemPool({account, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id}){
 
+        const chainData = this._scope.mainChain.data;
+
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
+        await chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         const publicKeyHash = address.publicKeyHash;
 
         let out;
         if (tokenCurrency){
-            out = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
+            out = await chainData.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
             const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency)[tokenCurrency.toString("hex")] || 0;
             return out + memPoolOut;
         }
         else {
 
-            out = await this._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
+            out = await chainData.accountHashMap.getBalances( publicKeyHash );
             const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency);
 
             const already = {};

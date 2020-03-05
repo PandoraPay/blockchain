@@ -44,6 +44,19 @@ export default class TokenHashVirtualMap extends HashVirtualMap {
         return label;
     }
 
+    async currencyExists(tokenPublicKeyHash){
+
+        if (!Buffer.isBuffer(tokenPublicKeyHash) && StringHelper.isHex(tokenPublicKeyHash) ) tokenPublicKeyHash = Buffer.from(tokenPublicKeyHash, "hex");
+
+        if ( EnumHelper.validateEnum( tokenPublicKeyHash.toString("hex") , TransactionTokenCurrencyTypeEnum) ) return;
+
+        const exists = await this.getTokenNode(tokenPublicKeyHash);
+
+        if (exists) return true;
+
+        throw new Exception(this, "Token Currency was not found");
+    }
+
     async getTokenNode( tokenPublicKeyHash ){
 
         tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);

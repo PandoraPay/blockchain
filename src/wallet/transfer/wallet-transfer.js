@@ -30,7 +30,7 @@ export default class WalletTransfer {
     async transferSimple( { address, txDsts, fee, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
 
         if ( typeof tokenCurrency === "string" && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
+        await this._scope.mainChain.data.tokenHashMap.currencyExists(tokenCurrency);
 
         const requiredFunds = this._calculateRequiredFunds(txDsts);
 

@@ -75,7 +75,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
     async getBalance( publicKeyHash, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
+        await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
         const out = await this.getMap(publicKeyHash);
@@ -114,7 +114,7 @@ export default class AccountHashVirtualMap extends HashVirtualMap {
     async updateBalance( publicKeyHash, value, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        if (!EnumHelper.validateEnum( tokenCurrency.toString("hex") , TransactionTokenCurrencyTypeEnum) ) throw new Exception(this, "Token Currency was not found");
+        await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         if (value === 0) throw new Exception(this, "Value is be different than 0");
 

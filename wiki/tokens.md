@@ -84,7 +84,7 @@ var changeSupply = async (tokenPublicKeyHash, supplyValue = 10) =>{
         nonce,
         tokenPublicKeyHash,
         supplyValue,
-        supplySign: (supplyValue > 0) ? true : false
+        supplySign: (supplyValue > 0) ? true : false,
         memPoolValidateTxData: false,
     });
 

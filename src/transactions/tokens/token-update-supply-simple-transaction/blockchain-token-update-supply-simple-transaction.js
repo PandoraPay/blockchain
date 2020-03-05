@@ -1,3 +1,7 @@
+const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
+const {Helper, Exception} = global.kernel.helpers;
+const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+
 import BlockchainSimpleTransaction from "../../simple-transaction/blockchain-simple-transaction";
 
 export default class BlockchainTokenUpdateSupplySimpleTransaction extends BlockchainSimpleTransaction {
@@ -81,11 +85,11 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
         const token = await chainData.tokenHashMap.getTokenNode( this.tokenPublicKeyHash );
         if (!token) throw new Exception(this, `Token doesn't exist`);
 
-        if (!token.data.printerPublicKeyHash.equals(this.vin[0].publicKeyHash)) //validate the printer public key hash
+        if (!token.printerPublicKeyHash.equals(this.vin[0].publicKeyHash)) //validate the printer public key hash
             throw new Exception(this, 'printerPublicKeyHash is not matching');
 
-        const newSupply = token.data.supply + this.supplyValue;
-        if ( newSupply > token.data.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });
+        const newSupply = token.supply + this.supplySignValue * this.supplyValue;
+        if ( newSupply > token.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });
 
         return true;
     }
@@ -94,10 +98,10 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
-        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, this.supplyValue );
+        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, this.supplySignValue );
         if (newSupply < 0) throw new Exception(this, "New Supply got negative", {newSupply });
 
-        const balance = await chainData.accountHashMap.updateBalance( this.vin[0].publicKeyHash, this.supplyValue, this.tokenPublicKeyHash );
+        const balance = await chainData.accountHashMap.updateBalance( this.vin[0].publicKeyHash, this.supplySignValue * this.supplyValue, this.tokenPublicKeyHash );
         if (balance < 0) throw new Exception(this, 'balance got negative', {balance});
 
         return true;
@@ -105,14 +109,18 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
 
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
 
-        const balance = await chainData.accountHashMap.updateBalance( this.vin[0].publicKeyHash, -this.supplyValue, this.tokenPublicKeyHash );
+        const balance = await chainData.accountHashMap.updateBalance( this.vin[0].publicKeyHash, (-this.supplySignValue) * this.supplyValue, this.tokenPublicKeyHash );
         if (balance < 0) throw new Exception(this, 'balance got negative', {balance});
 
-        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, -this.supplyValue );
+        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, (-this.supplySignValue) * this.supplyValue );
         if (newSupply < 0) throw new Exception(this, "New Supply got negative", {newSupply });
 
         return super.transactionRemoved(chain, chainData);
 
+    }
+
+    get supplySignValue(){
+        return this.supplySign ? 1 : - 1;
     }
 
 }
