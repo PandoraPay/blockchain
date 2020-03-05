@@ -7,6 +7,7 @@ Token **burning** - transaction to decrease the supply of a specific token
 ## Token Creation
 
 ```
+
 var create = async () =>{
 
     const mainAddress = PandoraWallet.$store.state.addresses.list[PandoraWallet.$store.state.wallet.mainAddress]

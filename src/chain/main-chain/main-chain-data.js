@@ -132,6 +132,7 @@ export default class MainChainData extends BaseChainData {
             this.addressTxHashMap.saveVirtualMap(true),
 
             this.accountHashMap.saveVirtualMap(true),
+            this.tokenHashMap.saveVirtualMap(true),
         ];
 
         await Promise.all(promises);
