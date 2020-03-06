@@ -31,7 +31,7 @@ export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
         if (!token) throw new Exception(this, 'token was not specified');
         if (!Buffer.isBuffer(token) && StringHelper.isHex(token) ) token = Buffer.from(token, "hex");
 
-        if ( EnumHelper.validateEnum( tokenPublicKeyHash.toString("hex") , TransactionTokenCurrencyTypeEnum) ) //00 token
+        if (toke.equals(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             return {
                 version:0,
                 name: "00",

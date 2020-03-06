@@ -405,7 +405,7 @@ export default  class MemPool extends DBSchema{
 
         let clone = true;
 
-        if ( !this._scope.mainChain.transactionsValidator.isTxReallyATx( transaction ) ){
+        if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) ){
             transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
             clone = false;
         }
@@ -508,7 +508,7 @@ export default  class MemPool extends DBSchema{
 
     async _removeTransactionFromMemPool(transaction, propagateTxMasterCluster = true, senderSockets){
 
-        if ( !this._scope.mainChain.transactionsValidator.isTxReallyATx( transaction ) ) {
+        if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) ) {
             transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
         }
 

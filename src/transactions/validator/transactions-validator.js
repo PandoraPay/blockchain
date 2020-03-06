@@ -25,10 +25,9 @@ export default class TransactionsValidator{
         if (EnumHelper.validateEnum( version , TransactionScriptTypeEnum) ) return true;
     }
 
-    isTxReallyATx(tx){
+    isReallyATx(tx){
 
-        if (!tx) return false;
-        if (tx instanceof BlockchainSimpleTransaction) return true;
+        if (tx && tx instanceof BlockchainSimpleTransaction) return true;
 
         return false;
     }
