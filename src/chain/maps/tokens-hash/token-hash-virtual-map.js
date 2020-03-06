@@ -48,11 +48,11 @@ export default class TokenHashVirtualMap extends HashVirtualMap {
 
         if (!Buffer.isBuffer(tokenPublicKeyHash) && StringHelper.isHex(tokenPublicKeyHash) ) tokenPublicKeyHash = Buffer.from(tokenPublicKeyHash, "hex");
 
-        if ( EnumHelper.validateEnum( tokenPublicKeyHash.toString("hex") , TransactionTokenCurrencyTypeEnum) ) return;
+        if ( EnumHelper.validateEnum( tokenPublicKeyHash.toString("hex") , TransactionTokenCurrencyTypeEnum) ) return true; //00 token
 
         const exists = await this.getTokenNode(tokenPublicKeyHash);
 
-        if (exists) return true;
+        if (exists) return true; //user created token
 
         throw new Exception(this, "Token Currency was not found");
     }

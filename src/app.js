@@ -13,6 +13,7 @@ import Forging from "src/forging/forging"
 import Genesis from "src/block/genesis/genesis"
 
 import AccountCommonSocketRouterPlugin from "src/sockets/protocol/account-common-socket-router-plugin"
+import TokenCommonSocketRouterPlugin from "src/sockets/protocol/token-common-socket-router-plugin"
 import BlockchainCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-common-socket-router-plugin"
 import TransactionsCommonSocketRouterPlugin from "src/sockets/protocol/transactions-common-socket-router-plugin"
 import WalletCommonSocketRouterPlugin from "src/sockets/protocol/wallet-common-socket-router-plugin"
@@ -223,6 +224,7 @@ export default class App extends Kernel.utils.App {
 
                 await Promise.all([
                     checkPlugin(commonSocketRouterPlugins, AccountCommonSocketRouterPlugin),
+                    checkPlugin(commonSocketRouterPlugins, TokenCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, BlockchainCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, BlockchainProtocolCommonSocketRouterPlugin),
                     checkPlugin(commonSocketRouterPlugins, TransactionsCommonSocketRouterPlugin),
