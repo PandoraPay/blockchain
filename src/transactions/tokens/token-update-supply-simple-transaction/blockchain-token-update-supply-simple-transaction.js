@@ -98,7 +98,7 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
-        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, this.supplySignValue );
+        const newSupply = await chainData.tokenHashMap.updateTokenSupply( this.tokenPublicKeyHash, this.supplySignValue * this.supplyValue );
         if (newSupply < 0) throw new Exception(this, "New Supply got negative", {newSupply });
 
         const balance = await chainData.accountHashMap.updateBalance( this.vin[0].publicKeyHash, this.supplySignValue * this.supplyValue, this.tokenPublicKeyHash );

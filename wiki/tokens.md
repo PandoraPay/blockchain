@@ -83,7 +83,7 @@ var changeSupply = async (tokenPublicKeyHash, supplyValue = 10) =>{
         fee: 1,
         nonce,
         tokenPublicKeyHash,
-        supplyValue,
+        supplyValue: Math.abs(supplyValue),
         supplySign: (supplyValue > 0) ? true : false,
         memPoolValidateTxData: false,
     });
