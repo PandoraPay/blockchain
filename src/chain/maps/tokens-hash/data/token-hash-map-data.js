@@ -32,7 +32,7 @@ export default class TokenHashMapData extends DBSchema{
                      * only lowercase ascii and one space between words is allowed.
                      */
                     validation(name){
-                        return /^([a-z]+ )+[a-z]+$|^[a-z]+$/.exec(name);
+                        return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name);
                     },
 
                     position: 101,
@@ -57,7 +57,7 @@ export default class TokenHashMapData extends DBSchema{
                      * only lowercase ascii is allowed. No space allowed
                      */
                     validation(ticker){
-                        return /^[a-z]+$/.exec(ticker)
+                        return /^[A-Z0-9]+$/.exec(ticker)
                     },
 
                     position: 103,

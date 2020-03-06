@@ -1,5 +1,5 @@
-const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = global.networking.sockets.protocol;
-const {Exception} = global.kernel.helpers;
+const {SocketRouterPlugin} = global.networking.sockets.protocol;
+const {Exception, StringHelper, BufferHelper, EnumHelper} = global.kernel.helpers;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
@@ -31,12 +31,12 @@ export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
         if (!token) throw new Exception(this, 'token was not specified');
         if (!Buffer.isBuffer(token) && StringHelper.isHex(token) ) token = Buffer.from(token, "hex");
 
-        if (toke.equals(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
+        if (token.equals(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             return {
                 version:0,
-                name: "00",
-                description: "Consensus Privacy Coin",
+                name: "PANDORA",
                 ticker: "PAN",
+                description: "Privacy Coin",
                 tokenPublicKeyHash: token,
                 decimalSeparator: 5,
             };

@@ -8,7 +8,7 @@ Token **burning** - transaction to decrease the supply of a specific token
 
 ```
 
-var create = async () =>{
+var createToken = async (name, description, ticker, maxSupply, decimalSeparator) =>{
 
     const mainAddress = PandoraWallet.$store.state.addresses.list[PandoraWallet.$store.state.wallet.mainAddress]
     if (!mainAddress) throw "Main address was not found";
@@ -24,11 +24,11 @@ var create = async () =>{
         nonce,
         tokenData:{
             version: 0,
-            name: "test token",
-            description: "token description 1234",
-            ticker: "tock",
-            maxSupply: 2100000000000000,
-            decimalSeparator: 8,
+            name,
+            description,
+            ticker,
+            maxSupply,
+            decimalSeparator,
             printerPublicKeyHash: mainAddress.publicKeyHash,
             supply: 0, //it needs to be 0
 
@@ -57,7 +57,8 @@ var create = async () =>{
 
 }
 
-create();
+createToken("test token", "token description 1234", "tock", 2100000000000000, 8 );
+createToken("token x", "token2 description 1234", "tockx", 2100000000000000, 8 );
 
 
 ```
@@ -112,6 +113,9 @@ changeSupply("1aff02668474c307133739d466d58c9e577f2e9c", 10);
 
 // burning coins from my own balance
 changeSupply("1aff02668474c307133739d466d58c9e577f2e9c", -5);
+
+
+changeSupply("74a57d94e9857ed9c36de26b4954553e0d8c6408", 80);
 
 
 ```
