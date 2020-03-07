@@ -58,7 +58,7 @@ export default class TokenHashMapData extends DBSchema{
                     type: 'string',
 
                     minSize: 0,
-                    maxSize: 255,
+                    maxSize: 512,
 
                     position: 103,
                 },

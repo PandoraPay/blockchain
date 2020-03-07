@@ -14,7 +14,7 @@ export default class TokenNameMapElement extends HashMapElement {
                     fixedBytes: 12,
                 },
 
-                string:{
+                id:{
                     minSize: 2,
                     maxSize: 15,
                 },

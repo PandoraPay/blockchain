@@ -87,7 +87,7 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
         const existsTokenName = await chainData.tokenNameHashMap.getMap( this.tokenData.name.toLowerCase() );
         if (existsTokenName) throw new Exception(this, 'Token Name already exists');
 
-        const existsTokenTicker = await chainData.tokenNameHashMap.getMap( this.tokenData.ticker.toLowerCase() );
+        const existsTokenTicker = await chainData.tokenTickerHashMap.getMap( this.tokenData.ticker.toLowerCase() );
         if (existsTokenTicker) throw new Exception(this, 'Token Ticker already exists');
 
         return true;

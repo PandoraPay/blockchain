@@ -14,7 +14,7 @@ export default class TokenTickerMapElement extends HashMapElement {
                     fixedBytes: 14,
                 },
 
-                string:{
+                id:{
                     minSize: 2,
                     maxSize: 6,
                 },
