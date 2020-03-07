@@ -57,8 +57,8 @@ var createToken = async (name, description, ticker, maxSupply, decimalSeparator)
 
 }
 
-createToken("test token", "token description 1234", "tock", 2100000000000000, 8 );
-createToken("token x", "token2 description 1234", "tockx", 2100000000000000, 8 );
+createToken("Test Token", "token description 1234", "TOCK", 2100000000000000, 8 );
+createToken("TOKEN X", "token2 description 1234", "TOCKX", 2100000000000000, 8 );
 
 
 ```

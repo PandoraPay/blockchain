@@ -38,15 +38,6 @@ export default class TokenHashMapData extends DBSchema{
                     position: 101,
                 },
 
-                description:{
-                    type: 'string',
-
-                    minSize: 0,
-                    maxSize: 255,
-
-                    position: 102,
-                },
-
                 ticker:{
                     type: 'string',
 
@@ -60,8 +51,18 @@ export default class TokenHashMapData extends DBSchema{
                         return /^[A-Z0-9]+$/.exec(ticker)
                     },
 
+                    position: 102,
+                },
+
+                description:{
+                    type: 'string',
+
+                    minSize: 0,
+                    maxSize: 255,
+
                     position: 103,
                 },
+
 
                 maxSupply:{
                     type: 'number',
