@@ -72,6 +72,16 @@ export default class BaseChainData extends DBSchema {
                     },
 
                     /**
+                     * Number of Tokens
+                     */
+                    tokensIndex:{
+                        type: "number",
+                        default: 0,
+
+                        position: 104,
+                    },
+
+                    /**
                      * Total Work (sum of difficulties)
                      */
                     chainwork:{
@@ -86,7 +96,7 @@ export default class BaseChainData extends DBSchema {
                             return chainwork;
                         },
 
-                        position: 104,
+                        position: 105,
                     },
 
 
@@ -98,7 +108,7 @@ export default class BaseChainData extends DBSchema {
                         type: "buffer",
                         fixedBytes: 32,
 
-                        position: 105,
+                        position: 106,
                     },
 
                     /**
@@ -109,7 +119,7 @@ export default class BaseChainData extends DBSchema {
                         type: "buffer",
                         fixedBytes: 32,
 
-                        position: 106,
+                        position: 107,
                     },
 
                     /**
@@ -122,7 +132,7 @@ export default class BaseChainData extends DBSchema {
 
                         removeLeadingZeros: true,
 
-                        position: 107,
+                        position: 108,
                     },
 
                     /**
@@ -135,7 +145,7 @@ export default class BaseChainData extends DBSchema {
 
                         removeLeadingZeros: true,
 
-                        position: 108,
+                        position: 109,
                     },
 
 
@@ -280,8 +290,9 @@ export default class BaseChainData extends DBSchema {
                 this.end = this.end - 1;
                 this.chainwork = this.chainwork.sub(  block.work );
 
-                this._scope.logger.info(this,'spliceBlocks', { transactionsIndex: this.transactionsIndex, txCount: block.txCount() });
+                this._scope.logger.info(this,'spliceBlocks', { transactionsIndex: this.transactionsIndex, tokensIndex: this.tokensIndex, txCount: block.txCount() });
                 this.transactionsIndex = this.transactionsIndex - block.txCount();
+                this.tokensIndex = this.tokensIndex - block.tokensCount();
                 delete this._grindingLockedTransfersFunds[i];
 
                 await block.removeBlock(this._scope.chain, this);

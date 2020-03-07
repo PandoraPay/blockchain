@@ -190,7 +190,6 @@ export default class BlockchainCommonSocketRouterPlugin extends SocketRouterPlug
         return {
             start: chainData.start,
             blocks: chainData.end,
-            transactionsIndex: chainData.transactionsIndex,
             hash: chainData.hash,
             kernelHash: chainData.kernelHash,
             prevHash: chainData.prevHash,

@@ -273,6 +273,7 @@ export default class BlockPoS extends DBSchema {
                 target: true,
                 totalDifficulty: true,
                 transactionsMerkleTree: true,
+                tokens: true,
                 pos:{
                     stakingAmount: true,
                     stakeForgerPublicKey: true,

@@ -46,6 +46,7 @@ export default class BaseChain extends Events{
         this.data.start = 0;
         this.data.end = 0;
         this.data.transactionsIndex = 0;
+        this.data.tokensIndex = 0;
         this.data.chainwork = new BN(0);
         this.data.hash = Buffer.alloc(32);
         this.data.prevHash = Buffer.alloc(32);

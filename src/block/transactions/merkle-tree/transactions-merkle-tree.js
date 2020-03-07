@@ -1,3 +1,6 @@
+import BlockchainTokenCreateSimpleTransaction
+    from "../../../transactions/tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction";
+
 const {MerkleTree} = global.kernel.dataStructures.merkleTree;
 const {Helper, Exception} = global.kernel.helpers;
 
@@ -216,6 +219,19 @@ export default class TransactionsMerkleTree extends MerkleTree {
 
     txCount(){
         return this.count;
+    }
+
+    async tokensCount(){
+
+        let count = 0;
+
+        const leaves = await this.leavesNonPruned();
+
+        for (const leaf of leaves)
+            if (leaf.transaction instanceof BlockchainTokenCreateSimpleTransaction)
+                count += 1;
+
+        return count;
     }
 
     async txIds(){

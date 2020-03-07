@@ -79,6 +79,7 @@ export default class MainChain extends BaseChain {
                     this.data.end = message.data.end;
                     this.data.start = message.data.start;
                     this.data.transactionsIndex = message.data.transactionsIndex;
+                    this.data.tokensIndex = message.data.tokensIndex;
                     this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( message.data.chainwork) );
                     this.data.hash = Buffer.from(message.data.hash );
                     this.data.prevHash = Buffer.from( message.data.prevHash );
@@ -196,6 +197,7 @@ export default class MainChain extends BaseChain {
 
                 newData.end = newData.end + 1;
                 newData.transactionsIndex = newData.transactionsIndex + block.txCount();
+                newData.tokensIndex = newData.tokensIndex + block.tokensCount();
                 newData.chainwork = newData.chainwork.add(  block.work );
                 newData.hash = block.hash();
                 newData.prevHash = block.prevHash;
@@ -286,6 +288,7 @@ export default class MainChain extends BaseChain {
                     start: newData.start,
                     end: newData.end,
                     transactionsIndex: newData.transactionsIndex,
+                    tokensIndex: newData.tokensIndex,
                     chainwork: newData.chainworkBuffer,
                     hash: newData.hash,
                     prevHash: newData.prevHash,
@@ -353,6 +356,7 @@ export default class MainChain extends BaseChain {
         forkSubChain.data.start = this.data.start;
         forkSubChain.data.end = this.data.end;
         forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
+        forkSubChain.data.tokensIndex = this.data.tokensIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
         forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
         forkSubChain.data._fallback = this.data;

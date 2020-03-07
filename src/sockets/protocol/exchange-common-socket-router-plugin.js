@@ -77,12 +77,12 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
     }
 
-    _getExchangeContentIds({ offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxTransactionsIds }){
+    _getExchangeContentIds({ offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffersIds }){
 
         if (typeof index !== "number") return null;
         if (typeof limit !== "number") return null;
 
-        limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxTransactionsIds) );
+        limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxExchangeOffersIds) );
 
         const array = this._scope.exchange.getExchangeData(offerType).array;
 
@@ -105,10 +105,10 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
         };
     }
 
-    _getExchangeContent({offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxTransactions, type = "buffer"  }){
+    _getExchangeContent({offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffers, type = "buffer"  }){
 
         if (typeof limit !== "number") return null;
-        limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxTransactions) );
+        limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxExchangeOffers) );
 
         const ids = this._getExchangeContentIds({offerType, index, limit});
         if (!ids) return false;

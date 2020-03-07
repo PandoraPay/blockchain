@@ -156,6 +156,12 @@ export default class Block extends DBSchema {
                         position: 108,
                     },
 
+                    tokens:{
+                        type: "number",
+
+                        position: 109,
+                    },
+
                     pos:{
                         type: "object",
                         classObject: BlockPoS,
@@ -237,6 +243,11 @@ export default class Block extends DBSchema {
          */
         
         if (await this.transactionsMerkleTree.validateMerkleTree( chain, chainData, this ) === false) return false;
+
+        /**
+         * validate the number of tokens in the block
+         */
+        if (this.tokens !== await this.transactionsMerkleTree.tokensCount() ) return false;
 
         /**
          * validate pos
@@ -339,6 +350,10 @@ export default class Block extends DBSchema {
 
     txCount(){
         return this.transactionsMerkleTree.txCount();
+    }
+
+    tokensCount(){
+        return this.tokens;
     }
 
     async txIds(){
