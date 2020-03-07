@@ -4,7 +4,7 @@ const {Helper, Exception} = global.kernel.helpers;
 const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 import BlockchainSimpleTransaction from "./../../simple-transaction/blockchain-simple-transaction"
-import TokenHashMapData from "../../../chain/maps/tokens-hash/data/token-hash-map-data";
+import TokenHashMapData from "../../../chain/maps/tokens/tokens-hash/data/token-hash-map-data";
 
 export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSimpleTransaction {
 
@@ -84,6 +84,12 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
         const exists = await chainData.tokenHashMap.getTokenNode( tokenPublicKeyHash );
         if (exists) throw new Exception(this, 'Token already exists');
 
+        const existsTokenName = await chainData.tokenNameHashMap.getMap( this.tokenData.name.toLowerCase() );
+        if (existsTokenName) throw new Exception(this, 'Token Name already exists');
+
+        const existsTokenTicker = await chainData.tokenNameHashMap.getMap( this.tokenData.ticker.toLowerCase() );
+        if (existsTokenTicker) throw new Exception(this, 'Token Ticker already exists');
+
         return true;
     }
 
@@ -92,6 +98,8 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
         await chainData.tokenHashMap.addMap(this.tokenPublicKeyHash, this.tokenData.toJSON() );
+        await chainData.tokenNameHashMap.addMap(this.tokenData.name.toLowerCase(), this.tokenPublicKeyHash.toString('hex') );
+        await chainData.tokenTickerHashMap.addMap(this.tokenData.ticker.toLowerCase(), this.tokenPublicKeyHash.toString('hex') );
 
         return true;
     }
@@ -99,6 +107,8 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
 
         await chainData.tokenHashMap.deleteMap(this.tokenPublicKeyHash);
+        await chainData.tokenNameHashMap.deleteMap(this.tokenData.name.toLowerCase()  );
+        await chainData.tokenTickerHashMap.deleteMap(this.tokenData.ticker.toLowerCase() );
 
         return super.transactionRemoved(chain, chainData);
 

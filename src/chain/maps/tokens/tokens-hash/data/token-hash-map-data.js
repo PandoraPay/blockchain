@@ -25,8 +25,8 @@ export default class TokenHashMapData extends DBSchema{
                 name:{
                     type: 'string',
 
-                    minSize: 4,
-                    maxSize: 10,
+                    minSize: 2,
+                    maxSize: 15,
 
                     /**
                      * only lowercase ascii and one space between words is allowed.

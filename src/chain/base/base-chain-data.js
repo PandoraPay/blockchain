@@ -14,7 +14,9 @@ import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/
 import BlockHashVirtualMap from "../maps/blocks/block-hash-map/block-hash-virtual-map";
 import HashBlockVirtualMap from "../maps/blocks/hash-block-map/hash-block-virtual-map";
 import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map";
-import TokenHashVirtualMap from "../maps/tokens-hash/token-hash-virtual-map";
+import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-map";
+import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
+import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -153,6 +155,16 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
+        this.tokenNameHashMap = new this._tokenNameMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
+        this.tokenTickerHashMap = new this._tokenTickerHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
         this.addressTxHashMap = new this._addressTxHashMapClass({
             ...this._scope,
             chainData: this,
@@ -189,6 +201,14 @@ export default class BaseChainData extends DBSchema {
 
     get _tokenHashMapClass(){
         return TokenHashVirtualMap;
+    }
+
+    get _tokenNameMapClass(){
+        return TokenNameVirtualMap;
+    }
+
+    get _tokenTickerHashMapClass(){
+        return TokenTickerVirtualMap;
     }
 
     get _addressTxHashMapClass(){
@@ -240,6 +260,8 @@ export default class BaseChainData extends DBSchema {
         this.hashBlockMap.resetHashMap();
         this.accountHashMap.resetHashMap();
         this.tokenHashMap.resetHashMap();
+        this.tokenTickerHashMap.resetHashMap();
+        this.tokenNameHashMap.resetHashMap();
     }
 
     /**
@@ -325,6 +347,9 @@ export default class BaseChainData extends DBSchema {
 
         this.accountHashMap._fallback = mainChainData.accountHashMap;
         this.tokenHashMap._fallback = mainChainData.tokenHashMap;
+
+        this.tokenNameHashMap._fallback = mainChainData.tokenNameHashMap;
+        this.tokenTickerHashMap._fallback = mainChainData.tokenTickerHashMap;
 
         this._fallback = mainChainData;
 

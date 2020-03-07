@@ -90,6 +90,10 @@ export default class MainChainData extends BaseChainData {
             this.addressTxHashMap.clearHashMap(),
 
             this.accountHashMap.clearHashMap(),
+            this.tokenHashMap.clearHashMap(),
+
+            this.tokenNameHashMap.clearHashMap(),
+            this.tokenTickerHashMap.clearHashMap(),
 
         ];
 
@@ -133,6 +137,9 @@ export default class MainChainData extends BaseChainData {
 
             this.accountHashMap.saveVirtualMap(true),
             this.tokenHashMap.saveVirtualMap(true),
+
+            this.tokenNameHashMap.saveVirtualMap(true),
+            this.tokenTickerHashMap.saveVirtualMap(true),
         ];
 
         await Promise.all(promises);

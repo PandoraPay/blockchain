@@ -17,9 +17,9 @@ const AccountHashMapElement = require("src/chain/maps/account-hash/account-hash-
 const AccountHashMapData = require("src/chain/maps/account-hash/data/account-hash-map-data").default;
 const AccountHashMapDataDelegate = require ("src/chain/maps/account-hash/data/account-hash-map-data-delegate").default;
 const AccountHashMapDataBalance = require("src/chain/maps/account-hash/data/account-hash-map-data-balance").default;
-const TokenHashVirtualMap = require("src/chain/maps/tokens-hash/token-hash-virtual-map").default;
-const TokenHashMapElement = require("src/chain/maps/tokens-hash/token-hash-map-element").default;
-const TokenHashMapData = require("src/chain/maps/tokens-hash/data/token-hash-map-data").default;
+const TokenHashVirtualMap = require("src/chain/maps/tokens/tokens-hash/token-hash-virtual-map").default;
+const TokenHashMapElement = require("src/chain/maps/tokens/tokens-hash/token-hash-map-element").default;
+const TokenHashMapData = require("src/chain/maps/tokens/tokens-hash/data/token-hash-map-data").default;
 
 const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
 const BlockchainDelegateStakeSimpleTransaction = require("src/transactions/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction").default;
