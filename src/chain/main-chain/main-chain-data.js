@@ -79,6 +79,8 @@ export default class MainChainData extends BaseChainData {
 
     async clearData(){
 
+        this._scope.logger.info(this, "Delete hash maps");
+
         //delete maps
         const promises = [
 
@@ -128,18 +130,18 @@ export default class MainChainData extends BaseChainData {
          */
 
         const promises = [
-            this.blockHashMap.saveVirtualMap(true),
-            this.hashBlockMap.saveVirtualMap(true),
+            this.blockHashMap.saveVirtualMap(),
+            this.hashBlockMap.saveVirtualMap(),
 
-            this.txHashMap.saveVirtualMap(true),
-            this.addressHashMap.saveVirtualMap(true),
-            this.addressTxHashMap.saveVirtualMap(true),
+            this.txHashMap.saveVirtualMap(),
+            this.addressHashMap.saveVirtualMap(),
+            this.addressTxHashMap.saveVirtualMap(),
 
-            this.accountHashMap.saveVirtualMap(true),
-            this.tokenHashMap.saveVirtualMap(true),
+            this.accountHashMap.saveVirtualMap(),
+            this.tokenHashMap.saveVirtualMap(),
 
-            this.tokenNameHashMap.saveVirtualMap(true),
-            this.tokenTickerHashMap.saveVirtualMap(true),
+            this.tokenNameHashMap.saveVirtualMap(),
+            this.tokenTickerHashMap.saveVirtualMap(),
         ];
 
         await Promise.all(promises);
