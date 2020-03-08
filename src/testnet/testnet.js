@@ -36,7 +36,7 @@ export default class TestNet{
                 const wallets = this._scope.wallet.addresses.map( it => it.decryptPublicAddress( ).calculateAddress() );
 
 
-                this._scope.masterCluster.sendMessage("testnet-wallet", {wallets: wallets}, false );
+                this._scope.masterCluster.sendMessage("testnet-wallet", {  wallets }, false );
 
                 this.createTestNetTransactionsToSlaveWallets();
 
@@ -50,6 +50,7 @@ export default class TestNet{
             let count = 0;
             this._scope.masterCluster.on("testnet-wallet", ({wallets}) =>{
 
+                this._scope.logger.warn(this, 'testnet-wallet received', wallets);
 
                 wallets.map( wallet => {
 
@@ -146,6 +147,7 @@ export default class TestNet{
 
     async createTestNetTransactionsToSlaveWallets(){
 
+
         let moneySent = false;
         let processing = false;
 
@@ -182,7 +184,7 @@ export default class TestNet{
                 }
             }
 
-            processing= false;
+            processing = false;
 
 
         });

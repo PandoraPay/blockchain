@@ -12,7 +12,7 @@ export default class TransactionsCreator {
         this._scope = scope;
     }
 
-    async _calculateNonce(nonce, tx){
+    async _calculateNonce(chain, nonce, tx){
         if (nonce === undefined) {
             nonce = await chain.data.accountHashMap.getNonce(tx.vin[0].publicKeyHash);
             nonce = this._scope.memPool.getMemPoolTransactionNonce( tx.vin[0].publicKeyHash,  nonce || 0);
@@ -41,7 +41,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        nonce = await this._calculateNonce(nonce, tx);
+        nonce = await this._calculateNonce(chain, nonce, tx);
 
         const signatures = tx.signTransaction(privateKeys);
 
@@ -70,7 +70,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        nonce = await this._calculateNonce(nonce, tx);
+        nonce = await this._calculateNonce(chain, nonce, tx);
 
         if ( !delegateOld ){
             delegateOld = await chain.data.accountHashMap.getDelegate(tx.vin[0].publicKeyHash);
@@ -104,7 +104,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        nonce = await this._calculateNonce(nonce, tx);
+        nonce = await this._calculateNonce(chain, nonce, tx);
 
         if (!tokenPublicKeyHash){
             tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
@@ -141,7 +141,7 @@ export default class TransactionsCreator {
 
         }, "object" );
 
-        nonce = await this._calculateNonce(nonce, tx);
+        nonce = await this._calculateNonce(chain, nonce, tx);
 
         if (!tokenPublicKeyHash){
             tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
