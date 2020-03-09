@@ -361,6 +361,8 @@ export default class MainChain extends BaseChain {
         forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
         forkSubChain.data._fallback = this.data;
 
+        forkSubChain.data.setFallbacks(this.data);
+
         return forkSubChain;
 
     }

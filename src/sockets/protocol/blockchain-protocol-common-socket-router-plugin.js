@@ -152,6 +152,14 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         this._scope.logger.info(this, "new block received", {end: this._scope.mainChain.data.end, chainwork: req.chainwork });
 
+        let reqHash = req.hash.toString('hex');
+        let reqKernelHash = req.kernelHash.toString('hex');
+
+        if (typeof reqHash === 'string') reqHash = Buffer.from(reqHash, 'hex');
+        if (typeof reqKernelHash === 'string') reqKernelHash = Buffer.from(reqKernelHash, 'hex');
+        if (!Buffer.isBuffer(reqHash) || reqHash.length !== 32) throw new Exception(this, 'hash is invalid' );
+        if (!Buffer.isBuffer(reqKernelHash) || reqKernelHash.length !== 32) throw new Exception(this, 'kernelHash is invalid');
+
         if (this._scope.mainChain.data.end < req.blocks - this._scope.argv.blockchain.maxForkAllowed ) return this._propagateNewBlock( socket );
 
         const chainwork = MarshalData.decompressBigNumber( req.chainwork );
@@ -179,12 +187,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 forkSubchain.data.unmarshal({
                     forkStart: req.blocks - 1,
                     forkEnd: req.blocks,
-                    listHashes: [{
-                        buffer: req.hash,
-                    }],
-                    listKernelHashes: [{
-                        buffer: req.kernelHash,
-                    }],
+                    listHashes: [ reqHash ],
+                    listKernelHashes: [ reqKernelHash ],
                     chainwork,
                 }, "object", undefined, {
                     onlyFields: {
@@ -196,8 +200,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                     },
                 });
 
-                forkSubchain.data.hashes[ req.hash.toString("hex") ] = true;
-                forkSubchain.data.listKernelHashes[ req.kernelHash.toString("hex") ] = true;
+                forkSubchain.data.hashes[ reqHash.toString("hex") ] = true;
+                forkSubchain.data.kernelHashes[ reqKernelHash.toString("hex") ] = true;
 
             }
 
@@ -216,19 +220,22 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                 //download hash and kernelHash
                 if ( forkHeight === req.blocks-1 ) { //last block, no download
-                    hash = req.hash;
-                    kernelHash = req.kernelHash;
+                    hash = reqHash;
+                    kernelHash = reqKernelHash;
                 }
                 else { //download hash & kernelHash
                     const blockHashes = await socket.emitAsync('blockchain/get-block-hashes', {index: forkHeight});
 
-                    if (!blockHashes) throw new Exception(this, 'blockchain/get-block-hashes returned undefined');
+                    if (!blockHashes || typeof blockHashes !== "object") throw new Exception(this, 'blockchain/get-block-hashes returned undefined');
+
                     hash =  blockHashes.hash;
                     kernelHash =  blockHashes.kernelHash;
                 }
 
-                if (!hash || !Buffer.isBuffer(hash) || !kernelHash || !Buffer.isBuffer(kernelHash))
-                    throw new Exception(this, "Hash or KernelHash was not received");
+                if (typeof hash === 'string') hash = Buffer.from(hash, 'hex');
+                if (typeof kernelHash === 'string') kernelHash = Buffer.from(kernelHash, 'hex');
+                if (!Buffer.isBuffer(hash) || hash.length !== 32) throw new Exception(this, 'hash is invalid' );
+                if (!Buffer.isBuffer(kernelHash) || kernelHash.length !== 32) throw new Exception(this, 'kernelHash is invalid');
 
                 //TODO asking if this hash/kernel was already found somewhere else
                 //if yes propagate the list
@@ -297,7 +304,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                     const forkSubchainHash = await forkSubchain.data.getBlockHash(forkHeight);
 
-                    if (forkSubchainHash && hash && hash.equals( forkSubchainHash )) {
+                    if (forkSubchainHash && hash.equals( forkSubchainHash )) {
                         forkHeight++;
                         this._scope.logger.log(this, "FORK IDENTIFIED", forkHeight);
                         break;
@@ -369,7 +376,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
             const workchainComparison = this._scope.mainChain.data.validateChainwork( forkSubchain.data.chainwork, forkSubchain.data.end );
             if ( workchainComparison <= 0)
-                throw new Exception(this, "chainwork is less now");
+                throw new Exception(this, "chainwork is less now", workchainComparison);
 
             //Not ready
             if (!forkSubchain.data.ready || forkSubchain.data.processing) return;

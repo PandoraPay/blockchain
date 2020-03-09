@@ -163,7 +163,6 @@ export default class TestNet{
 
             if (wallet && !this._testnetWalletsSent){
 
-                console.log("wallet has money", amount, this._testnetWallets );
                 this._testnetWalletsSent = true;
 
                 try{

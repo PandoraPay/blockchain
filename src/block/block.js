@@ -311,13 +311,15 @@ export default class Block extends DBSchema {
         await chainData.hashBlockMap.updateMap( this.hash().toString("hex"), Number.parseInt(this.height) );
 
 
-        await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
+        if (!chain.isForkSubChain)
+            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
         
     }
 
     async successfullyRemoved(chain = this._scope.chain, chainData = chain.data){
 
-        await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyRemoved(chain, chainData, this);
+        if (!chain.isForkSubChain)
+            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyRemoved(chain, chainData, this);
 
         /**
          * Remove hash from HashMap
