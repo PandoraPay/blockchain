@@ -277,7 +277,7 @@ export default class BaseChainData extends DBSchema {
     /**
      *  it needs to be locked !
      */
-    async spliceBlocks( start ){
+    async spliceBlocks( chain = this._scope.chain, start ){
 
         let blocksRemoved = [];
 
@@ -295,7 +295,7 @@ export default class BaseChainData extends DBSchema {
                 this.tokensIndex = this.tokensIndex - block.tokensCount();
                 delete this._grindingLockedTransfersFunds[i];
 
-                await block.removeBlock(this._scope.chain, this);
+                await block.removeBlock( chain, this);
 
                 blocksRemoved.push( block );
             }

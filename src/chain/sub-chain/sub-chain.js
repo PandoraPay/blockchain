@@ -25,7 +25,7 @@ export default class SubChain extends BaseChain{
 
         try{
 
-            await this.data.spliceBlocks(this.data.start, )
+            await this.data.spliceBlocks( this, this.data.start, )
 
         }catch(err){
 
@@ -45,7 +45,7 @@ export default class SubChain extends BaseChain{
 
         if (blocks.length === 0) return false;
 
-        await this.data.spliceBlocks( blocks[0].height, );
+        await this.data.spliceBlocks( this, blocks[0].height, );
 
         for (let i=0; i < blocks.length; i++){
 

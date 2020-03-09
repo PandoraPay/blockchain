@@ -31,7 +31,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
          */
         const nonce = await chainData.accountHashMap.getNonce( this.vin[0].publicKeyHash ) || 0;
 
-        if (nonce !== this.nonce) throw new Exception(this, "Nonce is invalid", {nonce, txNonce: this.nonce });
+        if (nonce !== this.nonce) throw new Exception(this, "Nonce is invalid", {nonce, txNonce: this.nonce, publicKeyHash: this.vin[0].publicKeyHash });
 
         for (let i=0; i < this.vin.length; i++){
 
@@ -39,7 +39,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const balance = await chainData.accountHashMap.getBalance( vin.publicKeyHash  ) || 0;
 
-            if (balance < vin.amount) throw new Exception(this, "Not Enough Funds", { publicKey: vin.publicKey, balance, txAmount: vin.amount }, )
+            if (balance < vin.amount) throw new Exception(this, "Not Enough Funds", { publicKeyHash: vin.publicKeyHash, balance, txAmount: vin.amount,  }, )
 
         }
 

@@ -166,7 +166,7 @@ export default class MainChain extends BaseChain {
 
             this._scope.logger.warn(this, 'Filtered Identical Blocks' );
 
-            const blocksRemoved = await newData.spliceBlocks( blocks[0].height, );
+            const blocksRemoved = await newData.spliceBlocks( this, blocks[0].height, );
             if (!blocksRemoved) throw new Exception(this, "error removing blocks");
 
             this._scope.logger.warn(this, 'Blocks Removed' );

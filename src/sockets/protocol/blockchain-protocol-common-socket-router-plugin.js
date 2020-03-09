@@ -249,7 +249,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                             const hash = forkSubchain.data.listHashes[i];
                             const kernelHash = forkSubchain.data.listKernelHashes[i];
 
-                            if (forkSubchain2.data.listHashes.length >= this._scope.argv.blockchain.maxForkAllowed){
+                            if (forkSubchain2.data.listHashes.length >= this._scope.argv.blockchain.maxForkAllowed - 1 ){
                                 done = false;
                                 index = i;
                                 break;
@@ -306,7 +306,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 }
 
                 //to be sure i don't exceed the limit
-                if (forkSubchain.data.listHashes.length >= this._scope.argv.blockchain.maxForkAllowed)
+                if (forkSubchain.data.listHashes.length >= this._scope.argv.blockchain.maxForkAllowed - 1 )
                     break;
 
                 forkSubchain.data.forkStart = forkHeight ;
