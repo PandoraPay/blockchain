@@ -176,7 +176,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
         let forkSubchain;
         try{
 
-            forkSubchain = this._getForkSubchainByBlockHash(req.hash.toString("hex") );
+            forkSubchain = this._getForkSubchainByBlockHash( reqHash );
             if (!forkSubchain) {
 
 
@@ -215,6 +215,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
             do {
 
                 const socket = this._getForkSubchainSocket(forkSubchain);
+                if (!socket) throw new Exception(this, 'Socket is empty');
 
                 let hash, kernelHash;
 
@@ -241,7 +242,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                 //if yes propagate the list
 
                 //let's verify with all other forks, if they match, then we should merge them
-                const forkSubchain2 = this._getForkSubchainByBlockHash( hash.toString("hex") );
+                const forkSubchain2 = this._getForkSubchainByBlockHash( hash );
                 if (forkSubchain2 && forkSubchain2 !== forkSubchain){
 
                     if (forkSubchain2.processing){
@@ -361,16 +362,21 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
          * Sort by chainwork
          */
 
-        this._scope.logger.log(this, "Subchains count", this.forkSubchainsList.length );
 
-        this.forkSubchainsList.sort(
-            (a, b) => !a.data._schema.fields.chainwork.sorts.worksort.filter.call(a.data) ? a.data._schema.fields.chainwork.sorts.worksort.score.call(a.data) : 0 -
-                                 !b.data._schema.fields.chainwork.sorts.worksort.filter.call(b.data) ? b.data._schema.fields.chainwork.sorts.worksort.score.call(b.data) : 0 );
-
-        //getting the best subchain
-        const forkSubchain = this.forkSubchainsList[0];
-
+        let forkSubchain;
         try{
+
+            this._scope.logger.log(this, "Subchains count", this.forkSubchainsList.length );
+            for (const fork of this.forkSubchainsList )
+                this._scope.logger.log(this, 'Subchain ', {id: fork.data.id, forkEnd: fork.data.forkEnd, forkStart: fork.data.forkStart });
+
+            //getting the best subchain
+            for (const fork of this.forkSubchainsList)
+                if ( fork.data.isReady() && ( !forkSubchain ||  forkSubchain.data.chainwork.lt( fork.data.chainwork ) ) ){
+                    forkSubchain = fork;
+                }
+
+            if (!forkSubchain) return;
 
             //this._scope.logger.log(this, "subchain.data.chainwork", { "subchain.data.chainwork" :  subchain.data.chainwork.toString(), "mainchain.data.chainwork": this._scope.mainChain.data.chainwork.toString() } );
 
@@ -503,6 +509,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     }
 
     _getForkSubchainByBlockHash(blockHash){
+
+        if (Buffer.isBuffer(blockHash)) blockHash = blockHash.toString('hex');
 
         for (let i=0; i < this.forkSubchainsList.length; i++)
             if (this.forkSubchainsList[i].data.hashes[blockHash])

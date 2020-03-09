@@ -30,21 +30,6 @@ export default class ForkSubChainData extends SubChainData{
 
                     chainwork:{
 
-                        sorts :{
-
-                            worksort:{
-
-                                filter(){
-                                    return !this.ready && this.processing;
-                                },
-
-                                score(){
-                                    return this.chainwork.toNumber();
-                                },
-
-                            }
-                        },
-
                         position: 302,
 
                     },
@@ -89,6 +74,14 @@ export default class ForkSubChainData extends SubChainData{
 
         this.errorDownload = 0;
 
+    }
+
+    isReady(){
+        return this.ready && !this.processing;
+    }
+
+    score(){
+        return this.chainwork;
     }
 
 
