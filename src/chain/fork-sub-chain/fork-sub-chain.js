@@ -17,5 +17,9 @@ export default class ForkSubChain extends SubChain{
     get _chainDataClass(){
         return ForkSubChainData
     }
+
+    get isForkSubChain(){
+        return true;
+    }
     
 }

@@ -39,6 +39,7 @@ export default class SubChain extends BaseChain{
 
         if (!blocks) return false;
         if (!Array.isArray(blocks)) blocks = [blocks];
+        if (blocks.length === 0) return false;
 
         blocks = await this.filterIdenticalBlocks(blocks);
 

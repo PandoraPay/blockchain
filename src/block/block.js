@@ -236,7 +236,8 @@ export default class Block extends DBSchema {
          * Validate POS
          */
 
-        if (await this.pos.validatePOS(chain, chainData) === false ) return false;
+        if (!chain.isForkSubChain)
+            if (await this.pos.validatePOS(chain, chainData) === false ) return false;
 
         /**
          * validate Merkle tree
@@ -275,9 +276,11 @@ export default class Block extends DBSchema {
     async addBlock(chain = this._scope.chain, chainData = chain.data){
 
         //update transactions
-        if (await this.transactionsMerkleTree.transactionsMerkleTreeInclude(chain, chainData, this) !== true) return false;
+        if (!chain.isForkSubChain) {
+            if (await this.transactionsMerkleTree.transactionsMerkleTreeInclude(chain, chainData, this) !== true) return false;
 
-        if (await this.pos.addBlockPOS(chain, chainData, this) !== true) return false;
+            if (await this.pos.addBlockPOS(chain, chainData, this) !== true) return false;
+        }
 
 
         return true;
@@ -286,9 +289,11 @@ export default class Block extends DBSchema {
 
     async removeBlock(chain = this._scope.chain, chainData = chain.data){
 
-        if (await this.pos.removeBlockPOS(chain, chainData, this) !== true ) return false;
+        if (!chain.isForkSubChain) {
+            if (await this.pos.removeBlockPOS(chain, chainData, this) !== true) return false;
 
-        if ( await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this) !== true)  return false;
+            if (await this.transactionsMerkleTree.transactionsMerkleTreeRemove(chain, chainData, this) !== true) return false;
+        }
 
         return true;
     }

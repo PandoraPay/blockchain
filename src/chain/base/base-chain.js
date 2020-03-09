@@ -155,6 +155,9 @@ export default class BaseChain extends Events{
         return BaseChainData;
     }
 
+    get isForkSubChain(){
+        return false;
+    }
 
 
 }
