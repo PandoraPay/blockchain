@@ -243,63 +243,8 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                 //let's verify with all other forks, if they match, then we should merge them
                 const forkSubchain2 = this._getForkSubchainByBlockHash( hash );
-                if (forkSubchain2 && forkSubchain2 !== forkSubchain){
-
-                    if (forkSubchain2.processing){
-                        break;
-                    }else {
-
-                        let done = true, index;
-
-                        //saving hashes at the end of the forkSubchain2
-                        for (let i=0; i < forkSubchain.data.listHashes.length; i++  ){
-
-                            const hash = forkSubchain.data.listHashes[i];
-                            const kernelHash = forkSubchain.data.listKernelHashes[i];
-
-                            if (forkSubchain2.data.listHashes.length >= this._scope.argv.blockchain.maxForkAllowed - 1 ){
-                                done = false;
-                                index = i;
-                                break;
-                            }
-
-                            if ( !forkSubchain2.data.hashes[hash.toString("hex")] ) {
-                                forkSubchain2.data.hashes[ hash.toString("hex") ] = true;
-                                forkSubchain2.data.pushArray("listHashes", hash, "object" ); //at the end
-                            }
-
-                            if ( !forkSubchain2.data.kernelHashes[kernelHash.toString("hex")] ) {
-                                forkSubchain2.data.kernelHashes[ kernelHash.toString("hex") ] = true;
-                                forkSubchain2.data.pushArray("listKernelHashes", kernelHash, "object"); //at the end
-                            }
-
-                        }
-
-                        if (done){
-
-                            if (forkSubchain.data.chainwork.gt( forkSubchain2.data.chainwork) ) {
-                                forkSubchain2.data.forkEnd = forkSubchain.data.forkEnd;
-                                forkSubchain2.data.hash = forkSubchain.data.hash;
-                                forkSubchain2.data.kernelHash = forkSubchain.data.kernelHash;
-                                forkSubchain2.data.chainwork = forkSubchain.data.chainwork;
-                                this._deleteForkSubchain(forkSubchain);
-                            }
-
-                        } else {
-                            forkSubchain.data.forkStart = index;
-
-                            for (let i=0; i < index; i++){
-                                delete forkSubchain.data.hashes[ forkSubchain.data.listHashes[i].toString('hex') ];
-                                delete forkSubchain.data.kernelHashes[ forkSubchain.data.listKernelHashes[i].toString('hex') ];
-                            }
-                            forkSubchain.data.listHashes.splice(0, index);
-                            forkSubchain.data.listKernelHashes.splice(0, index);
-                        }
-
-                        return;
-                    }
-
-                }
+                if (forkSubchain2 && forkSubchain2 !== forkSubchain)
+                    break;
 
                 if (this._scope.mainChain.data.end > forkHeight){
 
@@ -318,16 +263,11 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                     break;
 
                 forkSubchain.data.forkStart = forkHeight ;
+                forkSubchain.data.pushArray("listHashes", hash, "object", undefined, 0);
+                forkSubchain.data.hashes[ hash.toString("hex") ] = true;
 
-                if ( !forkSubchain.data.hashes[hash.toString("hex")]  ) {
-                    forkSubchain.data.pushArray("listHashes", hash, "object", undefined, 0);
-                    forkSubchain.data.hashes[ hash.toString("hex") ] = true;
-                }
-
-                if ( !forkSubchain.data.kernelHashes[kernelHash.toString("hex")] ) {
-                    forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, 0);
-                    forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
-                }
+                forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, 0);
+                forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
 
                 forkHeight--;
 
@@ -380,9 +320,11 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
             //this._scope.logger.log(this, "subchain.data.chainwork", { "subchain.data.chainwork" :  subchain.data.chainwork.toString(), "mainchain.data.chainwork": this._scope.mainChain.data.chainwork.toString() } );
 
-            const workchainComparison = this._scope.mainChain.data.validateChainwork( forkSubchain.data.chainwork, forkSubchain.data.end );
-            if ( workchainComparison <= 0)
-                throw new Exception(this, "chainwork is less now", workchainComparison);
+            for (const fork of this.forkSubchainsList)
+                if (!forkSubchain || forkSubchain.forkStart > fork.forkStart){
+                    forkSubchain = fork;
+                    break;
+                }
 
             //Not ready
             if (!forkSubchain.data.ready || forkSubchain.data.processing) return;
@@ -394,6 +336,9 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
                 if (this._scope.argv.debug.enabled)
                     this._scope.logger.log( this, "subchain downloaded successfully" );
+
+                for (let i=0; i < forkSubchain.data.listBlocks.length; i++)
+                    this._scope.logger.log( this, "listBlock", forkSubchain.data.listBlocks[i].height );
 
                 forkSubchain.data.processing = true;
                 await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, forkSubchain.sockets );

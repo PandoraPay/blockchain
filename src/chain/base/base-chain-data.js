@@ -290,7 +290,7 @@ export default class BaseChainData extends DBSchema {
                 this.end = this.end - 1;
                 this.chainwork = this.chainwork.sub(  block.work );
 
-                this._scope.logger.info(this,'spliceBlocks', { transactionsIndex: this.transactionsIndex, tokensIndex: this.tokensIndex, txCount: block.txCount() });
+                this._scope.logger.info(this,'spliceBlocks', { height:i, transactionsIndex: this.transactionsIndex, tokensIndex: this.tokensIndex, txCount: block.txCount() });
                 this.transactionsIndex = this.transactionsIndex - block.txCount();
                 this.tokensIndex = this.tokensIndex - block.tokensCount();
                 delete this._grindingLockedTransfersFunds[i];

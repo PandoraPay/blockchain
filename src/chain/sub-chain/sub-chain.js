@@ -73,17 +73,15 @@ export default class SubChain extends BaseChain{
 
     insertBlock(block){
 
+        if (this.data.blocks[block.height])
+            throw new Exception(this, 'block already found', block.height );
+
         let insertPosition;
-
-        if (!this.data.blocks[block.height]) {
-
-            for (let j=0; j < this.data.listBlocks.length-1; j++)
-                if (this.data.listBlocks[j].height < block.height && this.data.listBlocks[j+1].height > block.height ){
-                    insertPosition = j;
-                    break;
-                }
-
-        }
+        for (let j=0; j < this.data.listBlocks.length-1; j++)
+            if (this.data.listBlocks[j].height < block.height && ( j+1 < this.data.listBlocks.length && this.data.listBlocks[j+1].height > block.height ) ){
+                insertPosition = j;
+                break;
+            }
 
         this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
         this.data.blocks[block.height] = block;
