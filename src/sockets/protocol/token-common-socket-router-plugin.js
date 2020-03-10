@@ -81,27 +81,7 @@ export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     }
 
-    async _getContentIds({ index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxTokensIds }){
-
-        if (typeof index !== "number") return null;
-        if (typeof limit !== "number") return null;
-
-        limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxTokensIds) );
-
-        const obj = new TokenHashMapData(this._scope);
-
-        const elements = await this._scope.db._scanMiddleware( obj, '', '',  index, limit, undefined );
-        const out  = elements.filter ( obj => obj );
-
-        return out;
-
-        return {
-            out,
-            next: out.length === limit ? index + limit : undefined,
-        };
-    }
-
-    async _getContentIds({ index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxTokensIds }){
+    async _getContentIds({ index = 0, limit = this._scope.argv.transactions.protocol.protocolMaxTokensIds }){
 
         if (typeof index !== "number") return null;
         if (typeof limit !== "number") return null;
@@ -115,11 +95,11 @@ export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
         return {
             out,
-            next: out.length === limit ? index + limit : undefined,
+            next: out.length === limit ? index + limit : 0,
         };
     }
 
-    async _getContent({ index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxTokens }){
+    async _getContent({ index = 0, limit = this._scope.argv.transactions.protocol.protocolMaxTokens }){
 
         if (typeof index !== "number") return null;
         if (typeof limit !== "number") return null;
@@ -130,7 +110,7 @@ export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
         return {
             out,
-            next: out.length === limit ? index + limit : undefined,
+            next: out.length === limit ? index + limit : 0,
         };
     }
 
