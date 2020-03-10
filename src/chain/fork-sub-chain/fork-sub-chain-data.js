@@ -47,10 +47,6 @@ export default class ForkSubChainData extends SubChainData{
                     forkEnd:{
                         type: "number",
 
-                        validation(forkEnd){
-                            return forkEnd >= this.end;
-                        },
-
                         position: 304,
                     },
 

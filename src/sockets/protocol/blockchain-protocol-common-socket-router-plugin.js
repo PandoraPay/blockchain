@@ -368,7 +368,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
             this._scope.logger.log(this, "Subchains count", this.forkSubchainsList.length );
             for (const fork of this.forkSubchainsList )
-                this._scope.logger.log(this, 'Subchain ', {id: fork.data.id, forkEnd: fork.data.forkEnd, forkStart: fork.data.forkStart });
+                this._scope.logger.log(this, 'Subchain ', {id: fork.data.id, forkEnd: fork.data.forkEnd, forkStart: fork.data.forkStart, isReady: fork.data.isReady() });
 
             //getting the best subchain
             for (const fork of this.forkSubchainsList)
