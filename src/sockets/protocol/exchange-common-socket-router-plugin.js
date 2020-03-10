@@ -72,40 +72,33 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
     async _getExchangeContentCount({offerType}){
 
-        const array = this._scope.exchange.getExchangeData(offerType).array;
-        return array.length;
+        const exchangeSchemaClass = this._scope.exchange.getExchangeSchemaClass(offerType);
+        const out = await exchangeSchemaClass.count( this._scope.db, undefined, '', {skipProcessingConstructionValues: true, skipValidation: true } );
+        return out;
 
     }
 
-    _getExchangeContentIds({ offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffersIds }){
+    //TODO: right now the returned values are not sorted
+    async _getExchangeContentIds({ offerType, index = 0, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffersIds }){
 
         if (typeof index !== "number") return null;
         if (typeof limit !== "number") return null;
 
         limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxExchangeOffersIds) );
 
-        const array = this._scope.exchange.getExchangeData(offerType).array;
+        const exchangeSchemaClass = this._scope.exchange.getExchangeSchemaClass(offerType);
+        const schemaObject = new exchangeSchemaClass( this._scope, undefined, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true }  );
 
-        index = Math.min( index, array.length );
-        const startIndex = Math.max(0, index-limit );
-
-        const out = {};
-
-        for (let i=startIndex; i < index; i++){
-
-            const offer = array[i];
-            const hash = offer.id.toString("hex");
-            out[hash] = true;
-
-        }
+        const elements = await this._scope.db._scanMiddleware( schemaObject, '', '',  index, limit, undefined );
+        const out  = elements.filter ( obj => obj );
 
         return {
             out,
-            next: startIndex > 0 ? startIndex-1 : 0,
+            next: out.length === limit ? index + limit: 0,
         };
     }
 
-    _getExchangeContent({offerType, index = Number.MAX_SAFE_INTEGER, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffers, type = "buffer"  }){
+    async _getExchangeContent({offerType, index = 0, limit = this._scope.argv.transactions.protocol.protocolMaxExchangeOffers, type = "buffer"  }){
 
         if (typeof limit !== "number") return null;
         limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxExchangeOffers) );
@@ -113,16 +106,14 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
         const ids = this._getExchangeContentIds({offerType, index, limit});
         if (!ids) return false;
 
-        const map = this._scope.exchange.getExchangeData(offerType).map;
+        const exchangeSchemaClass = this._scope.exchange.getExchangeSchemaClass(offerType);
+        const out = await this._scope.db.findBySort( exchangeSchemaClass, "scoresort", index, limit, '', '', {skipProcessingConstructionValues: true, skipValidation: true } );
 
-        for (const hash in ids.out){
-
-            const offer = map[hash];
-            ids.out[hash] = offer.toType(type);
-
+        return {
+            out: out.map( it => it.toType(type) ),
+            next: out.length === limit ? index + limit: 0,
         }
 
-        return ids;
     }
 
     async _newExchangeOffer({offer}, res, socket){
@@ -155,7 +146,7 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
 
         if (Buffer.isBuffer(offerHash)) offerHash = offerHash.toString('hex');
 
-        const map = this._scope.exchange.getExchangeData(offerType).map;
+        const map = this._scope.exchange.getExchangeSchemaClass(offerType).map;
 
         const out = map[offerHash];
 

@@ -127,6 +127,17 @@ export default class ExchangeOffer extends DBSchema {
                 score:{
                     type: "number",
 
+                    sorts :{
+
+                        scoresort:{
+
+                            score(){
+                                return this.score;
+                            },
+
+                        }
+                    },
+
                     position: 112,
                 },
 
@@ -143,6 +154,11 @@ export default class ExchangeOffer extends DBSchema {
                     enabled: true,
                     fct: CryptoHelper.dkeccak256,
                 }
+            },
+
+            saving:{
+                indexableById: true,
+                indexable: true,
             },
 
         }, schema, false), data, type, creationOptions);
@@ -165,6 +181,8 @@ export default class ExchangeOffer extends DBSchema {
 
         return this._address;
     }
+
+
 
     prefixBufferForSignature(){
 
@@ -230,7 +248,7 @@ export default class ExchangeOffer extends DBSchema {
         let balance = await this._scope.mainChain.data.accountHashMap.getBalances( this.publicKeyHash );
         if (!balance) balance = 0;
 
-        return balance;
+        return balance[TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0;
     }
 
 }

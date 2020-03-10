@@ -151,7 +151,6 @@ export default class App extends Kernel.utils.App {
             await this._scope.memPool.reload();
 
             if (!this._scope.exchange) this._scope.exchange = new this._scope.Exchange(this._scope,);
-            await this._scope.exchange.reload();
 
             if (!this.wallet){
 
