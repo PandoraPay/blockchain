@@ -97,6 +97,9 @@ export default class MainChainData extends BaseChainData {
             this.tokenNameHashMap.clearHashMap(),
             this.tokenTickerHashMap.clearHashMap(),
 
+            this.zetherPendingHashMap.clearHashMap(),
+            this.zetherAccountHashMap.clearHashMap(),
+
         ];
 
         await Promise.all(promises);
@@ -142,6 +145,9 @@ export default class MainChainData extends BaseChainData {
 
             this.tokenNameHashMap.saveVirtualMap(),
             this.tokenTickerHashMap.saveVirtualMap(),
+
+            this.zetherPendingHashMap.saveVirtualMap(),
+            this.zetherAccountHashMap.saveVirtualMap(),
         ];
 
         await Promise.all(promises);

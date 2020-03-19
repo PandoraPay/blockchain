@@ -17,6 +17,10 @@ import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map
 import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-map";
 import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
 import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
+import ZSC from "./../zsc/ZSC"
+
+import ZetherAccountHashVirtualMap from "../maps/zether/zether-account-hash-map/zether-account-hash-virtual-map"
+import ZetherPendingHashVirtualMap from "../maps/zether/zether-pending-hash-map/zether-pending-hash-virtual-map"
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -200,6 +204,17 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
+        this.zetherAccountHashMap = new this._zetherAccountHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
+        this.zetherPendingHashMap = new this._zetherPendingHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
+        this.ZSC = new ZSC();
 
         this._grindingLockedTransfersFunds = {};
 
@@ -241,6 +256,14 @@ export default class BaseChainData extends DBSchema {
         return AccountHashVirtualMap;
     }
 
+    get _zetherAccountHashMapClass(){
+        return ZetherAccountHashVirtualMap;
+    }
+
+    get _zetherPendingHashMapClass(){
+        return ZetherPendingHashVirtualMap;
+    }
+
     async loadData(){
 
         if ( await this.exists() )
@@ -272,6 +295,8 @@ export default class BaseChainData extends DBSchema {
         this.tokenHashMap.resetHashMap();
         this.tokenTickerHashMap.resetHashMap();
         this.tokenNameHashMap.resetHashMap();
+        this.zetherAccountHashMap.resetHashMap();
+        this.zetherPendingHashMap.resetHashMap();
     }
 
     /**
@@ -361,6 +386,9 @@ export default class BaseChainData extends DBSchema {
 
         this.tokenNameHashMap._fallback = mainChainData.tokenNameHashMap;
         this.tokenTickerHashMap._fallback = mainChainData.tokenTickerHashMap;
+
+        this.zetherAccountHashMap._fallback = mainChainData.zetherAccountHashMap;
+        this.zetherPendingHashMap._fallback = mainChainData.zetherPendingHashMap;
 
         this._fallback = mainChainData;
 
