@@ -74,8 +74,7 @@ export default class WalletTransfer {
                 publicKey: walletAddress.decryptPublicKey(),
                 amount: requiredFunds[tokenCurrency].required + requiredFunds[tokenCurrency].fee,
                 tokenCurrency: requiredFunds[tokenCurrency].tokenCurrency,
-            })
-
+            });
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createSimpleTransaction( {
             vin: vin,

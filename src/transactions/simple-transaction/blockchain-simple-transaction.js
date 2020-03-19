@@ -93,9 +93,9 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vin = this.vin[i];
 
-            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, -vin.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, -vin.amount, vin.tokenCurrency );
 
-            if (balance < 0) throw new Exception(this, "Balance got negative", {publicKey: vin.publicKey, balance, txAmount: vin.amount });
+            if (balance < 0) throw new Exception(this, "Balance got negative", {publicKey: vin.publicKey, balance, txAmount: vin.amount, tokenCurrency: vin.tokenCurrency });
         }
 
         /**
@@ -105,7 +105,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vout = this.vout[i];
 
-            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, vout.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, vout.amount, vout.tokenCurrency );
 
         }
 
@@ -152,9 +152,9 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vout = this.vout[i];
 
-            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, -vout.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vout.publicKeyHash, -vout.amount, vout.tokenCurrency );
 
-            if (balance < 0) throw new Exception(this, "Balance got negative when tx removed", {publicKey: vout.publicKey, balance, txAmount: vout.amount });
+            if (balance < 0) throw new Exception(this, "Balance got negative when tx removed", {publicKey: vout.publicKey, balance, txAmount: vout.amount, tokenCurrency: vout.tokenCurrency });
 
         }
 
@@ -166,7 +166,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
             const vin = this.vin[i];
 
-            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, +vin.amount );
+            const balance = await chainData.accountHashMap.updateBalance( vin.publicKeyHash, +vin.amount, vin.tokenCurrency );
 
         }
 

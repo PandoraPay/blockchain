@@ -28,13 +28,6 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
                     specifyLength: false,
                 },
 
-                tokenCurrency: {
-
-                    validation(value) {
-                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer );
-                    },
-
-                },
 
                 vout:{
                     minSize: 0,

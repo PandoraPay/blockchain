@@ -154,7 +154,7 @@ export default class MainChainData extends BaseChainData {
     async getBlock( height  = this.end - 1 ){
 
         if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
-        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, end: this.end});
 
         if (this.blocksMap[height]) return this.blocksMap[height];
 

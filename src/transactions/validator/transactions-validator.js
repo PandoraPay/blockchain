@@ -3,6 +3,7 @@ const {TransactionTypeEnum, TransactionScriptTypeEnum} = global.cryptography.tra
 const {BaseTransaction} = global.cryptography.transactions.base;
 
 const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helpers;
+const {DBSchema} = global.kernel.marshal.db;
 
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
 import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
@@ -61,7 +62,7 @@ export default class TransactionsValidator{
     validateTx(input){
 
         const transactionClass = this.getTxClass( input );
-        return new transactionClass( this._scope, undefined, input )
+        return new transactionClass( this._scope, undefined, (input instanceof DBSchema) ? input.toBuffer() : input  )
 
     }
 

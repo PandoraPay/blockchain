@@ -30,13 +30,6 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
                     specifyLength: false,
                 },
 
-                tokenCurrency: {
-
-                    validation(value) {
-                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer );
-                    },
-                },
-
                 vout:{
                     minSize: 0,
                     maxSize: 0,
