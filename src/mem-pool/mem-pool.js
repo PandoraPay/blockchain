@@ -189,6 +189,8 @@ export default  class MemPool extends DBSchema{
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
 
+        const tokenCurrencyHex = tokenCurrency.toString('hex');
+
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         const publicKeyHash = address.publicKeyHash;
 
@@ -199,18 +201,17 @@ export default  class MemPool extends DBSchema{
             const array = this.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
             for (const tx of array) {
 
-                const txTokenCurrency = tx.tokenCurrency.toString("hex");
-                if (tx._memPoolIncluded ||  ( tokenCurrency && !tx.tokenCurrency.equals(tokenCurrency) ))
+                if ( tx._memPoolIncluded )
                     continue;
 
                 for (const vin of tx.vin)
-                    if (vin.publicKeyHash.equals(publicKeyHash))
-                        out[txTokenCurrency] =  (out[txTokenCurrency] || 0) - vin.amount;
+                    if (  vin.publicKeyHash.equals(publicKeyHash) && vin.tokenCurrency.equals(tokenCurrency) )
+                        out[ tokenCurrencyHex ] =  (out[ tokenCurrencyHex ] || 0) - vin.amount;
 
 
                 for (const vout of tx.vout)
-                    if (vout.publicKeyHash.equals(publicKeyHash))
-                        out[txTokenCurrency] =  (out[txTokenCurrency] || 0) + vout.amount;
+                    if (vout.publicKeyHash.equals(publicKeyHash) && vout.tokenCurrency.equals(tokenCurrency) )
+                        out[ tokenCurrencyHex ] =  (out[ tokenCurrencyHex ] || 0) + vout.amount;
 
             }
 

@@ -410,7 +410,7 @@ export default class BaseChainData extends DBSchema {
 
     async _computeGrindingLockedTransfersFundsHeight(height){
 
-        const txTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer; //native id;
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer; //native id;
 
         const block = await this.getBlock(height);
         if (!block) throw new Exception(this, `Block couldn't get retrieved`, {height } );
@@ -419,10 +419,11 @@ export default class BaseChainData extends DBSchema {
 
         const txs = await block.getTransactions();
         for (const tx of txs)
-            if (tx instanceof SimpleTransaction && tx.tokenCurrency.equals(txTokenCurrency) ) {
+            if (tx instanceof SimpleTransaction ) {
 
                 for (const vout of tx.vout)
-                    transfers[vout.publicKeyHash.toString('hex')] =  (transfers[vout.publicKeyHash.toString('hex')] || 0) + vout.amount;
+                    if ( vout.tokenCurrency.equals( tokenCurrency ) )
+                        transfers[vout.publicKeyHash.toString('hex')] =  (transfers[vout.publicKeyHash.toString('hex')] || 0) + vout.amount;
 
             }
 

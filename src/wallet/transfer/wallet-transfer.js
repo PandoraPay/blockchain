@@ -27,19 +27,18 @@ export default class WalletTransfer {
     }
 
 
-    async transferSimple( { address, txDsts, fee, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
 
-        if ( typeof tokenCurrency === "string" && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-        await this._scope.mainChain.data.tokenHashMap.currencyExists(tokenCurrency);
+        if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
 
         const requiredFunds = this._calculateRequiredFunds(txDsts);
 
+        for (const tokenCurrency in requiredFunds)
+            await this._scope.mainChain.data.tokenHashMap.currencyExists(tokenCurrency);
+
+        if ( requiredFunds[ feeTokenCurrency.toString('hex') ] ) await this._scope.mainChain.data.tokenHashMap.currencyExists(feeTokenCurrency);
+
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-
-        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
-        if (!foundFunds) throw new Exception(this, "Not enough funds");
-
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -47,23 +46,44 @@ export default class WalletTransfer {
             //TODO CALCULATE FEE
         }
 
-        if (requiredFunds === 0) throw new Exception(this, "Amount needs to be positive");
+        for (const tokenCurrency in requiredFunds) {
 
-        if (foundFunds + memPoolPending < requiredFunds + fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, requiredFunds, fee });
+            const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency);
+            if (!foundFunds) throw new Exception(this, "Not enough funds");
+
+            const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicAddress(networkByte), tokenCurrency)[tokenCurrency] || 0;
+
+            requiredFunds[tokenCurrency] = {
+                tokenCurrency,
+                required: requiredFunds[tokenCurrency],
+                foundFunds: foundFunds + memPoolPending,
+                fee: tokenCurrency === feeTokenCurrency.toString('hex') ? fee : 0
+            };
+
+            if (requiredFunds[tokenCurrency].requiredFunds < requiredFunds[tokenCurrency] + requiredFunds[tokenCurrency].fee)
+                throw new Exception(this, "Not enough funds", requiredFunds[tokenCurrency]);
+
+        }
 
         const outs = this._processDstsAddresses(txDsts);
 
-        const txOut =  await this._scope.mainChain.transactionsCreator.createSimpleTransaction( {
-            vin: [{
+        const vin = [];
+
+        for (const tokenCurrency in requiredFunds)
+            vin.push({
                 publicKey: walletAddress.decryptPublicKey(),
-                amount: requiredFunds + fee,
-            }],
+                amount: requiredFunds[tokenCurrency].required + requiredFunds[tokenCurrency].fee,
+                tokenCurrency: requiredFunds[tokenCurrency].tokenCurrency,
+            })
+
+
+        const txOut =  await this._scope.mainChain.transactionsCreator.createSimpleTransaction( {
+            vin: vin,
             vout: outs,
             privateKeys: [ {
                 privateKey: walletAddress.decryptPrivateKey()
             } ],
             nonce,
-            tokenCurrency,
         } );
 
         await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
@@ -204,13 +224,24 @@ export default class WalletTransfer {
 
     _calculateRequiredFunds(txDsts){
 
-        let requiredFunds = 0;
-        for (let i = 0 ; i < txDsts.length; i++)
-            requiredFunds += txDsts[i].amount;
+        const out = {};
 
-        if (!this._scope.argv.transactions.coins.validateCoins(requiredFunds)) throw new Exception(this, "Invalid funds");
+        for (let i = 0 ; i < txDsts.length; i++) {
+            let tokenCurrency = txDsts[i].tokenCurrency || TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ;
+            if ( Buffer.isBuffer(tokenCurrency) ) tokenCurrency = tokenCurrency.toString('hex');
 
-        return requiredFunds;
+            out[ tokenCurrency ] = (out[ tokenCurrency ] || 0) + txDsts[i].amount;
+        }
+
+        let currencies = 0;
+        for (const tokenCurrency in out) {
+            currencies += 1;
+            if (!this._scope.argv.transactions.coins.validateCoins(out[tokenCurrency])) throw new Exception(this, "Invalid funds");
+        }
+
+        if (currencies === 0) throw new Exception(this, "no outputs, it is required to have at least 1");
+
+        return out;
     }
 
     _processDstsAddresses(txDsts){

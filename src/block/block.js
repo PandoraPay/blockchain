@@ -202,8 +202,9 @@ export default class Block extends DBSchema {
         if ( this.timestamp >  networkTimestampDrift )
             throw new Exception(this, "timestamp drift is to big", {timestamp:this.timestamp, networkTimestampDrift: networkTimestampDrift });
 
-        if ( this.timestamp < await chainData.getBlockTimestamp( this.height - 1 ) )
-            throw new Exception( this, "Timestamp is less than last median blocks", { timestamp: this.timestamp  } );
+        const timestamp = await chainData.getBlockTimestamp( this.height - 1 );
+        if ( this.timestamp < timestamp )
+            throw new Exception( this, "Timestamp is less than last median blocks", { timestamp: this.timestamp, medianTimestamp: timestamp } );
 
         /**
          * validate prevHash

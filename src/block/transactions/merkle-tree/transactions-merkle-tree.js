@@ -207,12 +207,16 @@ export default class TransactionsMerkleTree extends MerkleTree {
 
     async sumFees(){
         
-        let fees = 0;
+        const fees = {};
         
         const leaves = await this.leavesNonPruned();
 
-        for (const leaf of leaves)
-            fees += leaf.transaction.fee;
+        for (const leaf of leaves) {
+            const fee = leaf.transaction.fee();
+            if (fee)
+                fees[fee.tokenCurrency] = (fees[fee.tokenCurrency] || 0 ) + fee.amount;
+
+        }
 
         return fees;
     }

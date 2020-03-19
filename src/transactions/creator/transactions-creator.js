@@ -21,7 +21,7 @@ export default class TransactionsCreator {
         return nonce;
     }
 
-    async createSimpleTransaction( { vin, vout, privateKeys, nonce, tokenCurrency }, chain = this._scope.chain ){
+    async createSimpleTransaction( { vin, vout, privateKeys, nonce }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (vout && !Array.isArray(vout)) vout = [vout];
@@ -37,7 +37,6 @@ export default class TransactionsCreator {
             vin: input,
             vout,
             nonce,
-            tokenCurrency,
 
         }, "object" );
 

@@ -169,26 +169,41 @@ export default class BlockPoS extends DBSchema {
         const fees = await this.block.sumFees();
         const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height );
 
-        const sum = fees + coinbase;
+        const sum = fees;
+        sum[ TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ] =  (sum[TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0) + coinbase; //reward
 
         const { delegated,  delegateFee } = await this._getStakeDelegateForgerPublicKeys(chain, chainData);
 
-        let distribution1, //owner
-            distribution2; //delegator
+        let distributions = {};
 
         //not delegated or reward address not specified
         if ( !delegated || this.stakeDelegateRewardPublicKeyHash.equals( Buffer.alloc(20) ) ){ //me
-            distribution1 = sum; //owner
-            distribution2 = 0;   //delegator
+
+            for (const tokenCurrency in sum){
+                distributions[tokenCurrency] = {
+                    owner: sum[tokenCurrency],  //owner
+                    delegator: 0,  //owner
+                }
+            }
+
         } else { //delegated
+
             const percentFee = delegateFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
             if (percentFee < 0 || percentFee > 1) throw new Exception(this, "Percent is invalid", {percentFee});
 
-            distribution2 = Math.round( sum * percentFee ); //delegator
-            distribution1 = sum - distribution2;               //owner
+            for (const tokenCurrency in sum){
+
+                const delegatorFee = Math.round( sum[tokenCurrency] * percentFee );
+
+                distributions[tokenCurrency] = {
+                    owner: sum[tokenCurrency] - delegatorFee, //owner
+                    delegator: delegatorFee, //delegator
+                }
+            }
+
         }
 
-        return {distribution1, distribution2 };
+        return distributions;
 
     }
 
@@ -197,16 +212,18 @@ export default class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
+            const distributions = await this._getRewardDistribution(chain, chainData);
 
-            if (distribution2)
-                this._scope.logger.warn(this, 'addBlocKPOS Distribution', {distribution1, distribution2, sum: distribution1 + distribution2});
+            for (const tokenCurrency in distributions){
 
-            if (distribution1 > 0) //owner
-                await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, distribution1 );
+                if ( distributions[tokenCurrency].owner > 0 )
+                    await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, distributions[tokenCurrency].owner, tokenCurrency );
 
-            if (distribution2 > 0) //reward delegator
-                await chainData.accountHashMap.updateBalance( this.stakeDelegateRewardPublicKeyHash, distribution2 );
+                if (distributions[tokenCurrency].delegator){
+                    await chainData.accountHashMap.updateBalance(this.stakeDelegateRewardPublicKeyHash, distributions[tokenCurrency].delegator, tokenCurrency);
+                    this._scope.logger.warn(this, 'addBlocKPOS Distribution', { distribution: distributions[tokenCurrency], sum: distributions[tokenCurrency].owner + distributions[tokenCurrency].delegator });
+                }
+            }
 
         }catch(err){
 
@@ -224,16 +241,18 @@ export default class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const {distribution1, distribution2} = await this._getRewardDistribution(chain, chainData);
+            const distributions = await this._getRewardDistribution(chain, chainData);
 
-            if (distribution2)
-                this._scope.logger.warn(this, 'removeBlockPOS Distribution', {distribution1, distribution2, sum: distribution1 + distribution2});
+            for (const tokenCurrency in distributions){
 
-            if (distribution2 > 0)
-                await chainData.accountHashMap.updateBalance( this.stakeDelegateRewardPublicKeyHash, - distribution2 );
+                if (distributions[tokenCurrency].delegator){
+                    await chainData.accountHashMap.updateBalance(this.stakeDelegateRewardPublicKeyHash, -distributions[tokenCurrency].delegator, tokenCurrency);
+                    this._scope.logger.warn(this, 'addBlocKPOS Distribution', { distribution: distributions[tokenCurrency], sum: distributions[tokenCurrency].owner + distributions[tokenCurrency].delegator });
+                }
 
-            if (distribution1 > 0)
-                await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, - distribution1 );
+                if ( distributions[tokenCurrency].owner > 0 )
+                    await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, -distributions[tokenCurrency].owner, tokenCurrency );
+            }
 
         }catch(err){
 
