@@ -12,8 +12,8 @@ export default class ZetherAccountHashMapElement extends HashMapElement {
             fields: {
 
                 table: {
-                    default: "zetherAccount",
-                    fixedBytes: 13,
+                    default: "zetAccount",
+                    fixedBytes: 10,
                 },
 
                 data: {

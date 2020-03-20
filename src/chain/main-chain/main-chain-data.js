@@ -99,6 +99,7 @@ export default class MainChainData extends BaseChainData {
 
             this.zetherPendingHashMap.clearHashMap(),
             this.zetherAccountHashMap.clearHashMap(),
+            this.zetherLastRollOverHashMap.clearHashMap(),
 
         ];
 
@@ -148,6 +149,7 @@ export default class MainChainData extends BaseChainData {
 
             this.zetherPendingHashMap.saveVirtualMap(),
             this.zetherAccountHashMap.saveVirtualMap(),
+            this.zetherLastRollOverHashMap.saveVirtualMap(),
         ];
 
         await Promise.all(promises);

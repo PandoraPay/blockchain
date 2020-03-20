@@ -18,8 +18,8 @@ export default class ZetherPendingHashVirtualMap extends HashVirtualMap {
             fields: {
 
                 table: {
-                    default: "zetherPending",
-                    fixedBytes: 13,
+                    default: "zetPending",
+                    fixedBytes: 10,
                 },
 
                 element: {

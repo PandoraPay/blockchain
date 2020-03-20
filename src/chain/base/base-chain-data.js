@@ -21,6 +21,7 @@ import ZSC from "./../zsc/ZSC"
 
 import ZetherAccountHashVirtualMap from "../maps/zether/zether-account-hash-map/zether-account-hash-virtual-map"
 import ZetherPendingHashVirtualMap from "../maps/zether/zether-pending-hash-map/zether-pending-hash-virtual-map"
+import ZetherLastRollOverHashVirtualMap from "../maps/zether/zether-last-roll-over-hash-map/zether-last-roll-over-hash-virtual-map"
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -214,6 +215,11 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
+        this.zetherLastRollOverHashMap = new this._zetherLastRollOverHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
         this.ZSC = new ZSC();
 
         this._grindingLockedTransfersFunds = {};
@@ -264,6 +270,10 @@ export default class BaseChainData extends DBSchema {
         return ZetherPendingHashVirtualMap;
     }
 
+    get _zetherLastRollOverHashMapClass(){
+        return ZetherLastRollOverHashVirtualMap;
+    }
+
     async loadData(){
 
         if ( await this.exists() )
@@ -297,6 +307,7 @@ export default class BaseChainData extends DBSchema {
         this.tokenNameHashMap.resetHashMap();
         this.zetherAccountHashMap.resetHashMap();
         this.zetherPendingHashMap.resetHashMap();
+        this.zetherLastRollOverHashMap.resetHashMap();
     }
 
     /**
@@ -389,6 +400,7 @@ export default class BaseChainData extends DBSchema {
 
         this.zetherAccountHashMap._fallback = mainChainData.zetherAccountHashMap;
         this.zetherPendingHashMap._fallback = mainChainData.zetherPendingHashMap;
+        this.zetherLastRollOverHashMap._fallback = mainChainData.zetherLastRollOverHashMap;
 
         this._fallback = mainChainData;
 

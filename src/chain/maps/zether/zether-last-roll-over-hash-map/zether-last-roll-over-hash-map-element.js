@@ -1,9 +1,9 @@
 const {HashMapElement} = global.kernel.dataStructures.hashMap;
 const {Helper, Exception} = global.kernel.helpers;
 
-import ZetherPendingHashMapData from "./data/zether-pending-hash-map-data"
+import ZetherLastRollOverHashMapData from "./data/zether-last-roll-over-hash-map-data"
 
-export default class ZetherPendingHashMapElement extends HashMapElement {
+export default class ZetherLastRollOverHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 
@@ -12,13 +12,13 @@ export default class ZetherPendingHashMapElement extends HashMapElement {
             fields: {
 
                 table: {
-                    default: "zetPending",
-                    fixedBytes: 10,
+                    default: "zetLastRollOver",
+                    fixedBytes: 15,
                 },
 
                 data: {
                     type: "object",
-                    classObject: ZetherPendingHashMapData,
+                    classObject: ZetherLastRollOverHashMapData,
                 },
 
             },
