@@ -1,6 +1,7 @@
 const {DBSchema} = global.kernel.marshal.db;
 const {Helper, Exception, StringHelper} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
+const Zether = global.cryptography.Zether;
 
 export default class ZetherAccountHashMapData extends DBSchema{
 
@@ -21,32 +22,18 @@ export default class ZetherAccountHashMapData extends DBSchema{
                     position: 100,
                 },
 
-                value1: {
+                value0: {
                     type: "buffer",
-                    fixedBytes: 32,
+                    fixedBytes: 64,
 
                     position: 101,
                 },
 
-                value1_1: {
-                    type: "buffer",
-                    fixedBytes: 32,
-
-                    position: 102,
-                },
-
-                value2: {
+                value1: {
                     type: "buffer",
                     fixedBytes: 64,
 
                     position: 103,
-                },
-
-                value2_2: {
-                    type: "buffer",
-                    fixedBytes: 64,
-
-                    position: 104,
                 },
 
             },
@@ -71,8 +58,16 @@ export default class ZetherAccountHashMapData extends DBSchema{
     }
 
     isEmpty(){
-        const empty = Buffer.alloc(32);
-        return this.value1.equals( empty ) && this.value1_1.equals(empty) && this.value2.equals(empty) && this.value2_2.equals(empty);
+        const empty = Buffer.alloc(64);
+        return this.value0.equals( empty ) && this.value1.equals(empty);
+    }
+
+    get point0(){
+        return Zether.utils.unserializeFromBuffer(this.value0);
+    }
+
+    get point1(){
+        return Zether.utils.unserializeFromBuffer(this.value1);
     }
 
 }

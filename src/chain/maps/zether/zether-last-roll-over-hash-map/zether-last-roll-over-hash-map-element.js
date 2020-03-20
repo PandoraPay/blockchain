@@ -16,6 +16,10 @@ export default class ZetherLastRollOverHashMapElement extends HashMapElement {
                     fixedBytes: 15,
                 },
 
+                id: {
+                    fixedBytes: 64,
+                },
+
                 data: {
                     type: "object",
                     classObject: ZetherLastRollOverHashMapData,

@@ -16,6 +16,10 @@ export default class ZetherPendingHashMapElement extends HashMapElement {
                     fixedBytes: 10,
                 },
 
+                id: {
+                    fixedBytes: 64,
+                },
+
                 data: {
                     type: "object",
                     classObject: ZetherPendingHashMapData,

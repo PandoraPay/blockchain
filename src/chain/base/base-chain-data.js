@@ -220,7 +220,10 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.ZSC = new ZSC();
+        this.ZSC = new ZSC({
+            ...this._scope,
+            chainData: this,
+        });
 
         this._grindingLockedTransfersFunds = {};
 
