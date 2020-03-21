@@ -66,14 +66,6 @@ export default class SubChainData extends BaseChainData{
 
         await super.clearData(this);
 
-        this.listBlocks = [];
-        this.blocks = {};
-
-        this.listKernelHashes = [];
-        this.kernelHashes = {};
-
-        this.listHashes = [];
-        this.hashes = {};
 
     }
 

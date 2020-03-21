@@ -4,6 +4,19 @@ import SubChainDataBlock from "./data/sub-chain-data-block"
 
 export default class SubChain extends BaseChain{
 
+    async _clearData() {
+        await super._clearData();
+
+        this.listBlocks = [];
+        this.blocks = {};
+
+        this.listKernelHashes = [];
+        this.kernelHashes = {};
+
+        this.listHashes = [];
+        this.hashes = {};
+    }
+
     async clear(free = true){
 
         try{
@@ -31,7 +44,7 @@ export default class SubChain extends BaseChain{
 
         }
 
-        BaseChain.prototype.clear.call(this);
+        super.clear(this);
 
     }
 

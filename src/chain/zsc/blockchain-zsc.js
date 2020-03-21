@@ -1,12 +1,14 @@
 const {Helper, Exception, StringHelper} = global.kernel.helpers;
-const Zether = global.cryptography.Zether;
+
+const Zether = global.cryptography.zether;
+
 const G1Point0 = Zether.utils.G1Point0;
 
 export default class BlockchainZSC extends Zether.ZSC {
 
     constructor(scope){
 
-        super(undefined, scope.blockchain.genesis.zsc.address );
+        super(undefined, scope.argv.blockchain.genesis.zsc.address );
         this._scope = scope;
 
     }
@@ -78,6 +80,33 @@ export default class BlockchainZSC extends Zether.ZSC {
             epoch: value,
         } );
 
+    }
+
+    _getNonceSet(uHash){
+        uHash = utils.fromHex(uHash);
+        return this._scope.chainData.zscNoncesMap[uHash];
+    }
+
+    async _setNonceSet(uHash){
+        uHash = utils.fromHex(uHash);
+        if ( !this._scope.chainData.zscNoncesMap[uHash] ){
+            this._scope.chainData.pushArray( "zscListNonceSet", Buffer.from(uHash,'hex') );
+            this._scope.chainData.zscNoncesMap[uHash] = true;
+        }
+    }
+
+    async _clearNonceSet(){
+        this._scope.chainData.zscListNonceSet = [];
+        this._scope.chainData.zscNoncesMap = {};
+        this._nonceSet = {};
+    }
+
+    _setLastGlobalUpdate(value){
+        this._scope.chainData.zscLastGlobalUpdate = value;
+    }
+
+    _getLastGlobalUpdate(){
+        return this._scope.chainData.zscLastGlobalUpdate;
     }
 
     _getEpoch(){

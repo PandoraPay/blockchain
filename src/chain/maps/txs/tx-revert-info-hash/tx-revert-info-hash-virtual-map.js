@@ -1,15 +1,15 @@
-
 const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
 const {Helper, Exception} = global.kernel.helpers;
 
-import ZetherAccountHashMapElement from "./zether-account-hash-map-element"
+import TxRevertInfoHashMapElement from "./tx-revert-info-hash-map-element"
 
 /**
- * Required for consensus.
- * It assures unique token name
+ * Required for consensus. Used only for explorer
+ * Stores json info related to revert a Transaction
+ *
  */
 
-export default class ZetherAccountHashMap extends HashVirtualMap {
+export default class TxRevertInfoHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 
@@ -18,12 +18,12 @@ export default class ZetherAccountHashMap extends HashVirtualMap {
             fields: {
 
                 table: {
-                    default: "zetAccount",
-                    fixedBytes: 10,
+                    default: "txRevertMap",
+                    fixedBytes: 11,
                 },
 
                 element: {
-                    classObject: ZetherAccountHashMapElement,
+                    classObject: TxRevertInfoHashMapElement,
                 },
 
             },

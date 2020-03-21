@@ -88,6 +88,7 @@ export default class MainChainData extends BaseChainData {
             this.hashBlockMap.clearHashMap(),
 
             this.txHashMap.clearHashMap(),
+            this.txRevertInfoHashMap.clearHashMap(),
             this.addressHashMap.clearHashMap(),
             this.addressTxHashMap.clearHashMap(),
 
@@ -138,6 +139,7 @@ export default class MainChainData extends BaseChainData {
             this.hashBlockMap.saveVirtualMap(),
 
             this.txHashMap.saveVirtualMap(),
+            this.txRevertInfoHashMap.saveVirtualMap(),
             this.addressHashMap.saveVirtualMap(),
             this.addressTxHashMap.saveVirtualMap(),
 

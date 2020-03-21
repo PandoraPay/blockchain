@@ -6,8 +6,11 @@ const {BN, BigNumber} = global.kernel.utils;
 const {StringHelper} = global.networking.sockets.protocol;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
+const {DBSchemaBuffer} = global.kernel.marshal.db.samples;
 
 import TxHashVirtualMap from "src/chain/maps/txs/tx-hash/tx-hash-virtual-map";
+import TxRevertInfoHashVirtualMap from "src/chain/maps/txs/tx-revert-info-hash/tx-revert-info-hash-virtual-map";
+
 import AddressHashVirtualMap from "src/chain/maps/addresses/addresses-hash/address-hash-virtual-map";
 import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map";
 
@@ -17,7 +20,7 @@ import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map
 import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-map";
 import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
 import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
-import ZSC from "./../zsc/ZSC"
+import BlockchainZSC from "./../zsc/blockchain-zsc"
 
 import ZetherAccountHashVirtualMap from "../maps/zether/zether-account-hash-map/zether-account-hash-virtual-map"
 import ZetherPendingHashVirtualMap from "../maps/zether/zether-pending-hash-map/zether-pending-hash-virtual-map"
@@ -153,7 +156,27 @@ export default class BaseChainData extends DBSchema {
                         position: 109,
                     },
 
+                    /**
+                     * ZSC NonceSet
+                     */
+                    zscListNonceSet:{
 
+                        type: "array",
+                        classObject: DBSchemaBuffer,
+
+                        maxSize: 5000,
+
+                        position: 110,
+                    },
+
+                    /**
+                     * ZSC LastGlobalUpdate
+                     */
+                    zscLastGlobalUpdate:{
+                        type: "number",
+
+                        position: 111,
+                    },
 
                 }
 
@@ -190,6 +213,11 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
+        this.txRevertInfoHashMap = new this._txHashMapClass({
+            ...this._scope,
+            chainData: this,
+        });
+
         this.blockHashMap = new this._blockHashMapClass({
             ...this._scope,
             chainData: this,
@@ -220,12 +248,14 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.ZSC = new ZSC({
+        this.ZSC = new BlockchainZSC({
             ...this._scope,
             chainData: this,
         });
 
         this._grindingLockedTransfersFunds = {};
+
+        if (!this.zscNoncesMap) this.zscNoncesMap = {};
 
     }
 
@@ -251,6 +281,10 @@ export default class BaseChainData extends DBSchema {
 
     get _txHashMapClass(){
         return TxHashVirtualMap;
+    }
+
+    get _txRevertInfoHashMapClass(){
+        return TxRevertInfoHashVirtualMap;
     }
 
     get _blockHashMapClass(){
@@ -300,6 +334,7 @@ export default class BaseChainData extends DBSchema {
 
     resetState(){
         this.txHashMap.resetHashMap();
+        this.txRevertInfoHashMap.resetHashMap();
         this.addressHashMap.resetHashMap();
         this.addressTxHashMap.resetHashMap();
         this.blockHashMap.resetHashMap();
@@ -392,6 +427,8 @@ export default class BaseChainData extends DBSchema {
         this.hashBlockMap._fallback = mainChainData.hashBlockMap;
 
         this.txHashMap._fallback = mainChainData.txHashMap;
+        this.txRevertInfoHashMap._fallback = mainChainData.txRevertInfoHashMap;
+
         this.addressHashMap._fallback = mainChainData.addressHashMap;
         this.addressTxHashMap._fallback = mainChainData.addressTxHashMap;
 

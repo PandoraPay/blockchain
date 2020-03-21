@@ -60,6 +60,13 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         } );
 
         /**
+         * Store Revert Info Previous State
+         */
+        const revertInfoPreviousState = await this.getTransactionRevertInfoPreviousState( chain, chainData );
+        if (revertInfoPreviousState)
+            await chainData.txRevertInfoHashMap.updateMap( this.hash().toString("hex"), JSON.stringify( revertInfoPreviousState ) );
+
+        /**
          * Store TxId into AddressTxMap
          */
 
@@ -121,6 +128,15 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         await chainData.txHashMap.deleteMap( this.hash().toString("hex") );
 
         /**
+         * Process Revert Info Previous State
+         */
+        const revertInfoPreviousState = await chainData.txRevertInfoHashMap.getMap( this.hash().toString("hex") );
+        if (revertInfoPreviousState){
+            await this.processTransactionRevertInfoPreviousState( chain, chainData, JSON.parse(revertInfoPreviousState.data) );
+            await chainData.txRevertInfoHashMap.deleteMap( this.hash().toString("hex")  );
+        }
+
+        /**
          * Remove TxId into AddressTxMap
          */
 
@@ -180,6 +196,12 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
     }
 
+    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data){
+        return undefined;
+    }
+
+    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, data){
+    }
 
     async transactionSuccessfullyAdded(chain = this._scope.chain, chainData = chain.data, ){
 
@@ -189,14 +211,10 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
     }
 
-
     calculateAddressesChanged(addresses){
 
-        for (let i=this.vout.length-1; i >= 0; i--) {
-
-            const vout = this.vout[i];
-
-        }
+        // for (let i=this.vout.length-1; i >= 0; i--)
+        //     const vout = this.vout[i];
 
     }
 
