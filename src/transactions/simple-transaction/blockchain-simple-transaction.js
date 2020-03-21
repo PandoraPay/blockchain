@@ -200,7 +200,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         return undefined;
     }
 
-    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, data){
+    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, revertInfoData){
     }
 
     async transactionSuccessfullyAdded(chain = this._scope.chain, chainData = chain.data, ){

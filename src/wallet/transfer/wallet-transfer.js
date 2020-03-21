@@ -92,17 +92,11 @@ export default class WalletTransfer {
     }
 
 
-    async changeDelegate({address, fee, nonce, delegateOld, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
+    async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
 
         const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-
-        if (delegateOld && typeof delegateOld.delegatePublicKey === "string" && StringHelper.isHex(delegateOld.delegatePublicKey) )
-            delegateOld.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegateOld.delegatePublicKey, "hex"), {
-                removeLeadingZeros: true,
-                fixedBytes: 33,
-            }, "delegatePublicKey", ()=>{}, "object", {}  );
 
         if (delegate && typeof delegate.delegatePublicKey === "string" && StringHelper.isHex(delegate.delegatePublicKey) )
             delegate.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKey, "hex"), {
@@ -133,7 +127,6 @@ export default class WalletTransfer {
                 privateKey: walletAddress.decryptPrivateKey()
             } ],
             nonce,
-            delegateOld,
             delegate,
         } );
 

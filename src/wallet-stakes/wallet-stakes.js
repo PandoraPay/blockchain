@@ -95,7 +95,7 @@ export default class WalletStakes extends DBSchema {
         const delegatorStakePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(delegatePrivateKey);
 
         if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKey) )
-            throw new Exception(this, "You need to set as delegate public key", delegatorStakePrivateAddress.publicKey );
+            throw new Exception(this, "Your stake delegate's public key is not matching with the private key", delegatorStakePrivateAddress.publicKey );
 
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
 
@@ -105,7 +105,7 @@ export default class WalletStakes extends DBSchema {
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
         if (!delegate || !delegate.delegatePublicKey.equals( delegatePublicKey ))
-            throw new Exception(this, "You need to set as delegate public key or the node is not sync", delegatePublicKey );
+            throw new Exception(this, "You need to delegate your stake to the following public key", delegatePublicKey );
 
         const lock = await this.lock(-1, publicKeyHash.toString("hex") );
 

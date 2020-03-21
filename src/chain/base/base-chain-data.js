@@ -213,7 +213,7 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.txRevertInfoHashMap = new this._txHashMapClass({
+        this.txRevertInfoHashMap = new this._txRevertInfoHashMapClass({
             ...this._scope,
             chainData: this,
         });

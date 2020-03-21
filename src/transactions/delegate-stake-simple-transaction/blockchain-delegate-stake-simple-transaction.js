@@ -38,13 +38,6 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
                     emptyAllowed: true,
                 },
 
-                delegateOld:{
-                    type: "object",
-                    classObject: AccountHashMapDataDelegate,
-
-                    position: 2000,
-                },
-
                 delegate: {
                     type: "object",
                     classObject: AccountHashMapDataDelegate,
@@ -71,10 +64,6 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         if (!delegate) throw new Exception(this, "delegate doesn't exist");
 
-        if (delegate.delegateNonce !== this.delegateOld.delegateNonce ) throw new Exception(this, "delegateOld.delegateNonce is not matching" );
-        if ( !delegate.delegatePublicKey.equals( this.delegateOld.delegatePublicKey) ) throw new Exception(this, "delegateOld.delegatePublickey is not matching" );
-        if ( delegate.delegateFee !== this.delegateOld.delegateFee ) throw new Exception(this, "delegateOld.delegateFee is not matching" );
-
         if ( this.delegate.delegateNonce < delegate.delegateNonce   ) throw new Exception(this, "Delegate.delegateNonce should be greater or equal with the previous value");
         if ( this.delegate.delegateNonce > delegate.delegateNonce+1   ) throw new Exception(this, "Delegate.delegateNonce shouldn't that much big");
 
@@ -94,12 +83,26 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
 
+        return super.transactionRemoved(chain, chainData);
+
+    }
+
+    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data){
+
+        const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
+        return {
+            delegateNonce: delegate.delegateNonce,
+            delegatePublicKey: delegate.delegatePublicKey.toString('hex'),
+            delegateFee: delegate.delegateFee,
+        };
+    }
+
+    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, revertInfoData){
+
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
 
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - this.delegateOld.delegateNonce, this.delegateOld.delegatePublicKey, this.delegateOld.delegateFee );
-
-        return super.transactionRemoved(chain, chainData);
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - revertInfoData.delegateNonce, Buffer.from(revertInfoData.delegatePublicKey, 'hex'), revertInfoData.delegateFee );
 
     }
 

@@ -16,7 +16,7 @@ export default class TxRevertInfoHashMapElement extends HashMapElement {
 
                 //i will store json, it will be easier
                 data: {
-                    type: "sting",
+                    type: "string",
                     maxSize: 100000,
                     minSize: 0,
                 },

@@ -51,7 +51,7 @@ export default class TransactionsCreator {
 
     }
 
-    async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegateOld, delegate }, chain = this._scope.chain ){
+    async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegate }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
@@ -64,17 +64,11 @@ export default class TransactionsCreator {
             vin: input,
             vout: [],
             nonce,
-            delegateOld,
             delegate,
 
         }, "object" );
 
         nonce = await this._calculateNonce(chain, nonce, tx);
-
-        if ( !delegateOld ){
-            delegateOld = await chain.data.accountHashMap.getDelegate(tx.vin[0].publicKeyHash);
-            tx.delegateOld = delegateOld;
-        }
 
         const signatures = tx.signTransaction(privateKeys);
 

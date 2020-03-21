@@ -53,8 +53,19 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== 33) throw new Exception(this, "public key is invalid", publicKey);
         if (!Buffer.isBuffer(signature) || signature.length !== 65) throw new Exception(this, "signature is invalid", signature);
         if (!Buffer.isBuffer(delegatePublicKey) || delegatePublicKey.length !== 33) throw new Exception(this, "delegatePublicKey is invalid", delegatePublicKey);
-        if ( Buffer.isBuffer(delegatePrivateKey) && delegatePrivateKey.length !== 32) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
+        if ( delegatePrivateKey && (!Buffer.isBuffer(delegatePrivateKey) || delegatePrivateKey.length !== 32) ) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
 
+        if (delegatePublicKey.equals(Buffer.alloc(33))){
+
+            if (this._scope.argv.walletStakes.allowDelegatingPrivateKey) throw new Exception(this, "You need to delegate first. Your stake is not delegated");
+            else {
+                const privateKey = await this._scope.walletStakes.dataSubscription.subscribeMessage("get-delegator-stake-private-key", {
+                    publicKey: publicKey.toString("hex"),
+                }, false, false );
+                const privateKeyAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
+                throw new Exception(this, "You need to delegate your stake to the following public key", privateKeyAddress.publicKey );
+            }
+        }
 
         const concat = Buffer.concat([
             this._challenge,

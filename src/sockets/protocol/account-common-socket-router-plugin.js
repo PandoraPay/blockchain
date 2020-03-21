@@ -91,8 +91,11 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
 
         const out = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash);
-        if (out)
-            return out.toJSON();
+        if (out) {
+            let result = out.toJSON();
+            result.delegate.delegatePublicKey = out.delegate.delegatePublicKey.toString('hex');
+            return result;
+        }
 
 
     }
