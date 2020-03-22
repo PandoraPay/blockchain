@@ -163,11 +163,11 @@ export default  class MemPool extends DBSchema{
 
     }
 
-    async newTransaction(transaction, propagateTxMasterCluster, validateTxData, senderSockets ){
+    async newTransaction(transaction, propagateTxMasterCluster, preValidateTx, senderSockets ){
 
         try{
 
-            await this._insertTransactionInMemPool(transaction, true, propagateTxMasterCluster, true, validateTxData, true, senderSockets ); //don't clone it as it was already cloned above
+            await this._insertTransactionInMemPool(transaction, true, propagateTxMasterCluster, true, preValidateTx, true, senderSockets ); //don't clone it as it was already cloned above
 
             return transaction;
 
@@ -399,7 +399,7 @@ export default  class MemPool extends DBSchema{
 
 
 
-    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxSignatures = false, validateTxData = true, propagateToSockets=true, senderSockets){
+    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, senderSockets){
 
         if (this.transactionsData.length >= this._schema.fields.transactionsData.maxSize - 1)
             return false;
@@ -416,16 +416,11 @@ export default  class MemPool extends DBSchema{
 
         if (this.transactions[ txIdString ]) return false;
 
-        if (validateTxSignatures){
+        if (validateTxOnce)
+            if ( await transaction.validateTransactionOnce(this._scope.mainChain) !== true) throw new Exception(this, "Signatures returned false");
 
-            if ( await transaction.verifyTransactionSignatures(this._scope.mainChain) !== true) throw new Exception(this, "Signatures returned false");
-
-        }
-
-        if (validateTxData) {
-            if (await transaction.validateTransactionInfo(this._scope.mainChain) !== true) throw new Exception(this, "Transaction validation failed");
-        }
-
+        if (preValidateTx)
+            if ( await transaction.preValidateTransaction(this._scope.mainChain) !== true) throw new Exception(this, "Transaction validation failed");
 
         if (cloneTx && !clone)
             transaction = this._scope.mainChain.transactionsValidator.cloneTx( transaction );

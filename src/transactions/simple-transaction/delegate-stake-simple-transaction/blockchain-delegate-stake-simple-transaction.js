@@ -3,8 +3,8 @@ const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
 const {Helper, Exception} = global.kernel.helpers;
 const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
-import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
-import AccountHashMapDataDelegate from "../../chain/maps/account-hash/data/account-hash-map-data-delegate";
+import BlockchainSimpleTransaction from "./../blockchain-simple-transaction"
+import AccountHashMapDataDelegate from "../../../chain/maps/account-hash/data/account-hash-map-data-delegate";
 
 export default class BlockchainDelegateStakeSimpleTransaction extends BlockchainSimpleTransaction {
 

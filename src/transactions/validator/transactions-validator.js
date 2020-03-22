@@ -6,7 +6,7 @@ const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helper
 const {DBSchema} = global.kernel.marshal.db;
 
 import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
-import BlockchainDelegateStakeSimpleTransaction from "./../delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
+import BlockchainDelegateStakeSimpleTransaction from "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
 import BlockchainTokenCreateSimpleTransaction from "./../tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction"
 import BlockchainTokenUpdateSupplySimpleTransaction from "./../tokens/token-update-supply-simple-transaction/blockchain-token-update-supply-simple-transaction"
 

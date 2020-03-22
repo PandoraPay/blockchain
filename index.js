@@ -22,7 +22,7 @@ const TokenHashMapElement = require("src/chain/maps/tokens/tokens-hash/token-has
 const TokenHashMapData = require("src/chain/maps/tokens/tokens-hash/data/token-hash-map-data").default;
 
 const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
-const BlockchainDelegateStakeSimpleTransaction = require("src/transactions/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction").default;
+const BlockchainDelegateStakeSimpleTransaction = require("src/transactions/simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction").default;
 const BlockchainTokenCreateSimpleTransaction = require("src/transactions/tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction").default;
 const BlockchainUpdateSupplySimpleTransaction = require("src/transactions/tokens/token-update-supply-simple-transaction/blockchain-token-update-supply-simple-transaction").default;
 const Genesis = require('src/block/genesis/genesis').default;

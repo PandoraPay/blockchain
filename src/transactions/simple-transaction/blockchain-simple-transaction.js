@@ -3,7 +3,7 @@ const {Helper, Exception} = global.kernel.helpers;
 
 export default class BlockainSimpleTransaction extends SimpleTransaction {
 
-    async validateTransactionInfo(chain = this._scope.chain, chainData = chain.data, block){
+    async validateTransactionOnce(chain = this._scope.chain, chainData = chain.data, block){
 
         for (const vin of this.vin)
             if ( !this._scope.argv.transactions.coins.validateCoins( vin.amount ) ) throw new Exception(this, "Vin is not good");
@@ -11,6 +11,12 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         for (const vout of this.vout)
             if ( !this._scope.argv.transactions.coins.validateCoins( vout.amount ) ) throw new Exception(this, "Vout is not good");
 
+        if ( await this.verifyTransactionSignatures(chain) !== true) throw new Exception(this, "Signatures returned false");
+
+        return true;
+    }
+
+    async preValidateTransaction(chain = this._scope.chain, chainData = chain.data, block){
 
         /**
          * Check Hash
@@ -19,12 +25,13 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         if (hashExistence ) throw new Exception (this, "Hash already found", {hash: this.hash().toString("hex") });
 
         return true;
+
     }
 
     async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
 
 
-        if ( await this.validateTransactionInfo(chain, chainData, block) !== true) throw new Exception(this, "Validate Transaction is false", {   });
+        if ( await this.preValidateTransaction(chain, chainData, block) !== true) throw new Exception(this, "Validate Transaction is false", {   });
 
         /**
          * Check nonce and balances
