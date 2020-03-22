@@ -51,7 +51,7 @@ export default class WalletTransfer {
             const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency);
             if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-            const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicAddress(networkByte), tokenCurrency)[tokenCurrency] || 0;
+            const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency)[tokenCurrency] || 0;
 
             requiredFunds[tokenCurrency] = {
                 tokenCurrency,
@@ -107,7 +107,7 @@ export default class WalletTransfer {
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -145,7 +145,7 @@ export default class WalletTransfer {
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -183,7 +183,7 @@ export default class WalletTransfer {
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance( walletAddress.decryptPublicAddress(networkByte), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){

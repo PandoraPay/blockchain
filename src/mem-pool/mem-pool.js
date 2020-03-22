@@ -1,4 +1,4 @@
-const {Helper, Exception, StringHelper} = global.kernel.helpers;
+const {Helper, Exception, StringHelper, ArrayHelper} = global.kernel.helpers;
 const {DBSchema} = global.kernel.marshal.db;
 const {DBSchemaBufferBig, DBSchemaString} = global.kernel.marshal.db.samples;
 const {BaseTransaction} = global.cryptography.transactions.base;
@@ -6,41 +6,16 @@ const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 import MemPoolTxData from "./data/mem-pool-tx-data";
 
-export default  class MemPool extends DBSchema{
+export default  class MemPool {
 
-    constructor(scope, schema = { }, data, type , creationOptions){
+    constructor(scope){
 
-        super(scope, Helper.merge( {
+        this._scope = scope;
 
-                fields:{
+        this._init = false;
+    }
 
-                    table: {
-                        default: "mem",
-                        fixedBytes: 3,
-                    },
-
-                    id: {
-                        default: "mempool",
-                        fixedBytes: 7,
-                    },
-
-                    transactionsData:{
-                        type : "array",
-                        minSize: 0,
-                        maxSize: 10000,
-                        classObject: MemPoolTxData,
-                    }
-
-                },
-
-                options: {
-                    hashing: {
-                        enabled: false,
-                    },
-                }
-
-            },
-            schema, false), data, type, creationOptions);
+    _reset(){
 
         /**
          * Map of all txs
@@ -67,12 +42,26 @@ export default  class MemPool extends DBSchema{
         this.queuedTxs = {};
         this.queuedTxsArray = [];
 
-        this._init = false;
+    }
+
+    async load(){
+
+        const out = await this._scope.db.scan( MemPoolTxData, 0, this._scope.argv.memPool.maximumMemPool, '', '', undefined );
+
+        this._reset();
+
+        for (const txData of out)
+            await this.newTransaction(txData, false, false,);
 
     }
 
     async clear(){
-        return this.delete();
+
+        const out = await this._scope.db.scan( MemPoolTxData, 0, this._scope.argv.memPool.maximumMemPool, '', '', undefined );
+        for (const txData of out)
+            await txData.delete();
+
+        this._reset();
     }
 
     async initializeMemPool(){
@@ -146,23 +135,6 @@ export default  class MemPool extends DBSchema{
         return true;
     }
 
-    /**
-     * Validating Transactions
-     * @returns {Promise<void>}
-     */
-    async onLoaded(){
-
-        this.transactions = {};
-        this.transactionsOrderedByVin0Nonce = {};
-        this.queuedTxs = {};
-        this.queuedTxsArray = [];
-
-        for (const txData of this.transactionsData) {
-            await this.newTransaction(txData, false, false,);
-        }
-
-    }
-
     async newTransaction(transaction, propagateTxMasterCluster, preValidateTx, senderSockets ){
 
         try{
@@ -180,19 +152,14 @@ export default  class MemPool extends DBSchema{
     getMemPoolTransaction(txId){
 
         if ( Buffer.isBuffer(txId) ) txId = txId.toString("hex");
-
         return this.transactions[txId];
 
     }
 
-    getMemPoolPendingBalance(account, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
+    getMemPoolPendingBalance(publicKeyHash, tokenCurrency ){
 
-        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
-
-        const tokenCurrencyHex = tokenCurrency.toString('hex');
-
-        const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        const publicKeyHash = address.publicKeyHash;
+        if (tokenCurrency)
+            if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency)) tokenCurrency = Buffer.from(tokenCurrency, "hex");
 
         const out = {};
 
@@ -201,20 +168,17 @@ export default  class MemPool extends DBSchema{
             const array = this.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
             for (const tx of array) {
 
-                if ( tx._memPoolIncluded )
-                    continue;
+                if ( tx._memPoolIncluded ) continue;
 
                 for (const vin of tx.vin)
-                    if (  vin.publicKeyHash.equals(publicKeyHash) && vin.tokenCurrency.equals(tokenCurrency) )
-                        out[ tokenCurrencyHex ] =  (out[ tokenCurrencyHex ] || 0) - vin.amount;
-
+                    if (  vin.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vin.tokenCurrency.equals(tokenCurrency) ) )
+                        out[ vin.tokenCurrency.toString('hex') ] =  (out[ vin.tokenCurrency.toString('hex') ] || 0) - vin.amount;
 
                 for (const vout of tx.vout)
-                    if (vout.publicKeyHash.equals(publicKeyHash) && vout.tokenCurrency.equals(tokenCurrency) )
-                        out[ tokenCurrencyHex ] =  (out[ tokenCurrencyHex ] || 0) + vout.amount;
+                    if (vout.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vout.tokenCurrency.equals(tokenCurrency) ) )
+                        out[ vout.tokenCurrency.toString('hex') ] =  (out[ vout.tokenCurrency.toString('hex') ] || 0) + vout.amount;
 
             }
-
 
         }
 
@@ -228,22 +192,10 @@ export default  class MemPool extends DBSchema{
 
         const array = this.transactionsOrderedByVin0Nonce[publicKeyHash] || [] ;
 
-        let insertPosition = 0;
-        let prevNonce = accountNonce;
-
-        while (insertPosition < array.length  ){
-
-            const nonce = array[insertPosition].nonce;
-
-            if (prevNonce < nonce) break;
-            if (prevNonce > nonce ) break;
-
-            prevNonce = nonce + 1;
-
-            insertPosition++;
-        }
-
-        return prevNonce
+        if (array.length)
+            return array[array.length-1].nonce+1;
+        else
+            return accountNonce;
 
     }
 
@@ -401,8 +353,7 @@ export default  class MemPool extends DBSchema{
 
     async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, senderSockets){
 
-        if (this.transactionsData.length >= this._schema.fields.transactionsData.maxSize - 1)
-            return false;
+        if (this.transactionsArray.length >= this._scope.argv.memPool.maximumMemPool) return false;
 
         let clone = true;
 
@@ -430,32 +381,31 @@ export default  class MemPool extends DBSchema{
          */
 
         const publicKeyHashVin = transaction.vin[0].publicKeyHash.toString("hex");
-        if (!this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ]) this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ] = [];
 
-        //sort by nonce
-        const array = this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ];
+        if (preValidateTx) {
 
-        //let's check the nonce position
-        let insertPosition = 0;
+            for (const vin of transaction.vin) {
 
-        while (insertPosition < array.length  ){
+                const balance = (await this._scope.mainChain.data.accountHashMap.getBalance(vin.publicKeyHash, vin.tokenCurrency)) || 0;
+                const memPoolBalance = this.getMemPoolPendingBalance(vin.publicKeyHash, vin.tokenCurrency)[vin.tokenCurrency.toString('hex')] || 0;
+                if (balance - vin.amount + memPoolBalance < 0)
+                    throw new Exception(this, "Vin balance is exceeding", {balance, vin: vin.amount, memPoolBalance});
 
-            const nonce = array[insertPosition].nonce;
-
-            if (nonce === transaction.nonce )
-                return false;
+            }
 
 
-            if (nonce > transaction.nonce) break;
+            const nonce = await this._scope.mainChain.data.accountHashMap.getNonce(transaction.vin[0].publicKeyHash);
+            const memPoolNonce = this.getMemPoolTransactionNonce(publicKeyHashVin, nonce);
+            if (transaction.nonce !== memPoolNonce)
+                throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce});
 
-            insertPosition++;
         }
 
-        if (insertPosition !== -1)
-            array.splice(insertPosition, 0, transaction);
+        if (!this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ]) this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ] = [];
+
+        ArrayHelper.addSortedArray(transaction, this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ], (a,b)=> a.nonce - b.nonce );
 
         this.transactions[txIdString] = transaction;
-
         //save transactionsByPublicKeyHash
         const inputs = transaction.vin.concat(transaction.vout);
         for (const input of inputs){
@@ -469,29 +419,13 @@ export default  class MemPool extends DBSchema{
          * Let's insert the tx in transactionsData
          */
 
-        let found = false;
-        for (const tx of this.transactionsData)
-            if ( tx.txId.equals( txId ) ){
-                found = true;
-                break;
-            }
+        if (propagateToSockets)
+            await this._scope.mainChain.emit("mem-pool/tx-included", {
+                data: { tx: transaction, txId: txIdString},
+                senderSockets,
+            });
 
-        if (!found) {
-
-            this.pushArray("transactionsData", {
-                buffer: transaction.toBuffer().toString("hex"),
-                txId: txIdString,
-            }, "object");
-
-            if (propagateToSockets)
-                await this._scope.mainChain.emit("mem-pool/tx-included", {
-                    data: { tx: transaction, txId: txIdString},
-                    senderSockets,
-                });
-
-            this._scope.logger.warn(this, "New Transaction", {id: txIdString, nonce: transaction.nonce});
-
-        }
+        this._scope.logger.warn(this, "New Transaction", {id: txIdString, nonce: transaction.nonce});
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
             await this.subscribeMessage("mem-pool-insert-tx", {
@@ -530,11 +464,7 @@ export default  class MemPool extends DBSchema{
             if (array.length === 0) delete this.transactionsByPublicKeyHash[publicKeyHash];
         }
 
-        for (let i=0; i < this.transactionsData.length; i++)
-            if (this.transactionsData[i].txId.equals( txId )) {
-                this.removeArray("transactionsData", i );
-                break;
-            }
+        //delete txData
 
         const publicKeyHashVin = transaction.vin[0].publicKeyHash.toString("hex");
         const array = this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ] || [];
@@ -543,6 +473,8 @@ export default  class MemPool extends DBSchema{
                 array.splice(i, 1);
                 break;
             }
+        if (array.length === 0)
+            delete this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ];
 
         for (let i=this.transactionsArray.length-1; i >= 0; i--)
             if (this.transactionsArray[i].hash().equals(txId)){

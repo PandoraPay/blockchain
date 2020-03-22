@@ -147,13 +147,13 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         let out;
         if (tokenCurrency){
             out = await chainData.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
-            const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency)[tokenCurrency.toString("hex")] || 0;
+            const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(publicKeyHash, tokenCurrency)[tokenCurrency.toString("hex")] || 0;
             return out + memPoolOut;
         }
         else {
 
             out = await chainData.accountHashMap.getBalances( publicKeyHash );
-            const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(account, tokenCurrency);
+            const memPoolOut = this._scope.memPool.getMemPoolPendingBalance(publicKeyHash);
 
             const already = {};
 
