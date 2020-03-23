@@ -69,7 +69,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         /**
          * Store Revert Info Previous State
          */
-        const revertInfoPreviousState = await this.getTransactionRevertInfoPreviousState( chain, chainData );
+        const revertInfoPreviousState = await this.getTransactionRevertInfoPreviousState( chain, chainData, block, merkleHeight, merkleLeafHeight );
         if (revertInfoPreviousState)
             await chainData.txRevertInfoHashMap.updateMap( this.hash().toString("hex"), JSON.stringify( revertInfoPreviousState ) );
 
@@ -139,7 +139,7 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
          */
         const revertInfoPreviousState = await chainData.txRevertInfoHashMap.getMap( this.hash().toString("hex") );
         if (revertInfoPreviousState){
-            await this.processTransactionRevertInfoPreviousState( chain, chainData, JSON.parse(revertInfoPreviousState.data) );
+            await this.processTransactionRevertInfoPreviousState( JSON.parse(revertInfoPreviousState.data), chain, chainData, block, merkleHeight, merkleLeafHeight );
             await chainData.txRevertInfoHashMap.deleteMap( this.hash().toString("hex")  );
         }
 
@@ -203,11 +203,11 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
 
     }
 
-    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data){
+    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
         return undefined;
     }
 
-    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, revertInfoData){
+    async processTransactionRevertInfoPreviousState(revertInfoData, chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){
     }
 
     async transactionSuccessfullyAdded(chain = this._scope.chain, chainData = chain.data, ){

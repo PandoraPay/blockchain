@@ -87,7 +87,7 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
 
     }
 
-    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data){
+    async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
 
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
@@ -97,7 +97,7 @@ export default class BlockchainDelegateStakeSimpleTransaction extends Blockchain
         };
     }
 
-    async processTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, revertInfoData){
+    async processTransactionRevertInfoPreviousState( revertInfoData, chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;

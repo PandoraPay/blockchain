@@ -1,4 +1,4 @@
-const {Exception} = global.kernel.helpers;
+const {Exception, Helper} = global.kernel.helpers;
 
 export default class TestNet{
 
@@ -233,6 +233,8 @@ export default class TestNet{
                             address: wallet.decryptPublicAddress(),
                             txDsts,
                         });
+
+                        await Helper.sleep(100);
 
                     }
 

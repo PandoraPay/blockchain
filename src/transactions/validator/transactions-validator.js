@@ -9,6 +9,7 @@ import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simp
 import BlockchainDelegateStakeSimpleTransaction from "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
 import BlockchainTokenCreateSimpleTransaction from "./../tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction"
 import BlockchainTokenUpdateSupplySimpleTransaction from "./../tokens/token-update-supply-simple-transaction/blockchain-token-update-supply-simple-transaction"
+import BlockchainZetherDepositSimpleTransaction from "./../simple-transaction/zether/blockchain-zether-deposit-simple-transaction"
 
 export default class TransactionsValidator{
     
@@ -54,6 +55,7 @@ export default class TransactionsValidator{
         if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return BlockchainDelegateStakeSimpleTransaction;
         if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATE_TRANSACTION ) return BlockchainTokenCreateSimpleTransaction;
         if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_UPDATE_SUPPLY_TRANSACTION ) return BlockchainTokenUpdateSupplySimpleTransaction;
+        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_ZETHER_DEPOSIT ) return BlockchainZetherDepositSimpleTransaction;
 
         throw new Exception(this, "Transaction class couldn't be identified by script version", scriptVersion);
             
@@ -62,7 +64,9 @@ export default class TransactionsValidator{
     validateTx(input){
 
         const transactionClass = this.getTxClass( input );
-        return new transactionClass( this._scope, undefined, (input instanceof DBSchema) ? input.toBuffer() : input  )
+
+        if (input instanceof transactionClass) return input;
+        else return new transactionClass( this._scope, undefined, input  );
 
     }
 

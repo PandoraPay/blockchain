@@ -5,6 +5,7 @@ import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simp
 import BlockchainDelegateStakeSimpleTransaction from "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
 import BlockchainTokenCreateSimpleTransaction from  "./../tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction"
 import BlockchainTokenUpdateSupplySimpleTransaction from  "./../tokens/token-update-supply-simple-transaction/blockchain-token-update-supply-simple-transaction"
+import BlockchainZetherDepositSimpleTransaction from  "./../simple-transaction/zether/blockchain-zether-deposit-simple-transaction"
 
 export default class TransactionsCreator {
     
@@ -140,6 +141,37 @@ export default class TransactionsCreator {
             tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( tx.vin[0].publicKeyHash, nonce );
             tx.tokenPublicKeyHash = tokenPublicKeyHash;
         }
+
+        const signatures = tx.signTransaction(privateKeys);
+
+        return {
+            tx,
+            signatures,
+        }
+
+    }
+
+    async createZetherDepositSimpleTransaction( { vin, vout, registration, privateKeys, nonce }, chain = this._scope.chain ){
+
+        if (vin && !Array.isArray(vin)) vin = [vin];
+        if (vout && !Array.isArray(vout)) vout = [vout];
+
+        if (!vin || !vin.length ) throw new Exception(this, "Vin is empty");
+        if (!vout || !vout.length  ) throw new Exception(this, "Vout is empty");
+
+        const input = [...vin];
+        input.map( it => it.signature = Buffer.alloc(65) );
+
+        const tx = new BlockchainZetherDepositSimpleTransaction( this._scope, undefined, {
+
+            vin: input,
+            vout,
+            nonce,
+            registration
+
+        }, "object" );
+
+        nonce = await this._calculateNonce(chain, nonce, tx);
 
         const signatures = tx.signTransaction(privateKeys);
 
