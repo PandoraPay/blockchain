@@ -89,7 +89,6 @@ export default class WalletAddress extends DBSchema {
         const publicKey =  this.decryptPublicKey( password );
 
         const publicAddress = this._scope.cryptography.addressGenerator.generateAddressFromPublicKey( publicKey, networkByte);
-
         return publicAddress;
     }
 
@@ -99,13 +98,74 @@ export default class WalletAddress extends DBSchema {
     decryptPrivateKey(password){
 
         this.wallet.encryption.decryptWallet(password);
-
         return this.keys.private.decryptKey();
 
     }
 
     /**
-     * Decrypt delegate private key
+     * extracting public key
+     */
+    decryptPublicKey(password){
+
+        this.wallet.encryption.decryptWallet(password);
+        return this.keys.public.decryptKey();
+
+    }
+
+    /**
+     * extracting public key hash
+     */
+    decryptPublicKeyHash(password){
+
+        const publicKey =  this.decryptPublicKey(password);
+        return this._scope.cryptography.addressGenerator.generatePublicKeyHash(publicKey);
+
+    }
+
+    /**
+     * Getting Public Address
+     */
+    decryptZetherPublicAddress( register = false, networkByte , password, ){
+
+        const publicKey =  this.decryptZetherPublicKey( password );
+        const registration =  this.decryptZetherRegistration( password );
+
+        const publicAddress = this._scope.cryptography.zetherAddressGenerator.generateZetherAddressFromPublicKey( register ? {
+            registered: 1,
+            c: registration.toString('hex').slice(0, 64),
+            s: registration.toString('hex').slice(64),
+        } : undefined, publicKey, networkByte);
+        return publicAddress;
+    }
+
+    /**
+     * extracting zether private
+     */
+    decryptZetherPrivateKey(password){
+        this.wallet.encryption.decryptWallet(password);
+        return this.keys.zetherPrivate.decryptKey();
+    }
+
+    /**
+     * extracting zether public key
+     */
+    decryptZetherPublicKey(password){
+        this.wallet.encryption.decryptWallet(password);
+        return this.keys.zetherPublicKey.decryptKey();
+    }
+
+    /**
+     * extracting zether registration
+     */
+    decryptZetherRegistration(password){
+        this.wallet.encryption.decryptWallet(password);
+        return this.keys.zetherRegistration.decryptKey();
+    }
+
+
+
+    /**
+     * extract delegate private key
      */
     decryptDelegateStakePrivateAddress(delegateNonce, password){
 
@@ -115,6 +175,12 @@ export default class WalletAddress extends DBSchema {
         return privateAddress.getDelegateStakePrivateAddress(delegateNonce);
     }
 
+    /**
+     * Decrypt Delegator Stake private key
+     * @param publicKey
+     * @param password
+     * @returns {*}
+     */
     decryptDelegatorStakePrivateAddress(publicKey, password){
         const privateKey = this.decryptPrivateKey(password);
         const privateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
@@ -122,27 +188,7 @@ export default class WalletAddress extends DBSchema {
         return privateAddress.getDelegatorStakePrivateAddress(publicKey);
     }
 
-    /**
-     * extracting public key
-     */
-    decryptPublicKey(password){
 
-        this.wallet.encryption.decryptWallet(password);
-
-        return this.keys.public.decryptKey();
-
-    }
-
-    /**
-     * extracting public key
-     */
-    decryptPublicKeyHash(password){
-
-        const publicKey =  this.decryptPublicKey(password);
-
-        return this._scope.cryptography.addressGenerator.generatePublicKeyHash(publicKey);
-
-    }
 
     /**
      * extracting mnemonic sequence index
@@ -151,7 +197,6 @@ export default class WalletAddress extends DBSchema {
     decryptMonemonicSequenceIndex(password){
 
         this.wallet.encryption.decryptWallet(password);
-
         return this.mnemonicSequenceIndex.decryptKey();
     }
 

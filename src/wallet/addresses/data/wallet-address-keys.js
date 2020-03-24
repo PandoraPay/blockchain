@@ -34,17 +34,37 @@ export default class WalletAddressKeys extends DBSchema{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 102,
+                        position: 101,
                     },
 
                     public:{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 103,
+                        position: 102,
                     },
 
 
+                    zetherPrivate:{
+                        type: "object",
+                        classObject: DBEncryptedSchema,
+
+                        position: 103,
+                    },
+
+                    zetherPublicKey:{
+                        type: "object",
+                        classObject: DBEncryptedSchema,
+
+                        position: 104,
+                    },
+
+                    zetherRegistration:{
+                        type: "object",
+                        classObject: DBEncryptedSchema,
+
+                        position: 105,
+                    },
 
                 },
 
