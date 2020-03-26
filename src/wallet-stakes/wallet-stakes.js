@@ -71,7 +71,7 @@ export default class WalletStakes extends DBSchema {
 
                 const {publicKey} = message.data;
 
-                const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].decryptDelegatorStakePrivateAddress( publicKey );
+                const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].keys.decryptDelegatorStakePrivateAddress( publicKey );
                 return delegatorStakePrivateAddress.privateKey.toString("hex");
 
             }

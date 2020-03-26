@@ -3,7 +3,7 @@ const {Helper, EnumHelper, Exception} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
 const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
 
-export default class WalletAddressKeys extends DBSchema{
+export default class WalletAddressTransparentKeys extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 
@@ -34,32 +34,17 @@ export default class WalletAddressKeys extends DBSchema{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 101,
+                        position: 103,
                     },
 
                     public:{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 102,
-                    },
-
-
-                    zetherPrivate:{
-                        type: "object",
-                        classObject: DBEncryptedSchema,
-
-                        position: 103,
-                    },
-
-                    zetherPublicKey:{
-                        type: "object",
-                        classObject: DBEncryptedSchema,
-
                         position: 104,
                     },
 
-                    zetherRegistration:{
+                    registration:{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
@@ -80,5 +65,51 @@ export default class WalletAddressKeys extends DBSchema{
             schema, false), data, type, creationOptions);
 
     }
+
+    get wallet(){
+        return this.parent.parent;
+    }
+
+    /**
+     * Getting Public Address
+     */
+    decryptPublicAddress( register = false, networkByte , password, ){
+
+        const publicKey =  this.decryptPublicKey( password );
+        const registration =  this.decryptRegistration( password );
+
+        const publicAddress = this._scope.cryptography.zetherAddressGenerator.generateZetherAddressFromPublicKey( publicKey, register ? registration : undefined, networkByte);
+        return publicAddress;
+    }
+
+    /**
+     * extracting zether private
+     */
+    decryptPrivateKey(password){
+        this.wallet.encryption.decryptWallet(password);
+        return this.private.decryptKey();
+    }
+
+    /**
+     * extracting zether public key
+     */
+    decryptPublicKey(password){
+        this.wallet.encryption.decryptWallet(password);
+        return this.publicKey.decryptKey();
+    }
+
+    /**
+     * extracting zether registration
+     */
+    decryptRegistration(password){
+        this.wallet.encryption.decryptWallet(password);
+        const registration = this.registration.decryptKey();
+        return {
+            c: Buffer.from( registration.toString('hex').slice(0, 64), "hex"),
+            s: Buffer.from( registration.toString('hex').slice(64), "hex"),
+        }
+    }
+
+
 
 }

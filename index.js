@@ -39,6 +39,12 @@ const ExchangeOfferPayment = require("src/exchange/data/exchange-offer-payment")
 const ExchangeOfferPaymentTypeEnum = require("src/exchange/data/exchange-offer-type-enum").default;
 const ExchangeAvailablePayments = require("src/exchange/data/available-payments").default;
 
+const Wallet = require("src/wallet/wallet").default;
+const WalletAddress = require("src/wallet/addresses/wallet-address").default;
+const WalletAddressTypeEnum = require("src/wallet/addresses/data/wallet-address-type-enum").default;
+const WalletAddressTransparentKeys = require("src/wallet/addresses/data/wallet-address-transparent-keys").default;
+const WalletAddressZetherKeys = require("src/wallet/addresses/data/wallet-address-zether-keys").default;
+
 const library = {
 
     ...kernel,
@@ -96,6 +102,13 @@ const library = {
             BlockchainUpdateSupplySimpleTransaction,
         },
 
+        wallet:{
+            Wallet,
+            WalletAddress,
+            WalletAddressTransparentKeys,
+            WalletAddressTypeEnum,
+            WalletAddressZetherKeys
+        },
 
     },
 

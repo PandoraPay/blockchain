@@ -41,7 +41,7 @@ export default function run () {
 
             const outTx = await chain.transactionsCreator.createSimpleTransaction( {
                 vin: [{
-                    publicKey: await wallet.decryptPublicKey(),
+                    publicKey: await wallet.keys.decryptPublicKey(),
                     amount: 1000,
                 }],
                 vout: [{
@@ -52,7 +52,7 @@ export default function run () {
                     amount: 666
                 }],
                 privateKeys: [ {
-                    privateKey: wallet.decryptPrivateKey()
+                    privateKey: wallet.keys.decryptPrivateKey()
                 } ]
             } );
 
@@ -65,7 +65,7 @@ export default function run () {
 
             const outTx2 = await chain.transactionsCreator.createSimpleTransaction( {
                 vin: [{
-                    publicKey: await wallet.decryptPublicKey(),
+                    publicKey: await wallet.keys.decryptPublicKey(),
                     amount: 1000,
                 }],
                 vout: [{
@@ -76,7 +76,7 @@ export default function run () {
                     amount: 666
                 }],
                 privateKeys: [ {
-                    privateKey: wallet.decryptPrivateKey()
+                    privateKey: wallet.keys.decryptPrivateKey()
                 } ],
             } );
 

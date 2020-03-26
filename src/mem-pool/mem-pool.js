@@ -12,6 +12,8 @@ export default  class MemPool {
 
         this._scope = scope;
 
+        this.dataSubscription = new DBSchema(this._scope, { fields: {  table: { default: "memPool", fixedBytes: 7 } }});
+
         this._init = false;
     }
 
@@ -77,9 +79,9 @@ export default  class MemPool {
 
         if ( this._scope.db.isSynchronized ) {
 
-            await this.subscribe();
+            await this.dataSubscription.subscribe();
 
-            this.subscription.on( async message => {
+            this.dataSubscription.subscription.on( async message => {
 
                 try{
 
@@ -349,8 +351,6 @@ export default  class MemPool {
 
     }
 
-
-
     async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, senderSockets){
 
         if (this.transactionsArray.length >= this._scope.argv.memPool.maximumMemPool) return false;
@@ -428,7 +428,7 @@ export default  class MemPool {
         this._scope.logger.warn(this, "New Transaction", {id: txIdString, nonce: transaction.nonce});
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
-            await this.subscribeMessage("mem-pool-insert-tx", {
+            await this.dataSubscription.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
             }, true, false);
@@ -483,7 +483,7 @@ export default  class MemPool {
             }
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
-            await this.subscribeMessage("mem-pool-remove-tx", {
+            await this.dataSubscription.subscribeMessage("mem-pool-remove-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
             }, true, false);

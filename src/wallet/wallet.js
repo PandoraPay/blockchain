@@ -1,4 +1,5 @@
 import WalletAddress from "./addresses/wallet-address"
+import WalletAddressTypeEnum from "./addresses/data/wallet-address-type-enum"
 import WalletManager from "./manager/wallet-manager"
 import WalletEncryption from "./encryption/wallet-encryption"
 import WalletTransfer from "./transfer/wallet-transfer"
@@ -68,13 +69,22 @@ export default class Wallet extends DBSchema {
                         position: 104,
                     },
 
+
+                    mnemonicSequenceCounterZether:{
+
+                        type: "object",
+                        classObject: DBEncryptedSchema,
+
+                        position: 105,
+                    },
+
                     addresses: {
                         type: "array",
                         classObject: WalletAddress,
                         minSize: 0,
                         maxSize: 4095,
 
-                        position: 105,
+                        position: 106,
                     },
                     
                 },
@@ -143,7 +153,8 @@ export default class Wallet extends DBSchema {
         await this.manager.createMnemonic(false,);
 
         //let's create first address
-        await this.manager.createNewAddress(undefined, save);
+        await this.manager.createNewAddress( WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT,undefined, save);
+        await this.manager.createNewAddress( WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER, undefined, save);
 
     }
 

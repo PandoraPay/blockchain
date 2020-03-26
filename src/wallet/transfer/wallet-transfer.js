@@ -17,7 +17,7 @@ export default class WalletTransfer {
         this.wallet.encryption.decryptWallet(password);
 
         for (const walletAddress of this.wallet.addresses){
-            const publicKeyHash = walletAddress.decryptPublicKeyHash();
+            const publicKeyHash = walletAddress.keys.decryptPublicKeyHash();
             const balance = await this._scope.mainChain.data.accountHashMap.getBalance(publicKeyHash, token);
 
             if (balance && balance >= amount)
@@ -48,10 +48,10 @@ export default class WalletTransfer {
 
         for (const tokenCurrency in requiredFunds) {
 
-            const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency);
+            const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency);
             if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-            const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency)[tokenCurrency] || 0;
+            const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency)[tokenCurrency] || 0;
 
             requiredFunds[tokenCurrency] = {
                 tokenCurrency,
@@ -71,7 +71,7 @@ export default class WalletTransfer {
 
         for (const tokenCurrency in requiredFunds)
             vin.push({
-                publicKey: walletAddress.decryptPublicKey(),
+                publicKey: walletAddress.keys.decryptPublicKey(),
                 amount: requiredFunds[tokenCurrency].required + requiredFunds[tokenCurrency].fee,
                 tokenCurrency: requiredFunds[tokenCurrency].tokenCurrency,
             });
@@ -80,7 +80,7 @@ export default class WalletTransfer {
             vin: vin,
             vout: outs,
             privateKeys: [ {
-                privateKey: walletAddress.decryptPrivateKey()
+                privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
             nonce,
         } );
@@ -104,10 +104,10 @@ export default class WalletTransfer {
                 fixedBytes: 33,
             }, "delegatePublicKey", ()=>{}, "object", {}  );
 
-        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -119,12 +119,12 @@ export default class WalletTransfer {
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createDelegateSimpleTransaction( {
             vin: [{
-                publicKey: walletAddress.decryptPublicKey(),
+                publicKey: walletAddress.keys.decryptPublicKey(),
                 amount: fee,
             }],
             vout: [],
             privateKeys: [ {
-                privateKey: walletAddress.decryptPrivateKey()
+                privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
             nonce,
             delegate,
@@ -142,10 +142,10 @@ export default class WalletTransfer {
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
-        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -158,12 +158,12 @@ export default class WalletTransfer {
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createTokenCreateSimpleTransaction( {
             vin: [{
-                publicKey: walletAddress.decryptPublicKey(),
+                publicKey: walletAddress.keys.decryptPublicKey(),
                 amount: fee,
             }],
             vout: [],
             privateKeys: [ {
-                privateKey: walletAddress.decryptPrivateKey()
+                privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
             nonce,
             tokenData,
@@ -180,10 +180,10 @@ export default class WalletTransfer {
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
-        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.decryptPublicKeyHash(), tokenCurrency );
+        const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
-        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
+        const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
         if (fee === undefined){
@@ -196,12 +196,12 @@ export default class WalletTransfer {
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createTokenUpdateSupplySimpleTransaction( {
             vin: [{
-                publicKey: walletAddress.decryptPublicKey(),
+                publicKey: walletAddress.keys.decryptPublicKey(),
                 amount: fee,
             }],
             vout: [],
             privateKeys: [ {
-                privateKey: walletAddress.decryptPrivateKey()
+                privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
             nonce,
             tokenPublicKeyHash,

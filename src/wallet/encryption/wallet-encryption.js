@@ -100,13 +100,17 @@ export default class WalletEncryption {
 
         const list = [
             this.wallet.mnemonic,
-            this.wallet.mnemonicSequenceCounter
+            this.wallet.mnemonicSequenceCounter,
+            this.wallet.mnemonicSequenceCounterZether,
         ];
 
         for (let i=0; i < this.wallet.addresses.length; i++) {
             list.push( this.wallet.addresses[i].mnemonicSequenceIndex );
             list.push( this.wallet.addresses[i].keys.private );
             list.push( this.wallet.addresses[i].keys.public );
+
+            if (this.wallet.addresses[i].keys.registration)
+                list.push( this.wallet.addresses[i].keys.registration );
         }
 
         return list.map ( callback );
@@ -131,6 +135,14 @@ export default class WalletEncryption {
 
     }
 
+    decryptMnemonicSequenceCounterZether(password){
+
+        this.decryptWallet(password);
+
+        const mnemonicSequenceCounterZether = this.wallet.mnemonicSequenceCounterZether.decryptKey();
+        return parseInt( mnemonicSequenceCounterZether.toString("hex"), 16);
+
+    }
 
     setEncrypted(newValue){
         this.wallet.encrypted = newValue;

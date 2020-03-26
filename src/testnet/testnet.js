@@ -33,7 +33,7 @@ export default class TestNet{
 
             setTimeout( () => {
 
-                const wallets = this._scope.wallet.addresses.map( it => it.decryptPublicAddress( ).calculateAddress() );
+                const wallets = this._scope.wallet.addresses.map( it => it.keys.decryptPublicAddress( ).calculateAddress() );
 
 
                 this._scope.masterCluster.sendMessage("testnet-wallet", {  wallets }, false );
@@ -109,7 +109,7 @@ export default class TestNet{
 
             } else { //master
 
-                const publicKey = await addressWallet.decryptPublicKey();
+                const publicKey = await addressWallet.keys.decryptPublicKey();
                 publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
 
                 timestamp = this._scope.genesis.settings.timestamp;
@@ -169,7 +169,7 @@ export default class TestNet{
 
                     for (let address of this._testnetWallets)
                         await this._scope.wallet.transfer.transferSimple({
-                            address: wallet.decryptPublicAddress(),
+                            address: wallet.keys.decryptPublicAddress(),
                             txDsts: [{
                                 address,
                                 amount,
@@ -230,7 +230,7 @@ export default class TestNet{
 
 
                         await this._scope.wallet.transfer.transferSimple({
-                            address: wallet.decryptPublicAddress(),
+                            address: wallet.keys.decryptPublicAddress(),
                             txDsts,
                         });
 

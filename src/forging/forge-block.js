@@ -108,7 +108,7 @@ export default class ForgeBlock {
 
         const networkTimestampDrift = this._scope.genesis.settings.getDateNow() + this._scope.argv.block.timestamp.timestampDriftMaximum;
 
-        const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].decryptPublicKeyHash();
+        const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].keys.decryptPublicKeyHash();
 
         while (block.timestamp < networkTimestampDrift && !this._scope.forging._reset){
 
@@ -117,7 +117,7 @@ export default class ForgeBlock {
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.decryptPublicKey(), availableStakeAddress.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.keys.decryptPublicKey(), availableStakeAddress.keys.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
