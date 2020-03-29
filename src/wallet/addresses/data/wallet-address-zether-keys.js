@@ -3,7 +3,7 @@ const {Helper, EnumHelper, Exception} = global.kernel.helpers;
 const {CryptoHelper} = global.kernel.helpers.crypto;
 const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
 
-export default class WalletAddressTransparentKeys extends DBSchema{
+export default class WalletAddressZetherKeys extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 
@@ -34,21 +34,21 @@ export default class WalletAddressTransparentKeys extends DBSchema{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 103,
+                        position: 101,
                     },
 
                     public:{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 104,
+                        position: 102,
                     },
 
                     registration:{
                         type: "object",
                         classObject: DBEncryptedSchema,
 
-                        position: 105,
+                        position: 103,
                     },
 
                 },
@@ -78,7 +78,7 @@ export default class WalletAddressTransparentKeys extends DBSchema{
         const publicKey =  this.decryptPublicKey( password );
         const registration =  this.decryptRegistration( password );
 
-        const publicAddress = this._scope.cryptography.zetherAddressGenerator.generateZetherAddressFromPublicKey( publicKey, register ? registration : undefined, networkByte);
+        const publicAddress = this._scope.cryptography.zetherAddressGenerator.generateAddressFromPublicKey( publicKey, register ? registration : undefined, networkByte);
         return publicAddress;
     }
 
@@ -95,7 +95,7 @@ export default class WalletAddressTransparentKeys extends DBSchema{
      */
     decryptPublicKey(password){
         this.wallet.encryption.decryptWallet(password);
-        return this.publicKey.decryptKey();
+        return this.public.decryptKey();
     }
 
     /**

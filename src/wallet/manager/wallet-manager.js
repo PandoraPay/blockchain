@@ -132,7 +132,7 @@ export default class WalletManager{
             } );
 
         } else
-        if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT ){
+        if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER ){
 
             privateAddress = this._scope.cryptography.zetherAddressValidator.validatePrivateAddress( {
                 privateKey: json.keys.private.value,
@@ -141,10 +141,10 @@ export default class WalletManager{
 
             const registration = privateAddress.getZetherRegistration();
             const registrationBuffer = Buffer.concat([
-                registration.s,
                 registration.c,
+                registration.s,
             ]);
-            if (!registrationBuffer.equals( json.keys.registration.value )) throw new Exception(this, "Registration is not matching");
+            if (!registrationBuffer.equals( Buffer.from(json.keys.registration.value, 'hex') )) throw new Exception(this, "Registration is not matching");
 
         }
 
@@ -259,7 +259,7 @@ export default class WalletManager{
             if (address === walletAddress || address.toBuffer().equals(walletAddress.toBuffer())) return address;
 
             for (const key of ["private", "public", "registration"])
-                if (walletAddress.keys[key]){
+                if (walletAddress.keys[key] && address.keys[key]){
                     if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.PLAIN_TEXT && address.keys[key].value.equals(walletAddress.keys[key].value)) return address;
                     if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED && address.keys[key]._unlocked.equals(walletAddress.keys[key].value)) return address;
                 }
