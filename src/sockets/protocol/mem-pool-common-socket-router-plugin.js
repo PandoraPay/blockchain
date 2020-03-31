@@ -11,16 +11,10 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         this._scope.events.on("start/chain-created", ()=>{
 
-            this._scope.mainChain.on( "mem-pool/tx-included", ( {data, senderSockets } ) => {
-
-                /**
-                 * Sending notification that a new offer was included
-                 */
-
-                this._scope.masterCluster.broadcast("mem-pool/new-tx-id", {txId: data.txId}, senderSockets);
-
-
-            });
+            /**
+             * Sending notification that a new offer was included
+             */
+            this._scope.mainChain.on( "mem-pool/tx-included", ( {data, senderSockets } ) =>  this._scope.masterCluster.broadcast("mem-pool/new-tx-id", {txId: data.txId}, senderSockets) );
 
         });
 
@@ -160,7 +154,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (Buffer.isBuffer(txId)) txId = txId.toString("hex");
         if (typeof txId !== "string" && txId.length !== 64) throw new Exception(this, "TxId is invalid");
 
-        this._scope.logger.info(this, "new tx received", { txId });
+        this._scope.logger.info(this, "new tx id received", { txId });
 
         if (this._scope.memPool.transactions[txId]) return true;
         if (this._transactionsDownloading[txId]) return this._transactionsDownloading[txId];
@@ -196,7 +190,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         const txId = transaction.hash().toString("hex");
 
-        this._scope.logger.info(this, "new tx received", { txId });
+        this._scope.logger.info(this, "new tx received", { txId, nonce: tx.nonce });
 
         if (this._scope.memPool.transactions[txId]) return true;
         if (this._transactionsDownloading[txId]) return this._transactionsDownloading[txId];

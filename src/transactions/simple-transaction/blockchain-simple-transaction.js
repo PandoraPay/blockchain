@@ -3,6 +3,25 @@ const {Helper, Exception} = global.kernel.helpers;
 
 export default class BlockainSimpleTransaction extends SimpleTransaction {
 
+    constructor(scope, schema={}, data, type, creationOptions) {
+
+        super(scope, Helper.merge({
+
+            fields: {
+
+                nonce: {
+
+                    type: "number",
+                    position: 10000,
+
+                },
+
+            }
+
+        }, schema, false), data, type, creationOptions);
+
+    }
+
     async validateTransactionOnce(chain = this._scope.chain, chainData = chain.data, block){
 
         for (const vin of this.vin)
@@ -21,6 +40,10 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         /**
          * Check Hash
          */
+
+        if (this.unlockTime && this.unlockTime < chainData.end)
+            throw new Exception (this, "Unlock time is invalid");
+
         const hashExistence = await chainData.txHashMap.getMap( this.hash().toString("hex"), );
         if (hashExistence ) throw new Exception (this, "Hash already found", {hash: this.hash().toString("hex") });
 
@@ -36,9 +59,11 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         /**
          * Check nonce and balances
          */
-        const nonce = await chainData.accountHashMap.getNonce( this.vin[0].publicKeyHash ) || 0;
 
-        if (nonce !== this.nonce) throw new Exception(this, "Nonce is invalid", {nonce, txNonce: this.nonce, publicKeyHash: this.vin[0].publicKeyHash });
+        if (this.getVinPublicKeyHash){
+            const nonce = await chainData.accountHashMap.getNonce( this.vin[0].publicKeyHash ) || 0;
+            if (nonce !== this.nonce) throw new Exception(this, "Nonce is invalid", {nonce, txNonce: this.nonce, publicKeyHash: this.vin[0].publicKeyHash });
+        }
 
         for (let i=0; i < this.vin.length; i++){
 
@@ -223,6 +248,17 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
         // for (let i=this.vout.length-1; i >= 0; i--)
         //     const vout = this.vout[i];
 
+    }
+
+    _fieldsForSignature(){
+        return {
+            ...super._fieldsForSignature(),
+            nonce: true,
+        }
+    }
+
+    get getVinPublicKeyHash(){
+        return this.vin.length ? this.vin[0].publicKeyHash : undefined;
     }
 
 }

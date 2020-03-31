@@ -173,11 +173,11 @@ export default  class MemPool {
                 if ( tx._memPoolIncluded ) continue;
 
                 for (const vin of tx.vin)
-                    if (  vin.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vin.tokenCurrency.equals(tokenCurrency) ) )
+                    if (  vin.publicKeyHash && vin.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vin.tokenCurrency.equals(tokenCurrency) ) )
                         out[ vin.tokenCurrency.toString('hex') ] =  (out[ vin.tokenCurrency.toString('hex') ] || 0) - vin.amount;
 
                 for (const vout of tx.vout)
-                    if (vout.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vout.tokenCurrency.equals(tokenCurrency) ) )
+                    if (vout.publicKeyHash && vout.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vout.tokenCurrency.equals(tokenCurrency) ) )
                         out[ vout.tokenCurrency.toString('hex') ] =  (out[ vout.tokenCurrency.toString('hex') ] || 0) + vout.amount;
 
             }
@@ -380,7 +380,7 @@ export default  class MemPool {
          * Let's update transactionsOrderedByVin0Nonce
          */
 
-        const publicKeyHashVin = transaction.vin[0].publicKeyHash.toString("hex");
+        const vinPublicKeyHashVin = transaction.getVinPublicKeyHash ? transaction.getVinPublicKeyHash.toString('hex') : undefined;
 
         if (preValidateTx) {
 
@@ -394,21 +394,27 @@ export default  class MemPool {
             }
 
 
-            const nonce = await this._scope.mainChain.data.accountHashMap.getNonce(transaction.vin[0].publicKeyHash);
-            const memPoolNonce = this.getMemPoolTransactionNonce(publicKeyHashVin, nonce);
-            if (transaction.nonce !== memPoolNonce)
-                throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce});
+            if (vinPublicKeyHashVin){
+                const nonce = await this._scope.mainChain.data.accountHashMap.getNonce(vinPublicKeyHashVin);
+                const memPoolNonce = this.getMemPoolTransactionNonce(vinPublicKeyHashVin, nonce);
+                if (transaction.nonce !== memPoolNonce)
+                    throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce});
+            }
+        }
+
+        if (vinPublicKeyHashVin) {
+            if (!this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin]) this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin] = [];
+            ArrayHelper.addSortedArray(transaction, this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin], (a, b) => a.nonce - b.nonce);
 
         }
 
-        if (!this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ]) this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ] = [];
-
-        ArrayHelper.addSortedArray(transaction, this.transactionsOrderedByVin0Nonce[ publicKeyHashVin ], (a,b)=> a.nonce - b.nonce );
-
         this.transactions[txIdString] = transaction;
+
         //save transactionsByPublicKeyHash
-        const inputs = transaction.vin.concat(transaction.vout);
-        for (const input of inputs){
+        const inputsOutputs = transaction.vin.concat(transaction.vout);
+        for (const input of inputsOutputs){
+
+            if (!input.publicKeyHash) continue;
             const publicKeyHash = input.publicKeyHash.toString("hex");
             if (!this.transactionsByPublicKeyHash[publicKeyHash]) this.transactionsByPublicKeyHash[publicKeyHash] = [];
             this.transactionsByPublicKeyHash[publicKeyHash].push(transaction);

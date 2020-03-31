@@ -133,4 +133,8 @@ export default class BlockchainZSC extends Zether.ZSC {
         return Math.floor( this._scope.chainData.end / 10);
     }
 
+    getTimeLockEpoch(epoch){
+        return epoch * 10;
+    }
+
 }

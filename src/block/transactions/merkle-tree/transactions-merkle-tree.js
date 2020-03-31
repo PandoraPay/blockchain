@@ -98,7 +98,7 @@ export default class TransactionsMerkleTree extends MerkleTree {
         /**
          * Signatures validation can be batched
          */
-        const promises = transactionsNonPruned.map( tx => tx.verify(chain, chainData) );
+        const promises = transactionsNonPruned.map( tx => tx.validateTransactionOnce(chain, chainData) );
 
         const verification = await Promise.all(promises);
 

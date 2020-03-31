@@ -31,7 +31,7 @@ export default class WalletTransfer {
         if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
         if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
 
-        const {vin, privateKeys} = await this._calculateRequiredFunds({txDsts, fee, feeTokenCurrency, password, networkByte});
+        const {vin, privateKeys} = await this._calculateRequiredFunds({address, txDsts, fee, feeTokenCurrency, password, networkByte});
 
         const outs = this._processDstsAddresses(txDsts);
 
@@ -48,16 +48,15 @@ export default class WalletTransfer {
 
     }
 
-    async zetherDepositSimple({address, txDsts, fee, feeTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData }, paymentId, password, networkByte ){
+    async zetherDepositSimple({address, txDst, fee, feeTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData }, paymentId, password, networkByte ){
 
         if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
-        if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
 
-        const {vin, privateKeys} = await this._calculateRequiredFunds({txDsts, fee, feeTokenCurrency, password, networkByte});
+        const {vin, privateKeys} = await this._calculateRequiredFunds({address, txDsts: [txDst], fee, feeTokenCurrency, password, networkByte});
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createZetherDepositSimpleTransaction( {
             vin: vin,
-            vout: [],
+            vout: [ txDst ],
             privateKeys,
             nonce,
         } );

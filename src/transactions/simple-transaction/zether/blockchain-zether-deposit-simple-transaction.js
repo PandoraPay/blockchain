@@ -6,8 +6,31 @@ import BlockchainSimpleTransaction from "./../blockchain-simple-transaction"
 
 export default class BlockchainZetherDepositTransaction extends ZetherDepositTransaction {
 
-    async validateTransactionInfo(chain = this._scope.chain, chainData = chain.data, block){
-        return BlockchainSimpleTransaction.prototype.validateTransactionInfo.call(this, chain, chainData, block);
+    constructor(scope, schema={}, data, type, creationOptions) {
+
+        super(scope, Helper.merge({
+
+            fields: {
+
+                nonce: {
+
+                    type: "number",
+                    position: 10000,
+
+                },
+
+            }
+
+        }, schema, false), data, type, creationOptions);
+
+    }
+
+    async validateTransactionOnce(chain = this._scope.chain, chainData = chain.data, block){
+        return BlockchainSimpleTransaction.prototype.validateTransactionOnce.call(this, chain, chainData, block);
+    }
+
+    async preValidateTransaction(chain = this._scope.chain, chainData = chain.data, block){
+        return BlockchainSimpleTransaction.prototype.preValidateTransaction.call(this, chain, chainData, block);
     }
 
     async validateTransaction(chain = this._scope.chain, chainData = chain.data, block){
@@ -91,6 +114,17 @@ export default class BlockchainZetherDepositTransaction extends ZetherDepositTra
         if (!revertInfoData.acc.point0) await chainData.ZSC._deleteAccMap( revertInfoData.acc.yHash );
         else await chainData.ZSC._setAccMap( revertInfoData.acc.yHash, [ revertInfoData.acc.point0, revertInfoData.acc.point1 ] );
 
+    }
+
+    _fieldsForSignature(){
+        return {
+            ...super._fieldsForSignature(),
+            nonce: true,
+        }
+    }
+
+    get getVinPublicKeyHash(){
+        return this.vin.length ? this.vin[0].publicKeyHash : undefined;
     }
 
 
