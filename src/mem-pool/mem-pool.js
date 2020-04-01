@@ -90,7 +90,7 @@ export default  class MemPool {
                     if (message.name === "mem-pool-insert-tx"){
 
                         if (!this.transactions[ message.data.txId ])
-                            await this._insertTransactionInMemPool(message.data.tx, false, false, false, true);
+                            await this._insertTransactionInMemPool(message.data.tx, false, false, false, true, message.data.propagateToSockets);
                     }
                     else if (message.name === "mem-pool-remove-tx"){
 
@@ -398,7 +398,7 @@ export default  class MemPool {
                 const nonce = await this._scope.mainChain.data.accountHashMap.getNonce(vinPublicKeyHashVin);
                 const memPoolNonce = this.getMemPoolTransactionNonce(vinPublicKeyHashVin, nonce);
                 if (transaction.nonce !== memPoolNonce)
-                    throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce});
+                    throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce, txId: txIdString });
             }
         }
 
@@ -437,6 +437,7 @@ export default  class MemPool {
             await this.dataSubscription.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
+                propagateToSockets
             }, true, false);
 
         return true;

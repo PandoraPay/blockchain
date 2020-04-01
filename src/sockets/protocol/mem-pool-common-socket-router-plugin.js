@@ -14,7 +14,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
             /**
              * Sending notification that a new offer was included
              */
-            this._scope.mainChain.on( "mem-pool/tx-included", ( {data, senderSockets } ) =>  this._scope.masterCluster.broadcast("mem-pool/new-tx-id", {txId: data.txId}, senderSockets) );
+            this._scope.mainChain.on( "mem-pool/tx-included", ( {data, senderSockets } ) =>  this._scope.masterCluster.broadcastAsync("mem-pool/new-tx-id", {txId: data.txId}, senderSockets) );
 
         });
 
