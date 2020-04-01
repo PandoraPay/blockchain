@@ -206,44 +206,49 @@ export default class TestNet{
             if (processing) return;
             processing = true;
 
-            const count = 12;
-            const txs = Math.floor( Math.random()*10 ) + 2;
-            const value = Math.floor( Math.random() * 5 +1 );
-            const amount = this._scope.argv.transactions.coins.convertToUnits( value ) * count;
-            const amountRequired = txs * amount + this._scope.argv.transactions.coins.convertToUnits( 2 * this._scope.argv.transactions.staking.stakingMinimumStake  );
-            const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amountRequired  );
+            Helper.sleep(5000).then( async ()=>{
 
-            if (wallet){
+                const count = 12;
+                const txs = Math.floor( Math.random()*10 ) + 2;
+                const value = Math.floor( Math.random() * 5 +1 );
+                const amount = this._scope.argv.transactions.coins.convertToUnits( value ) * count;
+                const amountRequired = txs * amount + this._scope.argv.transactions.coins.convertToUnits( 2 * this._scope.argv.transactions.staking.stakingMinimumStake  );
+                const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amountRequired  );
 
-                try{
+                if (wallet){
 
-                    for (let i=0; i < txs; i++) {
+                    try{
 
-                        const txDsts = [];
-                        for (let j=0; j < count; j++) {
-                            const privateAddress = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic( ).privateAddress;
-                            txDsts.push({
-                                address: privateAddress.getAddress().calculateAddress(),
-                                amount: amount / count,
+                        for (let i=0; i < txs; i++) {
+
+                            const txDsts = [];
+                            for (let j=0; j < count; j++) {
+                                const privateAddress = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic( ).privateAddress;
+                                txDsts.push({
+                                    address: privateAddress.getAddress().calculateAddress(),
+                                    amount: amount / count,
+                                });
+                            }
+
+
+                            await this._scope.wallet.transfer.transferSimple({
+                                address: wallet.keys.decryptPublicAddress(),
+                                txDsts,
                             });
+
+                            await Helper.sleep(100);
+
                         }
 
-
-                        await this._scope.wallet.transfer.transferSimple({
-                            address: wallet.keys.decryptPublicAddress(),
-                            txDsts,
-                        });
-
-                        await Helper.sleep(100);
+                    }catch(err){
 
                     }
 
-                }catch(err){
-
                 }
+                processing = false;
 
-            }
-            processing = false;
+            });
+
 
         });
 
