@@ -209,14 +209,16 @@ export default class Block extends DBSchema {
         /**
          * validate prevHash
          */
-        if (!this.prevHash.equals( await chainData.getBlockHash(this.height-1)  ))
-            throw new Exception(this, "prevHash doesn't match", {prevHash: this.prevHash });
+        const prevBlockHash = await chainData.getBlockHash(this.height-1);
+        if (!this.prevHash.equals(  prevBlockHash ))
+            throw new Exception(this, "prevHash doesn't match", {prevHash: this.prevHash, prevBlockHash });
 
         /**
          * validate target
          */
-        if (!this.target.equals( await chainData.nextTarget( this.height - 1 ) ))
-            throw new Exception(this, "target doesn't match", {target: this.target });
+        const nextTarget = await chainData.nextTarget( this.height - 1 );
+        if (!this.target.equals( nextTarget ))
+            throw new Exception(this, "target doesn't match", {target: this.target, nextTarget });
 
         /**
          * Validate prevKernelHash
@@ -231,20 +233,20 @@ export default class Block extends DBSchema {
 
     async validateBlock(chain = this._scope.chain, chainData = chain.data){
 
-        if (await this._validateBlockInfo(chain, chainData) === false) return false;
+        if (await this._validateBlockInfo(chain, chainData) !== true) return false;
 
         /**
          * Validate POS
          */
 
         if (!chain.isForkSubChain)
-            if (await this.pos.validatePOS(chain, chainData) === false ) return false;
+            if (await this.pos.validatePOS(chain, chainData) !== true ) return false;
 
         /**
          * validate Merkle tree
          */
         
-        if (await this.transactionsMerkleTree.validateMerkleTree( chain, chainData, this ) === false) return false;
+        if (await this.transactionsMerkleTree.validateMerkleTree( chain, chainData, this ) !== true) return false;
 
         /**
          * validate the number of tokens in the block

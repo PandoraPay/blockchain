@@ -46,19 +46,19 @@ export default class App extends Kernel.utils.App {
 
         await this._scope.testnet.createTestNet();
 
-        if ( await scope.mainChain.initializeChain()  === false)
+        if ( await scope.mainChain.initializeChain()  !== true)
             throw new Exception(this, "MainChain couldn't be initialized");
 
-        if ( await this._scope.walletStakes.initializeWalletStakes() === false)
+        if ( await this._scope.walletStakes.initializeWalletStakes() !== true)
             throw new Exception(this, "WalletStakes couldn't be initialized");
 
-        if ( await this._scope.memPool.initializeMemPool() === false)
+        if ( await this._scope.memPool.initializeMemPool() !== true)
             throw new Exception(this, "MemPool couldn't be initialized");
 
-        if ( await this._scope.exchange.initializeExchange() === false)
+        if ( await this._scope.exchange.initializeExchange() !== true)
             throw new Exception(this, "Exchange couldn't be initialized");
 
-        if ( await this._scope.forging.initializeForging() === false)
+        if ( await this._scope.forging.initializeForging() !== true)
             throw new Exception(this, "Forging couldn't be initialized");
 
         await this.events.emit("start/chain-created", scope);

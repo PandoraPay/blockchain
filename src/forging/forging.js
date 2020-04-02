@@ -100,7 +100,7 @@ export default class Forging  {
                 this._scope.logger.info( this, "BLOCK FORGED", { block: this._work.block.height, timestamp: this._work.block.timestamp, totalDifficulty: this._work.block.totalDifficulty.toString(), target: this._work.block.target.toString("hex") } );
                 this._scope.logger.info( this, "target", { target: this._work.block.target.toString("hex") } );
 
-                if ( await this._work.block.validateBlock( this._scope.mainChain ) === false)
+                if ( await this._work.block.validateBlock( this._scope.mainChain ) !== true )
                     throw new Exception(this, "Block is invalid");
 
                 if (!this._scope._reset) {

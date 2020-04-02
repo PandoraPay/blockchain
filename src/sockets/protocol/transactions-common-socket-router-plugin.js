@@ -60,6 +60,7 @@ export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPl
 
         const chainData = this._scope.mainChain.data;
 
+
         //included in mem pool
         const memPoolTx = this._scope.memPool.transactions[hash];
         if (memPoolTx) return {
@@ -79,6 +80,7 @@ export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPl
             confirmations: chainData.end - out.block,
             txId: out.tx.hash().toString("hex"),
         };
+
 
         return null;
     }

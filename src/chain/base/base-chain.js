@@ -5,10 +5,10 @@ import TransactionsValidator from "../../transactions/validator/transactions-val
 
 const {BN} = global.kernel.utils;
 
-const {Events} = global.kernel.helpers.events;
+const {AsyncEvents} = global.kernel.helpers.events;
 const {Helper, Exception} = global.kernel.helpers;
 
-export default class BaseChain extends Events{
+export default class BaseChain extends AsyncEvents{
 
     constructor(scope){
 
@@ -127,7 +127,7 @@ export default class BaseChain extends Events{
         for (let i=this.data.start; i < this.data.end; i++){
 
             const block = await this.getBlock(i);
-            if ( await block.validateBlock(this) === false)
+            if ( await block.validateBlock(this) !== true )
                 return false;
 
         }

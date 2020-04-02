@@ -402,13 +402,15 @@ export default  class MemPool {
             }
         }
 
+        if (this.transactions[ txIdString ]) return false; //checking again, it is an await above, so it is required
+        this.transactions[txIdString] = transaction;
+
         if (vinPublicKeyHashVin) {
             if (!this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin]) this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin] = [];
             ArrayHelper.addSortedArray(transaction, this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin], (a, b) => a.nonce - b.nonce);
 
         }
 
-        this.transactions[txIdString] = transaction;
 
         //save transactionsByPublicKeyHash
         const inputsOutputs = transaction.vin.concat(transaction.vout);
@@ -419,19 +421,21 @@ export default  class MemPool {
             if (!this.transactionsByPublicKeyHash[publicKeyHash]) this.transactionsByPublicKeyHash[publicKeyHash] = [];
             this.transactionsByPublicKeyHash[publicKeyHash].push(transaction);
         }
+
         this.transactionsArray.push(transaction);
 
         /**
          * Let's insert the tx in transactionsData
          */
 
-        if (propagateToSockets)
-            await this._scope.mainChain.emit("mem-pool/tx-included", {
-                data: { tx: transaction, txId: txIdString},
+        if (propagateToSockets) {
+            const out = await this._scope.mainChain.emit("mem-pool/tx-included", {
+                data: {tx: transaction, txId: txIdString},
                 senderSockets,
             });
+            this._scope.logger.warn(this, "Transaction Propagate to Mem Pool sockets", {txId, nonce: transaction.nonce, vin: vinPublicKeyHashVin, out  })
+        }
 
-        this._scope.logger.warn(this, "New Transaction", {id: txIdString, nonce: transaction.nonce});
 
         if (propagateTxMasterCluster && this._scope.db.isSynchronized )
             await this.dataSubscription.subscribeMessage("mem-pool-insert-tx", {

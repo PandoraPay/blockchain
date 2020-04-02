@@ -201,6 +201,8 @@ export default class TestNet{
                 if (!this._testnetWalletsSent && !moneySent) return; // i din't send it to
 
             } else{
+
+
             }
 
             if (processing) return;
@@ -245,6 +247,8 @@ export default class TestNet{
                     }
 
                 }
+
+                await Helper.sleep(1000);
                 processing = false;
 
             });

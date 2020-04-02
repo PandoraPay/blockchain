@@ -94,7 +94,7 @@ export default class ForgeBlock {
 
             chainData = block._scope.chain.cloneData();
 
-            if ( await block.pos.validatePOS( block._scope.chain, chainData) === false) throw new Exception(this, "Forging - POS is invalid");
+            if ( await block.pos.validatePOS( block._scope.chain, chainData) !== true) throw new Exception(this, "Forging - POS is invalid");
 
             return true;
 

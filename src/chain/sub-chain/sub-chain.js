@@ -64,7 +64,7 @@ export default class SubChain extends BaseChain{
 
             const block = blocks[i];
 
-            if ( await block.validateBlock(this)  === false) throw new Exception(this, "Block is invalid", block.height );
+            if ( await block.validateBlock(this) !== true ) throw new Exception(this, "Block is invalid", block.height );
 
             this.insertBlock(block);
 
@@ -105,7 +105,7 @@ export default class SubChain extends BaseChain{
     async validateChain(){
 
         for (let block of this.data.listBlocks)
-            if ( await block.validateBlock(this) === false)
+            if ( await block.validateBlock(this) !== true )
                 return false;
 
         return true;

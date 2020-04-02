@@ -355,11 +355,12 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
             this._scope.logger.log(this, "Download height", height);
 
             //requesting block
-            const blockBuffer = await socket.emitAsync( 'blockchain/get-block-by-height', {index: height} );
+            const blockBuffer = await socket.emitAsync( 'blockchain/get-block-by-height', {index: height}, 2 * this._scope.argv.networkSettings.networkTimeout );
 
             if (!blockBuffer || !Buffer.isBuffer(blockBuffer)) throw new Exception(this, "block received is invalid", {index: height});
 
             const block = await forkSubchain.createBlock( height );
+            if (!block) throw new Exception(this, "block couldn't be created");
             block.fromBuffer(blockBuffer);
             block.height = height;
 
