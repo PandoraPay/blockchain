@@ -416,7 +416,6 @@ export default  class MemPool {
         const inputsOutputs = transaction.vin.concat(transaction.vout);
         for (const input of inputsOutputs){
 
-            if (!input.publicKeyHash) continue;
             const publicKeyHash = input.publicKeyHash.toString("hex");
             if (!this.transactionsByPublicKeyHash[publicKeyHash]) this.transactionsByPublicKeyHash[publicKeyHash] = [];
             this.transactionsByPublicKeyHash[publicKeyHash].push(transaction);

@@ -30,8 +30,7 @@ export default class TransactionsCreator {
         if (!vin || !vin.length ) throw new Exception(this, "Vin is empty");
         if (!vout || !vout.length  ) throw new Exception(this, "Vout is empty");
 
-        const input = [...vin];
-        input.map( it => it.signature = Buffer.alloc(65) );
+        const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new BlockchainSimpleTransaction( this._scope, undefined, {
 
@@ -57,8 +56,7 @@ export default class TransactionsCreator {
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
 
-        const input = [...vin];
-        input.map( it => it.signature = Buffer.alloc(65) );
+        const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new BlockchainDelegateStakeSimpleTransaction( this._scope, undefined, {
 
@@ -85,8 +83,7 @@ export default class TransactionsCreator {
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
 
-        const input = [...vin];
-        input.map( it => it.signature = Buffer.alloc(65) );
+        const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new BlockchainTokenCreateSimpleTransaction( this._scope, undefined, {
 
@@ -121,8 +118,7 @@ export default class TransactionsCreator {
 
         if (!supplyValue) throw new Exception(this, 'SupplyValue needs to be provided');
 
-        const input = [...vin];
-        input.map( it => it.signature = Buffer.alloc(65) );
+        const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new BlockchainTokenUpdateSupplySimpleTransaction( this._scope, undefined, {
 
@@ -151,23 +147,39 @@ export default class TransactionsCreator {
 
     }
 
-    async createZetherDepositSimpleTransaction( { vin, vout, registration, privateKeys, nonce }, chain = this._scope.chain ){
+    async createZetherDepositSimpleTransaction( { vin, privateKeys, voutZether, nonce }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
-        if (vout && !Array.isArray(vout)) vout = [vout];
+        if (voutZether && !Array.isArray(voutZether)) voutZether = [voutZether];
 
         if (!vin || !vin.length ) throw new Exception(this, "Vin is empty");
-        if (!vout || !vout.length  ) throw new Exception(this, "Vout is empty");
+        if (!voutZether || !voutZether.length ) throw new Exception(this, "VoutZether is empty");
 
-        const input = [...vin];
-        input.map( it => it.signature = Buffer.alloc(65) );
+        const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new BlockchainZetherDepositSimpleTransaction( this._scope, undefined, {
 
             vin: input,
-            vout,
+            vout: [],
+            voutZether: voutZether.map(it=>{
+
+                const zetherAddress = this._scope.cryptography.zetherAddressValidator.validateAddress( it.address );
+
+                this._scope.logger.info(this, 'zetherAddress', zetherAddress.toJSON() );
+
+                return {
+                    tokenCurrency: it.tokenCurrency,
+                    amount: it.amount,
+                    zetherPublicKey: zetherAddress.publicKey,
+                    registration: {
+                        registered: zetherAddress.registration.registered,
+                        s: zetherAddress.registration.s,
+                        c: zetherAddress.registration.c,
+                    },
+
+                }
+            }),
             nonce,
-            registration
 
         }, "object" );
 

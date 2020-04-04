@@ -4,7 +4,7 @@ const Zether = global.cryptography.zether;
 
 import BlockchainSimpleTransaction from "./../blockchain-simple-transaction"
 
-export default class BlockchainZetherDepositTransaction extends ZetherDepositTransaction {
+export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepositTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 
@@ -39,11 +39,9 @@ export default class BlockchainZetherDepositTransaction extends ZetherDepositTra
 
     async transactionAdded(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
 
-        const out = await BlockchainSimpleTransaction.prototype.transactionAdded.call(this, chain, chainData, block, merkleHeight, merkleLeafHeight);
-        if (!out) return false;
-
-        const outAddZether = await super.transactionAddedToZether(chain, chainData);
-        if (!outAddZether) return false;
+        if (await BlockchainSimpleTransaction.prototype.transactionAdded.call(this, chain, chainData, block, merkleHeight, merkleLeafHeight) !== true) return false;
+        ;
+        if (await super.transactionAddedToZether(chain, chainData) !== true) return false;
 
         return true;
     }
@@ -62,57 +60,70 @@ export default class BlockchainZetherDepositTransaction extends ZetherDepositTra
 
     async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
 
-        const y =  Zether.bn128.unserializeFromBuffer(this.vout[0].zetherPublicKey);
-
-        const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( y ) ) );
-        const pending = await chainData.ZSC._getPending( yHash );
-        const acc = await chainData.ZSC._getAccMap( yHash );
+        const list = [];
 
         let nonceSet, lastGlobalUpdate;
 
         //used by rollover
         if (merkleLeafHeight === 0){
 
-            nonceSet = chainData.ZSC._getNonceSetAll();
-            lastGlobalUpdate = chainData.ZSC._getLastGlobalUpdate();
+            nonceSet = chainData.zsc._getNonceSetAll();
+            lastGlobalUpdate = chainData.zsc._getLastGlobalUpdate();
 
         } else {
             nonceSet = "skip";
             lastGlobalUpdate = "skip";
         }
 
+        for (const voutZether of this.voutZether){
+
+            const y =  Zether.bn128.unserializeFromBuffer( voutZether.zetherPublicKey);
+
+            const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( y ) ) );
+            const pending = await chainData.zsc._getPending( yHash );
+            const acc = await chainData.zsc._getAccMap( yHash );
+
+            list.push({
+                pending: {
+                    yHash,
+                    point0: pending ? pending.point0 : undefined,
+                    point1: pending ? pending.point1 : undefined,
+                },
+
+                acc: {
+                    yHash,
+                    point0: pending ? acc.point0 : undefined,
+                    point1: pending ? acc.point1 : undefined,
+                },
+            })
+        }
+
+
+        if (list.length !== this.voutZether.length) throw new Exception(this, "revertInfo length is not right");
 
         return {
-
-            pending: {
-                yHash,
-                point0: pending ? pending.data.point0 : undefined,
-                point1: pending ? pending.data.point1 : undefined,
-            },
-
-            acc: {
-                yHash,
-                point0: pending ? acc.data.point0 : undefined,
-                point1: pending ? acc.data.point1 : undefined,
-            },
-
+            list,
             nonceSet,
             lastGlobalUpdate,
         };
-
 
     }
 
     async processTransactionRevertInfoPreviousState(revertInfoData, chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){
 
-        if (revertInfoData.nonceSet !== "skip") chainData.ZSC._setNonceSetAll(revertInfoData.nonceSet);
-        if (revertInfoData.lastGlobalUpdate !== "skip") chainData.ZSC._setLastGlobalUpdate(revertInfoData.lastGlobalUpdate);
+        if (revertInfoData.nonceSet !== "skip") chainData.zsc._setNonceSetAll(revertInfoData.nonceSet);
+        if (revertInfoData.lastGlobalUpdate !== "skip") chainData.zsc._setLastGlobalUpdate(revertInfoData.lastGlobalUpdate);
 
-        if (!revertInfoData.pending.point0) await chainData.ZSC._deletePending( revertInfoData.pending.yHash );
-        else await chainData.ZSC._setPending( revertInfoData.pending.yHash, [ revertInfoData.pending.point0, revertInfoData.pending.point1 ] );
+        for (const revert of revertInfoData.list){
 
-        if (!revertInfoData.acc.point0) await chainData.ZSC._deleteAccMap( revertInfoData.acc.yHash );
-        else await chainData.ZSC._setAccMap( revertInfoData.acc.yHash, [ revertInfoData.acc.point0, revertInfoData.acc.point1 ] );
+            if (!revert.pending.point0) await chainData.zsc._deletePending( revert.pending.yHash );
+            else await chainData.zsc._setPending( revert.pending.yHash, [ revert.pending.point0, revert.pending.point1 ] );
+
+            if (!revert.acc.point0) await chainData.zsc._deleteAccMap( revert.acc.yHash );
+            else await chainData.zsc._setAccMap( revert.acc.yHash, [ revert.acc.point0, revert.acc.point1 ] );
+
+        }
+
 
     }
 

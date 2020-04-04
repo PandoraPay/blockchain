@@ -248,7 +248,7 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.ZSC = new BlockchainZSC({
+        this.zsc = new BlockchainZSC({
             ...this._scope,
             chainData: this,
         });

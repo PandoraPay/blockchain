@@ -9,7 +9,10 @@ export default class BlockchainZSC extends Zether.ZSC {
     constructor(scope){
 
         super(undefined, scope.argv.blockchain.genesis.zsc.address );
+
         this._scope = scope;
+
+        this._scope.logger.info(this,'this._scope.argv.blockchain.genesis.zsc.address', this._scope.argv.blockchain.genesis.zsc.address);
 
     }
 
@@ -36,8 +39,8 @@ export default class BlockchainZSC extends Zether.ZSC {
         if (!value[1].validate()) throw "Point1 is invalid";
 
         await this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
-            value0: Zether.utils.serializeToBuffer(value[0]),
-            value1: Zether.utils.serializeToBuffer(value[1]),
+            value0: Zether.bn128.serializeToBuffer(value[0]),
+            value1: Zether.bn128.serializeToBuffer(value[1]),
         } )
 
     }
@@ -57,14 +60,17 @@ export default class BlockchainZSC extends Zether.ZSC {
     }
 
     async _setPending(hash, value){
+
+        console.log("sendPending", hash, value);
+
         hash = Zether.utils.fromHex( hash );
 
         if (!value[0].validate()) throw "Point0 is invalid";
         if (!value[1].validate()) throw "Point1 is invalid";
 
         await this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
-            value0: Zether.utils.serializeToBuffer(value[0]),
-            value1: Zether.utils.serializeToBuffer(value[1]),
+            value0: Zether.bn128.serializeToBuffer(value[0]),
+            value1: Zether.bn128.serializeToBuffer(value[1]),
         } );
 
     }

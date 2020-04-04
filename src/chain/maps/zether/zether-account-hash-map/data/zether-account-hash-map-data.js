@@ -64,11 +64,11 @@ export default class ZetherAccountHashMapData extends DBSchema{
     }
 
     get point0(){
-        return Zether.utils.unserializeFromBuffer(this.value0);
+        return Zether.bn128.unserializeFromBuffer(this.value0);
     }
 
     get point1(){
-        return Zether.utils.unserializeFromBuffer(this.value1);
+        return Zether.bn128.unserializeFromBuffer(this.value1);
     }
 
 }

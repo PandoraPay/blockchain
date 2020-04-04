@@ -248,7 +248,6 @@ export default class TestNet{
 
                 }
 
-                await Helper.sleep(1000);
                 processing = false;
 
             });

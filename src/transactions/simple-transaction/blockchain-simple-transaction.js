@@ -102,9 +102,11 @@ export default class BlockainSimpleTransaction extends SimpleTransaction {
          * Store TxId into AddressTxMap
          */
 
-        const addresses = this.vin.map( it => it.publicKeyHash.toString("hex") ).concat(  this.vout.map( it => it.publicKeyHash.toString("hex" ) ));
+        const inputsOutputs = this.vin.concat(this.vout);
 
-        for (const address of addresses) {
+        for (const input of inputsOutputs) {
+
+            const address = input.publicKeyHash.toString('hex');
 
             const addressHashMapOut = await chainData.addressHashMap.getMap( address );
 
