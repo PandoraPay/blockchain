@@ -20,7 +20,7 @@ export default class BlockchainZSC extends Zether.ZSC {
         return this._scope.chainData.zetherAccountHashMap.deleteMap( Zether.utils.fromHex( hash ) );
     }
 
-    async _getAccMap(hash){
+    async _getAccMap(hash, returnNull = false ){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherAccountHashMap.getMap(hash);
@@ -28,7 +28,7 @@ export default class BlockchainZSC extends Zether.ZSC {
         if (out)
             return [out.data.point0, out.data.point1];
 
-        return [ G1Point0(), G1Point0() ];
+        return returnNull ? null : [ G1Point0(), G1Point0() ];
     }
 
     async _setAccMap(hash, value){
@@ -49,19 +49,17 @@ export default class BlockchainZSC extends Zether.ZSC {
         return this._scope.chainData.zetherPendingHashMap.deleteMap( Zether.utils.fromHex( hash ) );
     }
 
-    async _getPending(hash){
+    async _getPending(hash, returnNull = false){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherPendingHashMap.getMap(hash);
         if (out)
             return [ out.data.point0, out.data.point1 ];
 
-        return [G1Point0(), G1Point0() ];
+        return returnNull ? null : [ G1Point0(), G1Point0() ];
     }
 
     async _setPending(hash, value){
-
-        console.log("sendPending", hash, value);
 
         hash = Zether.utils.fromHex( hash );
 
@@ -75,14 +73,14 @@ export default class BlockchainZSC extends Zether.ZSC {
 
     }
 
-    async _getLastRollOver(hash){
+    async _getLastRollOver(hash, returnNull = false){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherLastRollOverHashMap.getMap(hash);
         if (out)
             return out.data.epoch;
 
-        return 0;
+        return returnNull ? null : 0;
     }
 
     async _setLastRollOver(hash, value){

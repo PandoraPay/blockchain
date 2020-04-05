@@ -80,20 +80,21 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
             const y =  Zether.bn128.unserializeFromBuffer( voutZether.zetherPublicKey);
 
             const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( y ) ) );
-            const pending = await chainData.zsc._getPending( yHash );
-            const acc = await chainData.zsc._getAccMap( yHash );
+
+            const pending = await chainData.zsc._getPending( yHash, true );
+            const acc = await chainData.zsc._getAccMap( yHash, true );
 
             list.push({
+
+                yHash,
+
                 pending: {
-                    yHash,
-                    point0: pending ? pending.point0 : undefined,
-                    point1: pending ? pending.point1 : undefined,
+                    data: pending,
                 },
 
                 acc: {
-                    yHash,
-                    point0: pending ? acc.point0 : undefined,
-                    point1: pending ? acc.point1 : undefined,
+
+                    data: acc,
                 },
             })
         }
@@ -116,11 +117,11 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
 
         for (const revert of revertInfoData.list){
 
-            if (!revert.pending.point0) await chainData.zsc._deletePending( revert.pending.yHash );
-            else await chainData.zsc._setPending( revert.pending.yHash, [ revert.pending.point0, revert.pending.point1 ] );
+            if (revert.pending.data === null) await chainData.zsc._deletePending( revert.pending.yHash );
+            else await chainData.zsc._setPending( revert.pending.yHash, revert.pending.data );
 
-            if (!revert.acc.point0) await chainData.zsc._deleteAccMap( revert.acc.yHash );
-            else await chainData.zsc._setAccMap( revert.acc.yHash, [ revert.acc.point0, revert.acc.point1 ] );
+            if (!revert.acc.data) await chainData.zsc._deleteAccMap( revert.acc.yHash );
+            else await chainData.zsc._setAccMap( revert.acc.yHash, revert.acc..data );
 
         }
 
