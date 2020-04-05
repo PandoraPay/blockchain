@@ -93,7 +93,6 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
                 },
 
                 acc: {
-
                     data: acc,
                 },
             })
@@ -117,11 +116,13 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
 
         for (const revert of revertInfoData.list){
 
-            if (revert.pending.data === null) await chainData.zsc._deletePending( revert.pending.yHash );
-            else await chainData.zsc._setPending( revert.pending.yHash, revert.pending.data );
+            const yHash = revert.yHash;
 
-            if (!revert.acc.data) await chainData.zsc._deleteAccMap( revert.acc.yHash );
-            else await chainData.zsc._setAccMap( revert.acc.yHash, revert.acc..data );
+            if (revert.pending.data === null) await chainData.zsc._deletePending( yHash );
+            else await chainData.zsc._setPending( yHash, revert.pending.data );
+
+            if (!revert.acc.data) await chainData.zsc._deleteAccMap( yHash );
+            else await chainData.zsc._setAccMap( yHash, revert.acc.data );
 
         }
 
