@@ -20,15 +20,26 @@ export default class BlockchainZSC extends Zether.ZSC {
         return this._scope.chainData.zetherAccountHashMap.deleteMap( Zether.utils.fromHex( hash ) );
     }
 
-    async _getAccMap(hash, returnNull = false ){
+    async _getAccMap(hash){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherAccountHashMap.getMap(hash);
 
-        if (out)
-            return [out.data.point0, out.data.point1];
+        if (out) return [out.data.point0, out.data.point1];
 
-        return returnNull ? null : [ G1Point0(), G1Point0() ];
+        return [ G1Point0(), G1Point0() ];
+    }
+
+    async getAccMapObject(hash){
+        hash = Zether.utils.fromHex( hash );
+        const out = await this._scope.chainData.zetherAccountHashMap.getMap(hash);
+
+        if (out) return {
+            value0: out.data.value0,
+            value1: out.data.value1,
+        };
+
+        return null;
     }
 
     async _setAccMap(hash, value){
@@ -38,52 +49,97 @@ export default class BlockchainZSC extends Zether.ZSC {
         if (!value[0].validate()) throw "Point0 is invalid";
         if (!value[1].validate()) throw "Point1 is invalid";
 
-        await this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
+        return this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
             value0: Zether.bn128.serializeToBuffer(value[0]),
             value1: Zether.bn128.serializeToBuffer(value[1]),
         } )
 
     }
 
-    async _deletePending(hash){
+    async setAccMapObject(hash, value){
+
+        hash = Zether.utils.fromHex( hash );
+
+        return this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
+            value0: value.value0,
+            value1: value.value1,
+        } )
+    }
+
+
+
+
+
+    async _deletePendingMap(hash){
         return this._scope.chainData.zetherPendingHashMap.deleteMap( Zether.utils.fromHex( hash ) );
     }
 
-    async _getPending(hash, returnNull = false){
+    async _getPendingMap(hash){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherPendingHashMap.getMap(hash);
-        if (out)
-            return [ out.data.point0, out.data.point1 ];
 
-        return returnNull ? null : [ G1Point0(), G1Point0() ];
+        if (out) return [ out.data.point0, out.data.point1 ];
+
+        return [G1Point0(), G1Point0()];
     }
 
-    async _setPending(hash, value){
+    async getPendingMapObject(hash){
+        hash = Zether.utils.fromHex( hash );
+        const out = await this._scope.chainData.zetherPendingHashMap.getMap(hash);
+
+        if (out) return {
+            value0: out.data.value0,
+            value1: out.data.value1,
+        };
+
+        return null;
+    }
+
+    async _setPendingMap(hash, value){
 
         hash = Zether.utils.fromHex( hash );
 
         if (!value[0].validate()) throw "Point0 is invalid";
         if (!value[1].validate()) throw "Point1 is invalid";
 
-        await this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
+        return this._scope.chainData.zetherPendingHashMap.updateMap(hash, {
             value0: Zether.bn128.serializeToBuffer(value[0]),
             value1: Zether.bn128.serializeToBuffer(value[1]),
         } );
 
     }
 
-    async _getLastRollOver(hash, returnNull = false){
+    async setPendingMapObject(hash, value){
+
+        hash = Zether.utils.fromHex( hash );
+
+        if (!value[0].validate()) throw "Point0 is invalid";
+        if (!value[1].validate()) throw "Point1 is invalid";
+
+        return this._scope.chainData.zetherPendingHashMap.updateMap(hash, {
+            value0: value.value0,
+            value1: value.value1,
+        } )
+
+    }
+
+
+
+
+
+
+    async _getLastRollOverMap(hash){
 
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherLastRollOverHashMap.getMap(hash);
-        if (out)
-            return out.data.epoch;
 
-        return returnNull ? null : 0;
+        if (out) return out.data.epoch;
+
+        return 0;
     }
 
-    async _setLastRollOver(hash, value){
+    async _setLastRollOverMap(hash, value){
 
         if (typeof value !== "number") throw new Exception(this, "value is invalid");
 
@@ -93,6 +149,9 @@ export default class BlockchainZSC extends Zether.ZSC {
         } );
 
     }
+
+
+
 
     _getNonceSetAll(){
         return this._scope.chainData.zscListNonceSet.map( it => it.buffer );

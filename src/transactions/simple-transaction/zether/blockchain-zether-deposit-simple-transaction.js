@@ -40,7 +40,7 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
     async transactionAdded(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
 
         if (await BlockchainSimpleTransaction.prototype.transactionAdded.call(this, chain, chainData, block, merkleHeight, merkleLeafHeight) !== true) return false;
-        ;
+
         if (await super.transactionAddedToZether(chain, chainData) !== true) return false;
 
         return true;
@@ -81,8 +81,8 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
 
             const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( y ) ) );
 
-            const pending = await chainData.zsc._getPending( yHash, true );
-            const acc = await chainData.zsc._getAccMap( yHash, true );
+            const pending = await chainData.zsc.getPendingMapObject( yHash);
+            const acc = await chainData.zsc.getAccMapObject( yHash );
 
             list.push({
 
@@ -118,11 +118,11 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
 
             const yHash = revert.yHash;
 
-            if (revert.pending.data === null) await chainData.zsc._deletePending( yHash );
-            else await chainData.zsc._setPending( yHash, revert.pending.data );
+            if (revert.pending.data === null) await chainData.zsc._deletePendingMap( yHash );
+            else await chainData.zsc.setPendingMapObject( yHash, revert.pending.data );
 
-            if (!revert.acc.data) await chainData.zsc._deleteAccMap( yHash );
-            else await chainData.zsc._setAccMap( yHash, revert.acc.data );
+            if ( revert.acc.data === null) await chainData.zsc._deleteAccMap( yHash );
+            else await chainData.zsc.setAccMapObject( yHash, revert.acc.data );
 
         }
 
