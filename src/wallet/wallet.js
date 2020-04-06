@@ -108,6 +108,20 @@ export default class Wallet extends DBSchema {
 
     }
 
+    async initializeWallet(){
+
+
+        this._scope.mainChain.on("blocks/included", async ()=>{
+
+            if (this._scope.argv.wallet.printWalletBalances) await this.manager.printWalletBalances();
+
+
+        });
+
+        return true;
+
+    }
+
     async clearWallet(save = true){
 
         await this.delete();

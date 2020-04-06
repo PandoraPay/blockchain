@@ -309,4 +309,15 @@ export default class WalletManager{
 
     }
 
+    async printWalletBalances(){
+
+        for (let i=0; i < this.wallet.addresses.length; i++){
+
+            const balances = await this.wallet.addresses[i].keys.decryptBalances();
+            this._scope.logger.warn(this, `Wallet Balance ${i} - ${this.wallet.addresses[i].address} `, balances === undefined ? 'none' : balances );
+
+        }
+
+    }
+
 }

@@ -1,4 +1,5 @@
 const {Helper, Exception, StringHelper} = global.kernel.helpers;
+const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
 const Zether = global.cryptography.zether;
 
@@ -15,6 +16,35 @@ export default class BlockchainZSC extends Zether.ZSC {
         this._scope.logger.info(this,'this._scope.argv.blockchain.genesis.zsc.address', this._scope.argv.blockchain.genesis.zsc.address);
 
     }
+
+    async getBalances(publicKey, privateKey){
+
+        const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
+        if (!result) return undefined;
+
+        const simulated = result[0];
+
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id;
+        const balances = {};
+
+        balances[tokenCurrency.toString('hex')] = this.readBalance( simulated[0], simulated[1], privateKey );
+
+        return balances;
+    }
+
+    async getBalance(publicKey, privateKey, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
+
+
+        const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
+        if (!result) return undefined;
+
+        const simulated = result[0];
+
+        return this.readBalance( simulated[0], simulated[1], privateKey );
+
+    }
+
+
 
     async _deleteAccMap(hash){
         return this._scope.chainData.zetherAccountHashMap.deleteMap( Zether.utils.fromHex( hash ) );

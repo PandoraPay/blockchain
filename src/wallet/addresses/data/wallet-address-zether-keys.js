@@ -110,6 +110,19 @@ export default class WalletAddressZetherKeys extends DBSchema{
         }
     }
 
+    async decryptBalances(password){
 
+        const publicKey = this.decryptPublicKey(password);
+        const privateKey = this.decryptPrivateKey(password);
+
+        return this._scope.mainChain.zsc.getBalances(publicKey, privateKey);
+    }
+
+    async decryptBalance(tokenCurrency, password){
+        const publicKey = this.decryptPublicKey(password);
+        const privateKey = this.decryptPrivateKey(password);
+
+        return this._scope.mainChain.zsc.getBalances(publicKey, privateKey, tokenCurrency);
+    }
 
 }

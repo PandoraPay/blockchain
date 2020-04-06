@@ -61,6 +61,9 @@ export default class App extends Kernel.utils.App {
         if ( await this._scope.forging.initializeForging() !== true)
             throw new Exception(this, "Forging couldn't be initialized");
 
+        if (await this._scope.wallet.initializeWallet() !== true)
+            throw new Exception(this, "Wallet couldn't be initialized");
+
         await this.events.emit("start/chain-created", scope);
 
         return mainChain;
@@ -163,8 +166,7 @@ export default class App extends Kernel.utils.App {
 
                     if ( await this.wallet.loadWallet() !== true) throw new Exception(this, "loadWallet is not true");
 
-                    if (this._scope.argv.wallet.printWallet)
-                        this.wallet.manager.printWallet();
+                    if (this._scope.argv.wallet.printWallet) this.wallet.manager.printWallet();
 
                     await this._scope.events.emit("wallet/loaded", this._scope.wallet);
                 }catch(err){
