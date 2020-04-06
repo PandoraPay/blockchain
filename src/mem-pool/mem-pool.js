@@ -53,7 +53,7 @@ export default  class MemPool {
         this._reset();
 
         for (const txData of out)
-            await this.newTransaction(txData, false, false,);
+            await this.newTransaction(txData, false, false, true);
 
     }
 
@@ -90,7 +90,7 @@ export default  class MemPool {
                     if (message.name === "mem-pool-insert-tx"){
 
                         if (!this.transactions[ message.data.txId ])
-                            await this._insertTransactionInMemPool(message.data.tx, false, false, false, true, message.data.propagateToSockets);
+                            await this._insertTransactionInMemPool(message.data.tx, false, false, false, true, message.data.propagateToSockets, message.data.awaitPropagate );
                     }
                     else if (message.name === "mem-pool-remove-tx"){
 
@@ -137,11 +137,11 @@ export default  class MemPool {
         return true;
     }
 
-    async newTransaction(transaction, propagateTxMasterCluster, preValidateTx, senderSockets ){
+    async newTransaction(transaction, propagateTxMasterCluster, preValidateTx, awaitPropagate, senderSockets ){
 
         try{
 
-            await this._insertTransactionInMemPool(transaction, true, propagateTxMasterCluster, true, preValidateTx, true, senderSockets ); //don't clone it as it was already cloned above
+            await this._insertTransactionInMemPool(transaction, true, propagateTxMasterCluster, true, preValidateTx, true, awaitPropagate, senderSockets ); //don't clone it as it was already cloned above
 
             return transaction;
 
@@ -351,7 +351,7 @@ export default  class MemPool {
 
     }
 
-    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, senderSockets){
+    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, awaitPropagate = true, senderSockets){
 
         if (this.transactionsArray.length >= this._scope.argv.memPool.maximumMemPool) return false;
 
@@ -428,10 +428,13 @@ export default  class MemPool {
          */
 
         if (propagateToSockets) {
+
             const out = await this._scope.mainChain.emit("mem-pool/tx-included", {
                 data: {tx: transaction, txId: txIdString},
                 senderSockets,
+                awaitPropagate,
             });
+
             this._scope.logger.warn(this, "Transaction Propagate to Mem Pool sockets", {txId, nonce: transaction.nonce, vin: vinPublicKeyHashVin, out  })
         }
 
@@ -440,7 +443,8 @@ export default  class MemPool {
             await this.dataSubscription.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
                 txId: txIdString,
-                propagateToSockets
+                propagateToSockets,
+                awaitPropagate,
             }, true, false);
 
         return true;

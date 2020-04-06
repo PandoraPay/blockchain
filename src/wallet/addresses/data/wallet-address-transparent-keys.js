@@ -160,13 +160,13 @@ export default class WalletAddressTransparentKeys extends DBSchema{
 
     async decryptBalances(password){
         const publicKeyHash = this.decryptPublicKeyHash(password);
-        return this._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
+        return this.wallet._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
     }
 
     async decryptBalance(tokenCurrency, password){
 
         const publicKeyHash = this.decryptPublicKeyHash(password);
-        return this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
+        return this.wallet._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
 
     }
 

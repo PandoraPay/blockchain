@@ -314,7 +314,7 @@ export default class WalletManager{
         for (let i=0; i < this.wallet.addresses.length; i++){
 
             const balances = await this.wallet.addresses[i].keys.decryptBalances();
-            this._scope.logger.warn(this, `Wallet Balance ${i} - ${this.wallet.addresses[i].address} `, balances === undefined ? 'none' : balances );
+            this._scope.logger.warn(this, `Wallet Balance ${i} - ${this.wallet.addresses[i].keys.decryptPublicAddress().calculateAddress() } `, balances === undefined ? 'none' : balances );
 
         }
 
