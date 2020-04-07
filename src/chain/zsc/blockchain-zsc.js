@@ -4,6 +4,7 @@ const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyT
 const Zether = global.cryptography.zether;
 
 const G1Point0 = Zether.utils.G1Point0;
+const G1Point0Const = Zether.utils.G1Point0Const;
 
 export default class BlockchainZSC extends Zether.ZSC {
 
@@ -12,12 +13,37 @@ export default class BlockchainZSC extends Zether.ZSC {
         super(undefined, scope.argv.blockchain.genesis.zsc.address );
 
         this._scope = scope;
+    }
 
-        this._scope.logger.info(this,'this._scope.argv.blockchain.genesis.zsc.address', this._scope.argv.blockchain.genesis.zsc.address);
+    async getAccount(publicKey){
+
+        publicKey = Zether.bn128.unserializeFromBuffer(publicKey);
+
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id;
+
+        const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( publicKey ) ) );
+        const registered = await this.registered( yHash );
+
+        const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
+        if (!result) return undefined;
+
+        const simulated = result[0];
+
+        const confidential = {};
+        if ( !(simulated[0].eq( G1Point0Const ) && simulated[1].eq( G1Point0Const ) ) )
+            confidential[tokenCurrency.toString('hex')] = [ Zether.bn128.serializeToBuffer(simulated[0]), Zether.bn128.serializeToBuffer(simulated[1]) ];
+
+        return {
+            registered,
+            confidential,
+        };
 
     }
 
     async getBalances(publicKey, privateKey){
+
+        publicKey = Zether.bn128.unserializeFromBuffer(publicKey);
+        privateKey = Zether.utils.BNFieldfromHex(privateKey);
 
         const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
         if (!result) return undefined;
@@ -34,6 +60,8 @@ export default class BlockchainZSC extends Zether.ZSC {
 
     async getBalance(publicKey, privateKey, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
 
+        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
         if (!result) return undefined;

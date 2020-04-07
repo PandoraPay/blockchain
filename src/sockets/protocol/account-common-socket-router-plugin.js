@@ -87,21 +87,36 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
     async _getAccount({account }){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        const publicKeyHash = address.publicKeyHash;
+        if (address){
 
+            const publicKeyHash = address.publicKeyHash;
+            const out = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash );
+            if (out) {
+                const result = out.toJSON();
+                result.delegate.delegatePublicKey = out.delegate.delegatePublicKey.toString('hex');
+                return result;
+            }
 
-        const out = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash);
-        if (out) {
-            let result = out.toJSON();
-            result.delegate.delegatePublicKey = out.delegate.delegatePublicKey.toString('hex');
-            return result;
         }
 
+        const zetherAddress = this._scope.cryptography.zetherAddressValidator.validateAddress( account );
+        if (zetherAddress){
+
+            const out = await this._scope.mainChain.data.zsc.getAccount( zetherAddress.publicKey );
+            if (out){
+                return out;
+            }
+
+        }
+
+        throw "Account is invalid";
 
     }
     async _getBalance({account, token}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         let out;
@@ -115,6 +130,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
     async _getNonce({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         const out = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
@@ -126,6 +143,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
     async _getDelegate({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         const out = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
@@ -142,6 +161,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         await chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         let out;
@@ -176,6 +197,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
     async _getNonceIncludingMemPool({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         const accountNonce = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );
@@ -193,6 +216,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         throw {message: "not implemented"};
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         if (token && typeof token === "string" ) token = Buffer.from(token, "hex");
@@ -214,6 +239,8 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         throw {message: "not implemented"};
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const publicKeyHash = address.publicKeyHash;
 
         const out = await this._scope.mainChain.data.accountHashMap.getNonce( publicKeyHash );

@@ -42,7 +42,7 @@ export default class WalletTransfer {
             nonce,
         } );
 
-        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
+        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData, true );
 
         return txOut;
 
