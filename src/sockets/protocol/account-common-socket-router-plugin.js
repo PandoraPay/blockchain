@@ -90,21 +90,37 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (address){
 
             const publicKeyHash = address.publicKeyHash;
-            const out = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash );
-            if (out) {
-                const result = out.toJSON();
-                result.delegate.delegatePublicKey = out.delegate.delegatePublicKey.toString('hex');
-                return result;
-            }
+            const account = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash );
+            if (account) {
+                const result = account.toJSON();
+                result.delegate.delegatePublicKey = account.delegate.delegatePublicKey.toString('hex');
+                return {
+                    type: "transparent",
+                    found: true,
+                    account: result,
+                };
+            } else
+                return {
+                    type: "transparent",
+                    result:false,
+                }
 
         }
 
         const zetherAddress = this._scope.cryptography.zetherAddressValidator.validateAddress( account );
         if (zetherAddress){
 
-            const out = await this._scope.mainChain.data.zsc.getAccount( zetherAddress.publicKey );
-            if (out){
-                return out;
+            const account = await this._scope.mainChain.data.zsc.getAccount( zetherAddress.publicKey );
+
+            if (account)
+                return {
+                    type: "zether",
+                    found: true,
+                    account: account,
+                };
+            else return {
+                type: "zether",
+                found: false,
             }
 
         }
@@ -155,13 +171,13 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
     async _getBalanceIncludingMemPool({account, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id}){
 
+        const address = this._scope.cryptography.addressValidator.validateAddress( account );
+        if (!address) throw "Transparent Account is invalid";
+
         const chainData = this._scope.mainChain.data;
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         await chainData.tokenHashMap.currencyExists(tokenCurrency);
-
-        const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
 
         const publicKeyHash = address.publicKeyHash;
 

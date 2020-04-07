@@ -24,18 +24,16 @@ export default class BlockchainZSC extends Zether.ZSC {
         const yHash = Zether.utils.keccak256( Zether.utils.encodedPackaged( Zether.bn128.serialize( publicKey ) ) );
         const registered = await this.registered( yHash );
 
+        const acc = await this.getAccMapObject( yHash );
+        const pending = await this.getPendingMapObject( yHash );
+        const pending = await this.getPendingMapObject( yHash );
+
         const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
         if (!result) return undefined;
 
-        const simulated = result[0];
-
-        const confidential = {};
-        if ( !(simulated[0].eq( G1Point0Const ) && simulated[1].eq( G1Point0Const ) ) )
-            confidential[tokenCurrency.toString('hex')] = [ Zether.bn128.serializeToBuffer(simulated[0]), Zether.bn128.serializeToBuffer(simulated[1]) ];
-
         return {
             registered,
-            confidential,
+            data,
         };
 
     }
@@ -118,6 +116,8 @@ export default class BlockchainZSC extends Zether.ZSC {
 
         hash = Zether.utils.fromHex( hash );
 
+        if (value === null) return this._deleteAccMap( hash );
+
         return this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
             value0: value.value0,
             value1: value.value1,
@@ -172,6 +172,8 @@ export default class BlockchainZSC extends Zether.ZSC {
 
         hash = Zether.utils.fromHex( hash );
 
+        if (value === null) return this._deletePendingMap( hash );
+
         if (!value[0].validate()) throw "Point0 is invalid";
         if (!value[1].validate()) throw "Point1 is invalid";
 
@@ -185,6 +187,9 @@ export default class BlockchainZSC extends Zether.ZSC {
 
 
 
+    async _deletetLastRollOverMap(hash){
+        return this._scope.chainData.zetherLastRollOverHashMap.deleteMap( Zether.utils.fromHex( hash ) );
+    }
 
 
     async _getLastRollOverMap(hash){
@@ -195,6 +200,13 @@ export default class BlockchainZSC extends Zether.ZSC {
         if (out) return out.data.epoch;
 
         return 0;
+    }
+
+    async _getLastRollOverMapObject(hash){
+        hash = Zether.utils.fromHex( hash );
+        const out = await this._scope.chainData.zetherLastRollOverHashMap.getMap(hash);
+        if (out) return out.data.epoch;
+        return null;
     }
 
     async _setLastRollOverMap(hash, value){
@@ -208,6 +220,15 @@ export default class BlockchainZSC extends Zether.ZSC {
 
     }
 
+    async _setLastRollOverMapObject(hash, value){
+        hash = Zether.utils.fromHex( hash );
+
+        if (value === null) return this._deletetLastRollOverMap( hash );
+
+        await this._scope.chainData.zetherLastRollOverHashMap.updateMap( hash, {
+            epoch: value,
+        } );
+    }
 
 
 

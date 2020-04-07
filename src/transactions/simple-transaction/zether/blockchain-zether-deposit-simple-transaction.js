@@ -118,11 +118,9 @@ export default class BlockchainZetherDepositSimpleTransaction extends ZetherDepo
 
             const yHash = revert.yHash;
 
-            if (revert.pending.data === null) await chainData.zsc._deletePendingMap( yHash );
-            else await chainData.zsc.setPendingMapObject( yHash, revert.pending.data );
+            await chainData.zsc.setPendingMapObject( yHash, revert.pending.data );
 
-            if ( revert.acc.data === null) await chainData.zsc._deleteAccMap( yHash );
-            else await chainData.zsc.setAccMapObject( yHash, revert.acc.data );
+            await chainData.zsc.setAccMapObject( yHash, revert.acc.data );
 
         }
 
