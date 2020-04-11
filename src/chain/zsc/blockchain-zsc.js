@@ -26,14 +26,21 @@ export default class BlockchainZSC extends Zether.ZSC {
 
         const acc = await this.getAccMapObject( yHash );
         const pending = await this.getPendingMapObject( yHash );
-        const pending = await this.getPendingMapObject( yHash );
+        const lastRollOver = await this.getLastRollOverMapObject( yHash );
 
-        const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
-        if (!result) return undefined;
+        const balances = [];
+        if (acc || pending || lastRollOver){
+            balances.push({
+                tokenCurrency,
+                acc,
+                pending,
+                lastRollOver
+            })
+        }
 
         return {
             registered,
-            data,
+            balances,
         };
 
     }
@@ -43,12 +50,13 @@ export default class BlockchainZSC extends Zether.ZSC {
         publicKey = Zether.bn128.unserializeFromBuffer(publicKey);
         privateKey = Zether.utils.BNFieldfromHex(privateKey);
 
+        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id;
+
         const result = await this.simulateAccounts([ publicKey ], this._getEpoch() + 1);
         if (!result) return undefined;
 
         const simulated = result[0];
 
-        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id;
         const balances = {};
 
         balances[tokenCurrency.toString('hex')] = this.readBalance( simulated[0], simulated[1], privateKey );
@@ -57,6 +65,9 @@ export default class BlockchainZSC extends Zether.ZSC {
     }
 
     async getBalance(publicKey, privateKey, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
+
+        publicKey = Zether.bn128.unserializeFromBuffer(publicKey);
+        privateKey = Zether.utils.BNFieldfromHex(privateKey);
 
         if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
@@ -118,6 +129,11 @@ export default class BlockchainZSC extends Zether.ZSC {
 
         if (value === null) return this._deleteAccMap( hash );
 
+        const point0 = Zether.bn128.unserializeFromBuffer(value[0]);
+        if (!point0.validate() ) throw "Point0 is invalid";
+        const point1 = Zether.bn128.unserializeFromBuffer(value[1]);
+        if (!point1.validate() ) throw "Point1 is invalid";
+
         return this._scope.chainData.zetherAccountHashMap.updateMap(hash, {
             value0: value.value0,
             value1: value.value1,
@@ -174,8 +190,10 @@ export default class BlockchainZSC extends Zether.ZSC {
 
         if (value === null) return this._deletePendingMap( hash );
 
-        if (!value[0].validate()) throw "Point0 is invalid";
-        if (!value[1].validate()) throw "Point1 is invalid";
+        const point0 = Zether.bn128.unserializeFromBuffer(value[0]);
+        if (!point0.validate() ) throw "Point0 is invalid";
+        const point1 = Zether.bn128.unserializeFromBuffer(value[1]);
+        if (!point1.validate() ) throw "Point1 is invalid";
 
         return this._scope.chainData.zetherPendingHashMap.updateMap(hash, {
             value0: value.value0,
@@ -202,7 +220,7 @@ export default class BlockchainZSC extends Zether.ZSC {
         return 0;
     }
 
-    async _getLastRollOverMapObject(hash){
+    async getLastRollOverMapObject(hash){
         hash = Zether.utils.fromHex( hash );
         const out = await this._scope.chainData.zetherLastRollOverHashMap.getMap(hash);
         if (out) return out.data.epoch;
@@ -220,7 +238,7 @@ export default class BlockchainZSC extends Zether.ZSC {
 
     }
 
-    async _setLastRollOverMapObject(hash, value){
+    async setLastRollOverMapObject(hash, value){
         hash = Zether.utils.fromHex( hash );
 
         if (value === null) return this._deletetLastRollOverMap( hash );
