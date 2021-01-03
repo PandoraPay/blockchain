@@ -17,7 +17,7 @@ export default class ExchangeCommonSocketRouterPlugin extends SocketRouterPlugin
                  * Sending notification that a new offer was included
                  */
 
-                this._scope.masterCluster.broadcast("exchange/new-offer", { offer: data.offer.toBuffer() }, senderSockets);
+                this._scope.masterCluster.broadcastToSocketsAsync("exchange/new-offer", { offer: data.offer.toBuffer() }, senderSockets);
 
 
             });

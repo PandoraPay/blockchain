@@ -33,9 +33,9 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.log(this, "Initializing Main Chain");
 
-        let cleared = false;
-
         if (BROWSER) return true;
+
+        let cleared = false;
 
         try{
 
@@ -47,24 +47,18 @@ export default class MainChain extends BaseChain {
                 return false;
             }
 
-            if (this.data.end === 0) {
-                cleared = true;
-                await this.clear();
+            if (this.data.end === 0 || this._scope.argv.testnet.createNewTestNet ) {
+
+                if (!cleared) {
+                    cleared = true;
+                    await this.clearChain();
+                }
+
             }
 
         } catch (err){
             this._scope.logger.error(this, "Error loading MainChain", err);
         }
-
-        if (this._scope.argv.testnet.createNewTestNet )
-            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
-
-                if (!cleared) {
-                    cleared = true;
-                    await this.clear();
-                }
-
-            }
 
 
         if ( this._scope.db.isSynchronized ) {
@@ -115,7 +109,10 @@ export default class MainChain extends BaseChain {
     /**
      * Clear entire Blockchain
      */
-    async clear(){
+    async clearChain(){
+
+        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
+
 
         await this._clearData();
 

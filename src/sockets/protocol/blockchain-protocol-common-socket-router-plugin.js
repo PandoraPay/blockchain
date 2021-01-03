@@ -24,7 +24,7 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
                  * Sending notification that a new block was received
                  */
 
-                this._scope.masterCluster.broadcast("blockchain-protocol/new-block", this._getBlockchainInfo(), senderSockets);
+                this._scope.masterCluster.broadcastToSocketsAsync("blockchain-protocol/new-block", this._getBlockchainInfo(), senderSockets);
 
 
             });

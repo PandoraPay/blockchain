@@ -16,7 +16,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
              */
             this._scope.mainChain.on( "mem-pool/tx-included", async ( {data, senderSockets, awaitPropagate } ) =>  {
 
-                const out = this._scope.masterCluster.broadcastAsync("mem-pool/new-tx-id", {txId: data.txId}, undefined, senderSockets);
+                const out = this._scope.masterCluster.broadcastToSocketsAsync("mem-pool/new-tx-id", {txId: data.txId}, undefined, senderSockets);
 
                 if (awaitPropagate)
                     await out;

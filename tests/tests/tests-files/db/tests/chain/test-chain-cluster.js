@@ -23,7 +23,7 @@ export default function run (dbType) {
 
         const chain = this._scope.mainChain;
 
-        if (masterCluster.isMasterCluster){
+        if (masterCluster.isMaster){
 
             await Helper.waitUntilCondition( () => masterCluster.totalPeers.count === 2 * this._scope.argv.masterCluster.workerCount, undefined, 55000 );
 
@@ -101,9 +101,9 @@ export default function run (dbType) {
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            await chain.clear();
+            await chain.clearChain();
 
-            if (masterCluster.isMasterCluster){
+            if (masterCluster.isMaster){
 
             }
 
@@ -121,7 +121,7 @@ export default function run (dbType) {
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            await chain.clear();
+            await chain.clearChain();
         },
 
         'chain initialization - masterCluster 30 blocks': async function () {

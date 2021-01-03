@@ -23,7 +23,8 @@ export default {
         //await TestRedis();
 
         await TestCouchDB();
-        await TestPouchDB();
+
+        //await TestPouchDB();
 
 
     }

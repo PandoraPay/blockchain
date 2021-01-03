@@ -10,20 +10,20 @@ export default function run () {
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
+            this._scope.app.setScope( undefined, "masterCluster", { isMaster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{}, broadcastToSocketsAsync: ()=>{} }, undefined, [ this.db ] );
 
-            await chain.clear();
+            await chain.clearChain();
 
         },
 
-        'chain create 10 blocks': async function () {
+        'chain create 10 blocks - Chain': async function () {
 
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
+            this._scope.app.setScope( undefined, "masterCluster", { isMaster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{}, broadcastToSocketsAsync: ()=>{} }, undefined, [ this.db ] );
 
-            await chain.clear();
+            await chain.clearChain();
 
             this.expect(chain.data.end, 0);
 

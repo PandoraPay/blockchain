@@ -7,13 +7,13 @@ export default function run () {
 
         'chain initialization': async function () {
 
-            this._scope.app.setScope( undefined, "masterCluster", { isMasterCluster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{} }, undefined, [ this.db ] );
+            this._scope.app.setScope( undefined, "masterCluster", { isMaster: true, on: ()=>{}, once: ()=>{}, broadcastMessage: ()=>{}, sendMessage: ()=>{}, broadcastToSocketsAsync: ()=>{} }, undefined, [ this.db ] );
 
             const chain = await this._scope.app.createMainChain( undefined, {
                 db: this.db,
             } );
 
-            await chain.clear();
+            await chain.clearChain();
 
         },
 
@@ -23,7 +23,7 @@ export default function run () {
                 db: this.db,
             } );
 
-            await chain.clear();
+            await chain.clearChain();
 
             const subChain = chain.createSubChain();
 

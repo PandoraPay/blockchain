@@ -17,7 +17,7 @@ export default class SubChain extends BaseChain{
         this.hashes = {};
     }
 
-    async clear(free = true){
+    async clearChain(free = true){
 
         try{
 
@@ -44,7 +44,7 @@ export default class SubChain extends BaseChain{
 
         }
 
-        super.clear(this);
+        super.clearChain(this);
 
     }
 

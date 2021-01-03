@@ -57,7 +57,7 @@ export default  class MemPool {
 
     }
 
-    async clear(){
+    async clearMemPool(){
 
         const out = await this._scope.db.scan( MemPoolTxData, 0, this._scope.argv.memPool.maximumMemPool, '', '', undefined );
         for (const txData of out)
@@ -71,9 +71,9 @@ export default  class MemPool {
         if (this._init) return true;
 
         if (this._scope.argv.testnet.createNewTestNet )
-            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
+            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
 
-                await this.clear();
+                await this.clearMemPool();
 
             }
 

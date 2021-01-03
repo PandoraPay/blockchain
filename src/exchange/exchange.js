@@ -51,7 +51,7 @@ class Exchange extends DBSchema{
         if (this._init) return true;
 
         if (this._scope.argv.testnet.createNewTestNet )
-            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMasterCluster) {
+            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
 
                 await this._scope.db.deleteAll( this._scope.ExchangeOfferBuy, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true } );
                 await this._scope.db.deleteAll( this._scope.ExchangeOfferSell, undefined, undefined, {skipProcessingConstructionValues: true, skipValidation: true } );
@@ -59,7 +59,7 @@ class Exchange extends DBSchema{
             }
 
 
-        if ( this._scope.masterCluster.isMasterCluster || !this._scope.db.isSynchronized)
+        if ( this._scope.masterCluster.isMaster || !this._scope.db.isSynchronized)
             this._updateExpiredExchangeOffersInterval = setAsyncInterval( this._updateExpiredExchangeOffers.bind(this), 60*1000 );
 
 

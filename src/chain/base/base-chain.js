@@ -59,7 +59,7 @@ export default class BaseChain extends AsyncEvents{
 
     }
 
-    async clear(){
+    async clearChain(){
         await this._clearData();
     }
 
