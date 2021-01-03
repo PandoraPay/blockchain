@@ -43,7 +43,6 @@ const Wallet = require("src/wallet/wallet").default;
 const WalletAddress = require("src/wallet/addresses/wallet-address").default;
 const WalletAddressTypeEnum = require("src/wallet/addresses/data/wallet-address-type-enum").default;
 const WalletAddressTransparentKeys = require("src/wallet/addresses/data/wallet-address-transparent-keys").default;
-const WalletAddressZetherKeys = require("src/wallet/addresses/data/wallet-address-zether-keys").default;
 
 const library = {
 
@@ -107,7 +106,6 @@ const library = {
             WalletAddress,
             WalletAddressTransparentKeys,
             WalletAddressTypeEnum,
-            WalletAddressZetherKeys
         },
 
     },

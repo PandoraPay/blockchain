@@ -20,10 +20,10 @@ export default {
 
         await TestsWallet(scope);
 
-        await TestRedis();
+        //await TestRedis();
 
-        // await TestCouchDB();
-        // await TestPouchDB();
+        await TestCouchDB();
+        await TestPouchDB();
 
 
     }

@@ -1,5 +1,6 @@
 const {describe} = global.kernel.tests;
 const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
+const {Helper, BufferHelper} = global.kernel.helpers;
 
 export default function run () {
 
@@ -96,7 +97,7 @@ export default function run () {
 
             //let's encrypt it
 
-            const password = "password123";
+            const password = BufferHelper.generateRandomBuffer( 32 );
             await wallet.encryption.encryptWallet(undefined, password );
 
             this.expect( wallet.encrypted, true );
@@ -105,19 +106,19 @@ export default function run () {
             mnemonicSequenceCounter = wallet.encryption.decryptMnemonicSequenceCounter();
             this.expect(mnemonicSequenceCounter, 1);
 
-            this.expect(wallet.mnemonicSequenceCounter.value.length, 16);
+            this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
 
             for (let i = 0; i < count; i++) {
                 await wallet.manager.createNewAddress();
                 this.expect(wallet.addresses.length, i + 1);
 
-                this.expect(wallet.addresses[i].keys.public.value.length, 48 );
-                this.expect(wallet.addresses[i].keys.private.value.length, 48 );
+                this.expect(wallet.addresses[i].keys.public.value.length, 64 );
+                this.expect(wallet.addresses[i].keys.private.value.length, 64 );
 
                 mnemonicSequenceCounter = wallet.encryption.decryptMnemonicSequenceCounter();
                 this.expect(mnemonicSequenceCounter, i + 2);
 
-                this.expect(wallet.mnemonicSequenceCounter.value.length, 16);
+                this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
             }
 
 
@@ -138,7 +139,7 @@ export default function run () {
 
             mnemonicSequenceCounter = wallet.encryption.decryptMnemonicSequenceCounter(password);
             this.expect(mnemonicSequenceCounter, count+1);
-            this.expect(wallet.mnemonicSequenceCounter.value.length, 16);
+            this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
 
             mnemonicSequenceCounter = wallet.encryption.decryptMnemonicSequenceCounter();
             this.expect(mnemonicSequenceCounter, count + 1);
@@ -147,10 +148,10 @@ export default function run () {
 
             for (let i = 0; i < count; i++) {
 
-                this.expect(wallet.addresses[i].keys.public.value.length, 48 );
-                this.expect(wallet.addresses[i].keys.private.value.length, 48 );
+                this.expect(wallet.addresses[i].keys.public.value.length, 64 );
+                this.expect(wallet.addresses[i].keys.private.value.length, 64 );
 
-                this.expect(wallet.mnemonicSequenceCounter.value.length, 16);
+                this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
 
             }
 
@@ -160,7 +161,7 @@ export default function run () {
 
             await wallet.clearWallet();
 
-            const password = '123456';
+            const password = BufferHelper.generateRandomBuffer( 32 );
 
             await wallet.manager.createNewAddress();
 

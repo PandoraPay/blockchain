@@ -7,7 +7,6 @@ const {DBEncryptedSchema, } = global.cryptography.marshal.db.samples;
 
 import WalletAddressTypeEnum from "./data/wallet-address-type-enum"
 import WalletAddressTransparentKeys from "./data/wallet-address-transparent-keys";
-import WalletAddressZetherKeys from "./data/wallet-address-zether-keys";
 
 export default class WalletAddress extends DBSchema {
 
@@ -69,7 +68,6 @@ export default class WalletAddress extends DBSchema {
 
                         classObject(){
                             if (this.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) return WalletAddressTransparentKeys;
-                            if (this.type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER) return WalletAddressZetherKeys;
                         },
 
                         position: 104,

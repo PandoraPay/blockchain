@@ -69,15 +69,6 @@ export default class Wallet extends DBSchema {
                         position: 104,
                     },
 
-
-                    mnemonicSequenceCounterZether:{
-
-                        type: "object",
-                        classObject: DBEncryptedSchema,
-
-                        position: 105,
-                    },
-
                     addresses: {
                         type: "array",
                         classObject: WalletAddress,
@@ -168,7 +159,6 @@ export default class Wallet extends DBSchema {
 
         //let's create first address
         await this.manager.createNewAddress( WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT,undefined, save);
-        await this.manager.createNewAddress( WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER, undefined, save);
 
     }
 

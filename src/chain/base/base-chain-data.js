@@ -20,11 +20,6 @@ import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map
 import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-map";
 import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
 import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
-import BlockchainZSC from "./../zsc/blockchain-zsc"
-
-import ZetherAccountHashVirtualMap from "../maps/zether/zether-account-hash-map/zether-account-hash-virtual-map"
-import ZetherPendingHashVirtualMap from "../maps/zether/zether-pending-hash-map/zether-pending-hash-virtual-map"
-import ZetherLastRollOverHashVirtualMap from "../maps/zether/zether-last-roll-over-hash-map/zether-last-roll-over-hash-virtual-map"
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
@@ -233,26 +228,6 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.zetherAccountHashMap = new this._zetherAccountHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.zetherPendingHashMap = new this._zetherPendingHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.zetherLastRollOverHashMap = new this._zetherLastRollOverHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.zsc = new BlockchainZSC({
-            ...this._scope,
-            chainData: this,
-        });
-
         this._grindingLockedTransfersFunds = {};
 
         if (!this.zscNoncesMap) this.zscNoncesMap = {};
@@ -299,18 +274,6 @@ export default class BaseChainData extends DBSchema {
         return AccountHashVirtualMap;
     }
 
-    get _zetherAccountHashMapClass(){
-        return ZetherAccountHashVirtualMap;
-    }
-
-    get _zetherPendingHashMapClass(){
-        return ZetherPendingHashVirtualMap;
-    }
-
-    get _zetherLastRollOverHashMapClass(){
-        return ZetherLastRollOverHashVirtualMap;
-    }
-
     async loadData(){
 
         if ( await this.exists() )
@@ -343,9 +306,6 @@ export default class BaseChainData extends DBSchema {
         this.tokenHashMap.resetHashMap();
         this.tokenTickerHashMap.resetHashMap();
         this.tokenNameHashMap.resetHashMap();
-        this.zetherAccountHashMap.resetHashMap();
-        this.zetherPendingHashMap.resetHashMap();
-        this.zetherLastRollOverHashMap.resetHashMap();
     }
 
     /**
@@ -437,10 +397,6 @@ export default class BaseChainData extends DBSchema {
 
         this.tokenNameHashMap._fallback = mainChainData.tokenNameHashMap;
         this.tokenTickerHashMap._fallback = mainChainData.tokenTickerHashMap;
-
-        this.zetherAccountHashMap._fallback = mainChainData.zetherAccountHashMap;
-        this.zetherPendingHashMap._fallback = mainChainData.zetherPendingHashMap;
-        this.zetherLastRollOverHashMap._fallback = mainChainData.zetherLastRollOverHashMap;
 
         this._fallback = mainChainData;
 

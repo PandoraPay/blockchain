@@ -82,13 +82,6 @@ export default class WalletManager{
 
         }, "object" );
 
-        this.wallet.mnemonicSequenceCounterZether = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonicSequenceCounter", {
-
-            encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
-            value: Buffer.from( "01", "hex" ), //00 is reservered
-
-        }, "object" );
-
         if (save) await this.wallet.save();
 
         return mnemonicString;
@@ -117,8 +110,6 @@ export default class WalletManager{
 
             if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT ){
 
-            } else if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER ){
-                if (walletAddress.keys.registration.encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED) json.keys.registration.value = walletAddress.keys.registration.decryptKey( accountPassword );
             }
 
         }
@@ -131,21 +122,6 @@ export default class WalletManager{
                 publicKey: json.keys.public.value,
             } );
 
-        } else
-        if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER ){
-
-            privateAddress = this._scope.cryptography.zetherAddressValidator.validatePrivateAddress( {
-                privateKey: json.keys.private.value,
-                publicKey: json.keys.public.value,
-            } );
-
-            const registration = privateAddress.getZetherRegistration();
-            const registrationBuffer = Buffer.concat([
-                registration.c,
-                registration.s,
-            ]);
-            if (!registrationBuffer.equals( Buffer.from(json.keys.registration.value, 'hex') )) throw new Exception(this, "Registration is not matching");
-
         }
 
         return this.importPrivateKeyAddress(privateAddress, json.type, Number.parseInt( json.mnemonicSequenceIndex.value.toString("hex"), 16 ), password, save )
@@ -157,7 +133,6 @@ export default class WalletManager{
         let privateAddress;
 
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateAddress = this._scope.cryptography.addressValidator.validatePrivateAddress(privateKey);
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER) privateAddress = this._scope.cryptography.zetherAddressValidator.validatePrivateAddress(privateKey);
         if (!privateAddress) throw new Exception(this, "Private Key is invalid" );
 
         //validating mnemonic Sequence Index
@@ -168,7 +143,6 @@ export default class WalletManager{
         let privateAddressMnemonic;
 
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateAddressMnemonic = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceIndex ).privateAddress;
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER) privateAddressMnemonic = this._scope.cryptography.zetherAddressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceIndex ).privateAddress;
 
         //mnemonic sequence index is not matching, it must be generated from a different mnemonic seed
         if (!privateAddress.privateKey.equals( privateAddressMnemonic.privateKey ))
@@ -198,11 +172,6 @@ export default class WalletManager{
                     value: privateAddress.publicKey,
                 },
 
-                registration: type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER ? {
-                    encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
-                    value: Buffer.concat([ privateAddress.getZetherRegistration().c, privateAddress.getZetherRegistration().s ]),
-                } : undefined,
-
             },
 
         }, "object");
@@ -220,10 +189,6 @@ export default class WalletManager{
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) {
             mnemonicSequenceCounter = this.wallet.encryption.decryptMnemonicSequenceCounter();
             privateKey = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceCounter ) ;
-        } else
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER){
-            mnemonicSequenceCounter = this.wallet.encryption.decryptMnemonicSequenceCounterZether();
-            privateKey = this._scope.cryptography.zetherAddressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceCounter ) ;
         } else throw new Exception(this, "Invalid Type");
 
 
@@ -231,7 +196,6 @@ export default class WalletManager{
 
         let mnemonicSequenceCounterObject;
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) mnemonicSequenceCounterObject = this.wallet.mnemonicSequenceCounter = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonicSequenceCounter",{ }, "object" );
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_ZETHER) mnemonicSequenceCounterObject = this.wallet.mnemonicSequenceCounterZether = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonicSequenceCounterZether",{ }, "object" );
 
         mnemonicSequenceCounterObject.encryption = DBSchemaEncryptionTypeEnum.PLAIN_TEXT;
         mnemonicSequenceCounterObject.value = BufferHelper.convertNumberToBuffer( mnemonicSequenceCounter + 1 );
@@ -258,7 +222,7 @@ export default class WalletManager{
 
             if (address === walletAddress || address.toBuffer().equals(walletAddress.toBuffer())) return address;
 
-            for (const key of ["private", "public", "registration"])
+            for (const key of ["private", "public"])
                 if (walletAddress.keys[key] && address.keys[key]){
                     if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.PLAIN_TEXT && address.keys[key].value.equals(walletAddress.keys[key].value)) return address;
                     if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED && address.keys[key]._unlocked.equals(walletAddress.keys[key].value)) return address;
@@ -282,7 +246,7 @@ export default class WalletManager{
             walletAddress.mnemonicSequenceIndex.encryptKey(this.wallet.encryption._password);
             walletAddress.mnemonicSequenceIndex.decryptKey(this.wallet.encryption._password);
 
-            for (const value of ["private", "public", "registration "])
+            for (const value of ["private", "public"])
                 if (walletAddress.keys[value]) {
                     walletAddress.keys[value].encryptKey(this.wallet.encryption._password);
                     walletAddress.keys[value].decryptKey(this.wallet.encryption._password);

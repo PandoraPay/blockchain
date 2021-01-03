@@ -48,26 +48,6 @@ export default class WalletTransfer {
 
     }
 
-    async zetherDepositSimple({address, txDsts, fee, feeTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData }, paymentId, password, networkByte ){
-
-        if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
-
-        const {vin, privateKeys} = await this._calculateRequiredFunds({address, txDsts, fee, feeTokenCurrency, password, networkByte});
-
-        const txOut =  await this._scope.mainChain.transactionsCreator.createZetherDepositSimpleTransaction( {
-            vin: vin,
-            vout: [],
-            voutZether: txDsts,
-            privateKeys,
-            nonce,
-        } );
-
-        await this._scope.memPool.newTransaction(txOut.tx, true, memPoolValidateTxData);
-
-        return txOut;
-
-    }
-
     async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
 
         const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;

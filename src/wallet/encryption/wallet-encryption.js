@@ -22,7 +22,7 @@ export default class WalletEncryption {
 
         if (this.wallet.mnemonic.encryption === DBSchemaEncryptionTypeEnum.NON_EXISTENT ) throw new Exception(this, "Mnemonic is missing");
 
-        if (typeof password !== "string"){
+        if ( !Buffer.isBuffer(password) || password.length !== 32 ){
 
             if (!askPassword) throw new Exception(this, "Ask Password is set false");
 
@@ -101,7 +101,6 @@ export default class WalletEncryption {
         const list = [
             this.wallet.mnemonic,
             this.wallet.mnemonicSequenceCounter,
-            this.wallet.mnemonicSequenceCounterZether,
         ];
 
         for (let i=0; i < this.wallet.addresses.length; i++) {
@@ -132,15 +131,6 @@ export default class WalletEncryption {
 
         const mnemonicSequenceCounter = this.wallet.mnemonicSequenceCounter.decryptKey();
         return parseInt( mnemonicSequenceCounter.toString("hex"), 16);
-
-    }
-
-    decryptMnemonicSequenceCounterZether(password){
-
-        this.decryptWallet(password);
-
-        const mnemonicSequenceCounterZether = this.wallet.mnemonicSequenceCounterZether.decryptKey();
-        return parseInt( mnemonicSequenceCounterZether.toString("hex"), 16);
 
     }
 

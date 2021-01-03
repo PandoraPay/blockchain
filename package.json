@@ -4,8 +4,7 @@
   "description": "Blockchain data structure and consensus",
   "homepage": "https://github.com/PandoraPay",
   "license": "MIT",
-  "contributors": [
-  ],
+  "contributors": [],
   "keywords": [
     "webpack",
     "node.js",

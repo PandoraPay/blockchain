@@ -46,8 +46,8 @@ export default async function run() {
     });
 
 
-    //await TestBlock("PouchDB");
-    //await TestChain("PouchDB");
+    await TestBlock("PouchDB");
+    await TestChain("PouchDB");
     await TestChainCluster("PouchDB");
     await TestTransaction("PouchDB");
     await TestTransactionsChain("PouchDB");

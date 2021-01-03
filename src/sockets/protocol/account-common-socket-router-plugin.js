@@ -107,24 +107,6 @@ export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         }
 
-        const zetherAddress = this._scope.cryptography.zetherAddressValidator.validateAddress( account );
-        if (zetherAddress){
-
-            const account = await this._scope.mainChain.data.zsc.getAccount( zetherAddress.publicKey );
-
-            if (account)
-                return {
-                    type: "zether",
-                    found: true,
-                    account: account,
-                };
-            else return {
-                type: "zether",
-                found: false,
-            }
-
-        }
-
         throw "Account is invalid";
 
     }
