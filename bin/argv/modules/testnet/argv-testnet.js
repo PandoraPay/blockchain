@@ -26,10 +26,6 @@ export default {
                     publicKeyHash: Buffer.from("9863e0c7bf82fd985776a07a419006b57537b99d", "hex"),
                 },
 
-                zsc:{
-                    address: "0x5d6c4ebf1b789883b58b0d7a7fe937e275212960",
-                },
-
                 /**
                  * To avoid issues with timestamp in the future
                  */

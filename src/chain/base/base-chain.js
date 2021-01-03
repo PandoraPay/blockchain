@@ -53,10 +53,6 @@ export default class BaseChain extends AsyncEvents{
         this.data.kernelHash = Buffer.alloc(32);
         this.data.prevKernelHash = Buffer.alloc(32);
 
-        this.zscListNonceSet = [];
-        this.zscNoncesMap = {};
-        this.zscLastGlobalUpdate = 0;
-
     }
 
     async clearChain(){

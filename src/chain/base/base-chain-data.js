@@ -151,28 +151,6 @@ export default class BaseChainData extends DBSchema {
                         position: 109,
                     },
 
-                    /**
-                     * ZSC NonceSet
-                     */
-                    zscListNonceSet:{
-
-                        type: "array",
-                        classObject: DBSchemaBuffer,
-
-                        maxSize: 5000,
-
-                        position: 110,
-                    },
-
-                    /**
-                     * ZSC LastGlobalUpdate
-                     */
-                    zscLastGlobalUpdate:{
-                        type: "number",
-
-                        position: 111,
-                    },
-
                 }
 
             },
@@ -229,8 +207,6 @@ export default class BaseChainData extends DBSchema {
         });
 
         this._grindingLockedTransfersFunds = {};
-
-        if (!this.zscNoncesMap) this.zscNoncesMap = {};
 
     }
 
