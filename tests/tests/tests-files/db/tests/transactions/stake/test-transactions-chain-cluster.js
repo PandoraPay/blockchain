@@ -36,7 +36,7 @@ export default function run () {
             this.expect(result, true);
             this.expect(chain.data.end, 10);
 
-            this.scope.logger.info(this, "chain create 10 blocks - Chain CLUSTER DONE");
+            this._scope.logger.info(this, "chain create 10 blocks - Chain CLUSTER DONE");
         },
 
 
