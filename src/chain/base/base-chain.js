@@ -39,24 +39,17 @@ export default class BaseChain extends AsyncEvents{
         return data;
     }
 
-    async _clearData(){
+    async _clearChainData(){
 
-        await this.data.clearData();
+        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
+            await this.data.clearData();
 
-        this.data.start = 0;
-        this.data.end = 0;
-        this.data.transactionsIndex = 0;
-        this.data.tokensIndex = 0;
-        this.data.chainwork = new BN(0);
-        this.data.hash = Buffer.alloc(32);
-        this.data.prevHash = Buffer.alloc(32);
-        this.data.kernelHash = Buffer.alloc(32);
-        this.data.prevKernelHash = Buffer.alloc(32);
+        this.data.resetCompleteData();
 
     }
 
     async clearChain(){
-        await this._clearData();
+        await this._clearChainData();
     }
 
     async addBlocks(blocks){

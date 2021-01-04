@@ -100,9 +100,13 @@ export default class MainChain extends BaseChain {
 
     }
 
-    async _clearData(){
+    async _clearChainData(){
 
-        await super._clearData();
+        await super._clearChainData();
+
+        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
+            await this.data.accountHashMap.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
+
         this.data.beingSaved = false;
     }
 
@@ -111,13 +115,12 @@ export default class MainChain extends BaseChain {
      */
     async clearChain(){
 
-        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
+        await this._clearChainData();
 
-
-        await this._clearData();
-
-        await this.data.save();
-        await this.data.saveState();
+        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
+            await this.data.save();
+            await this.data.saveState();
+        }
 
         this._scope.logger.warn(this, "Main Chain data cleared");
 

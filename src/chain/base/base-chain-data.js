@@ -156,6 +156,12 @@ export default class BaseChainData extends DBSchema {
             },
             schema, false), data, type, creationOptions);
 
+        this.resetCompleteData();
+
+    }
+
+    resetCompleteData(){
+
         this.addressHashMap = new this._addressHashMapClass({
             ...this._scope,
             chainData: this,
@@ -205,6 +211,16 @@ export default class BaseChainData extends DBSchema {
             ...this._scope,
             chainData: this,
         });
+
+        this.start = 0;
+        this.end = 0;
+        this.transactionsIndex = 0;
+        this.tokensIndex = 0;
+        this.chainwork = new BN(0);
+        this.hash = Buffer.alloc(32);
+        this.prevHash = Buffer.alloc(32);
+        this.kernelHash = Buffer.alloc(32);
+        this.prevKernelHash = Buffer.alloc(32);
 
         this._grindingLockedTransfersFunds = {};
 

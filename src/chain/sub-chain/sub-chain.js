@@ -4,8 +4,8 @@ import SubChainDataBlock from "./data/sub-chain-data-block"
 
 export default class SubChain extends BaseChain{
 
-    async _clearData() {
-        await super._clearData();
+    async _clearChainData() {
+        await super._clearChainData();
 
         this.listBlocks = [];
         this.blocks = {};

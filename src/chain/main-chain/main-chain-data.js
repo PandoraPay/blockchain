@@ -49,7 +49,6 @@ export default class MainChainData extends BaseChainData {
         this.transactionsHashesMap = {};
     }
 
-
     validateChainwork(subchainChainwork, subchainEnd){
 
         if ( Buffer.isBuffer(subchainChainwork) )
@@ -116,8 +115,6 @@ export default class MainChainData extends BaseChainData {
 
         await Promise.all(blockPromises);
         this._scope.logger.info(this, "Deleting block finished");
-
-        await this.accountHashMap.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
 
         await super.clearData(this);
 
