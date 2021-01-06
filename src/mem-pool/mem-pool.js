@@ -17,7 +17,7 @@ export default  class MemPool {
         this._init = false;
     }
 
-    _reset(){
+    _resetMemPool(){
 
         /**
          * Map of all txs
@@ -48,22 +48,14 @@ export default  class MemPool {
 
     async load(){
 
-        const out = await this._scope.db.scan( MemPoolTxData, 0, this._scope.argv.memPool.maximumMemPool, '', '', undefined );
-
-        this._reset();
-
-        for (const txData of out)
-            await this.newTransaction(txData, false, false, true);
+        this._resetMemPool();
 
     }
 
     async clearMemPool(){
 
-        const out = await this._scope.db.scan( MemPoolTxData, 0, this._scope.argv.memPool.maximumMemPool, '', '', undefined );
-        for (const txData of out)
-            await txData.delete();
+        this._resetMemPool();
 
-        this._reset();
     }
 
     async initializeMemPool(){

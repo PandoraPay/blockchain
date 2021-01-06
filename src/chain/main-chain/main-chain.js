@@ -104,6 +104,7 @@ export default class MainChain extends BaseChain {
 
         await super._clearChainData();
 
+        this._scope.logger.info(this, `Balance updated for Genesis ${this._scope.genesis.settings.stakes.publicKeyHash.toString('hex')}`)
         if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
             await this.data.accountHashMap.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
 

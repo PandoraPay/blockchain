@@ -23,7 +23,7 @@ export default {
                 timestamp: Math.floor(new Date("05/13/2019 10:04 pm").getTime() / 1000),
 
                 stakes: {
-                    publicKeyHash: Buffer.from("9863e0c7bf82fd985776a07a419006b57537b99d", "hex"),
+                    publicKeyHash: Buffer.from("bd9aecb961b47f622f419b3e2305f69ab11f8142", "hex"),
                 },
 
                 /**
