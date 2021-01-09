@@ -165,7 +165,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
             const tx = await socket.emitAsync('transactions/get-transaction', {hash: txId, type: "buffer"}, this._scope.argv.networkSettings.networkTimeout );
 
             if (tx && tx.tx)
-                txOut = await this._scope.memPool.newTransaction(tx.tx, false, true, true, false, [socket] );
+                txOut = await this._scope.memPool.newTransaction( txId, tx.tx, false, true, true, false, [socket] );
             else
                 throw new Exception(this, "Tx was not downloaded", {hash: txId, tx: tx});
 
@@ -187,28 +187,29 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         const transaction = this._scope.mainChain.transactionsValidator.cloneTx(tx);
 
-        const txId = transaction.hash().toString("hex");
+        const txId = transaction.hash();
+        const txIdHex = txId.toString("hex");
 
-        this._scope.logger.info(this, "new tx received", { txId, nonce: tx.nonce });
+        this._scope.logger.info(this, "new tx received", { txIdHex , nonce: tx.nonce });
 
-        if (this._transactionsDownloading[txId]) return this._transactionsDownloading[txId];
-        if (this._scope.memPool.transactions[txId]) return true;
+        if (this._transactionsDownloading[txIdHex]) return this._transactionsDownloading[txIdHex];
+        if (this._scope.memPool.transactions[txIdHex]) return true;
 
         let resolver;
         const promise = new Promise( resolve => resolver = resolve);
-        this._transactionsDownloading[txId] = promise;
+        this._transactionsDownloading[txIdHex] = promise;
 
 
         let out;
 
         try{
-            out = await this._scope.memPool.newTransaction( transaction, false, true, true, false, [socket] );
+            out = await this._scope.memPool.newTransaction( txId, transaction, false, true, true, false, [socket] );
         }catch(err){
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "newTx raised an error", err);
         }finally{
             resolver(!!out);
-            delete this._transactionsDownloading[txId];
+            delete this._transactionsDownloading[txIdHex];
         }
 
         return promise;

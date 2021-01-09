@@ -42,7 +42,7 @@ export default class WalletTransfer {
             nonce,
         } );
 
-        await this._scope.memPool.newTransaction(txOut.tx,  false,true, memPoolValidateTxData, true );
+        await this._scope.memPool.newTransaction( txOut.tx.hash(), txOut.tx,  false,true, memPoolValidateTxData, true );
 
         return txOut;
 
@@ -86,7 +86,7 @@ export default class WalletTransfer {
             delegate,
         } );
 
-        await this._scope.memPool.newTransaction(txOut.tx, false, true, memPoolValidateTxData, true);
+        await this._scope.memPool.newTransaction(txOut.tx.hash(), txOut.tx, false, true, memPoolValidateTxData, true);
 
         return txOut;
 
@@ -125,7 +125,7 @@ export default class WalletTransfer {
             tokenData,
         } );
 
-        await this._scope.memPool.newTransaction(txOut.tx, false,true, memPoolValidateTxData, true);
+        await this._scope.memPool.newTransaction(txOut.tx.hash(), txOut.tx, false,true, memPoolValidateTxData, true);
 
         return txOut;
     }
@@ -165,7 +165,7 @@ export default class WalletTransfer {
             supplyValue,
         } );
 
-        await this._scope.memPool.newTransaction(txOut.tx, false, true, memPoolValidateTxData, true);
+        await this._scope.memPool.newTransaction(txOut.tx.hash(), txOut.tx, false, true, memPoolValidateTxData, true);
 
         return txOut;
     }

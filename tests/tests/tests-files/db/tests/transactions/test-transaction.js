@@ -60,7 +60,7 @@ export default function run () {
             this.expect( !!outTx.tx, true );
             this.expect( outTx.signatures[0].length, 65 );
 
-            const newTx = await this._scope.memPool.newTransaction(outTx.tx);
+            const newTx = await this._scope.memPool.newTransaction(outTx.tx.hash(), outTx.tx);
             this.expect(!!newTx, true);
 
             const outTx2 = await chain.transactionsCreator.createSimpleTransaction( {
@@ -82,7 +82,7 @@ export default function run () {
 
             this.expect( outTx.tx.hash().toString("hex") === outTx2.tx.hash().toString("hex"), false);
 
-            const newTx2 = await this._scope.memPool.newTransaction(outTx2.tx);
+            const newTx2 = await this._scope.memPool.newTransaction(outTx2.tx.hash(), outTx2.tx);
             this.expect(!!newTx2, true);
 
             //let's mine the transaction
