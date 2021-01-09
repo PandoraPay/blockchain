@@ -63,11 +63,8 @@ export default  class MemPool {
         if (this._init) return true;
 
         if (this._scope.argv.testnet.createNewTestNet )
-            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
-
+            if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
                 await this.clearMemPool();
-
-            }
 
         if ( this._scope.db.isSynchronized ) {
 
@@ -80,13 +77,16 @@ export default  class MemPool {
                     //this._scope.logger.info(this, "subscription", message.name);
 
                     if (message.name === "mem-pool-insert-tx"){
-
-                        if (!this.transactions[ message.data.txId ])
+                        if (!this.transactions[ message.data.txIdHex ])
                             await this._insertTransactionInMemPool(message.data.tx, false, false, false, true, message.data.propagateToSockets, message.data.awaitPropagate );
+                    }
+                    else if (message.name === "mem-pool-propagate-tx-sockets"){
+                        if (this.transactions[ message.data.txIdHex ])
+                            await this._propagateTransactionInMemPool( message.data.txId,  message.data.awaitPropagate,  );
                     }
                     else if (message.name === "mem-pool-remove-tx"){
 
-                        if (this.transactions[ message.data.txId ])
+                        if (this.transactions[ message.data.txIdHex ])
                             await this._removeTransactionFromMemPool(message.data.tx, false);
 
                     }
@@ -94,22 +94,22 @@ export default  class MemPool {
                     // else if (message.name === "mem-pool-block-added-included-tx"){
                     //
                     //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
-                    //     const {txIdString, blockHeight} = message.data;
+                    //     const {txIdHex, blockHeight} = message.data;
                     //
-                    //     if (!this.transactions[ txIdString ])
+                    //     if (!this.transactions[ txIdHex ])
                     //         await this._insertTransactionInMemPool(message.data.tx, true, false);
                     //
-                    //     this.transactions[ txIdString ]._memPoolIncluded = true;
+                    //     this.transactions[ txIdHex ]._memPoolIncluded = true;
                     // }
                     // else if (message.name === "mem-pool-block-removed-removed-tx"){
                     //
                     //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
-                    //     const txId = message.data.txId;
+                    //     const txIdHex = message.data.txIdHex;
                     //
-                    //     if (!this.transactions[ txId ])
+                    //     if (!this.transactions[ txIdHex ])
                     //         await this._insertTransactionInMemPool( tx, false, false);
                     //
-                    //     delete this.transactions[ txId ]._memPoolIncluded;
+                    //     delete this.transactions[ txIdHex ]._memPoolIncluded;
                     //
                     // }
 
@@ -129,11 +129,12 @@ export default  class MemPool {
         return true;
     }
 
-    async newTransaction(transaction, propagateTxMasterCluster, preValidateTx, awaitPropagate, senderSockets ){
+    async newTransaction(transaction, cloneTx, propagateToMasterCluster, preValidateTx, awaitPropagate, senderSockets ){
 
         try{
 
-            await this._insertTransactionInMemPool(transaction, true, propagateTxMasterCluster, true, preValidateTx, true, awaitPropagate, senderSockets ); //don't clone it as it was already cloned above
+            //don't clone it as it was already cloned above
+            await this._insertTransactionInMemPool(transaction, cloneTx, propagateToMasterCluster, true, preValidateTx, true, awaitPropagate, senderSockets );
 
             return transaction;
 
@@ -143,10 +144,10 @@ export default  class MemPool {
 
     }
 
-    getMemPoolTransaction(txId){
+    getMemPoolTransaction(txIdHex){
 
-        if ( Buffer.isBuffer(txId) ) txId = txId.toString("hex");
-        return this.transactions[txId];
+        if ( Buffer.isBuffer(txIdHex) ) txIdHex = txIdHex.toString("hex");
+        return this.transactions[txIdHex];
 
     }
 
@@ -291,16 +292,16 @@ export default  class MemPool {
 
     // async onTransactionIncludedMainChain(transaction, block){
     //
-    //     const txIdString = transaction.hash().toString("hex");
+    //     const txIdHex = transaction.hash().toString("hex");
     //
-    //     if (!this.transactions[ txIdString ])
+    //     if (!this.transactions[ txIdHex ])
     //         await this._insertTransactionInMemPool(transaction, true, false);
     //
-    //     this.transactions[ txIdString ]._memPoolIncluded = true;
+    //     this.transactions[ txIdHex ]._memPoolIncluded = true;
     //
     //     if (this._scope.db.isSynchronized )
     //         await this.subscribeMessage("mem-pool-block-added-included-tx", {
-    //             txIdString,
+    //             txIdHex,
     //             blockHeight: block.height,
     //             tx: transaction.toBuffer(),
     //         }, true, false);
@@ -310,16 +311,16 @@ export default  class MemPool {
     //
     // async onTransactionRemovedMainChain(transaction){
     //
-    //     const txIdString = transaction.hash().toString("hex");
+    //     const txIdHex = transaction.hash().toString("hex");
     //
-    //     if (!this.transactions[ txIdString ])
+    //     if (!this.transactions[ txIdHex ])
     //         await this._insertTransactionInMemPool(transaction, true, false);
     //
-    //     delete this.transactions[ txIdString ]._memPoolIncluded;
+    //     delete this.transactions[ txIdHex ]._memPoolIncluded;
     //
     //     if (this._scope.db.isSynchronized )
     //         await this.subscribeMessage("mem-pool-block-removed-removed-tx", {
-    //             txIdString,
+    //             txIdHex,
     //             tx: transaction.toBuffer(),
     //         }, true, false);
     //
@@ -343,7 +344,7 @@ export default  class MemPool {
 
     }
 
-    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateTxMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, awaitPropagate = true, senderSockets){
+    async _insertTransactionInMemPool(transaction, cloneTx = true, propagateToMasterCluster = true, validateTxOnce = false, preValidateTx = true, propagateToSockets=true, awaitPropagate = true, senderSockets){
 
         if (this.transactionsArray.length >= this._scope.argv.memPool.maximumMemPool) return false;
 
@@ -355,9 +356,9 @@ export default  class MemPool {
         }
 
         const txId = transaction.hash();
-        const txIdString = txId.toString("hex");
+        const txIdHex = txId.toString("hex");
 
-        if (this.transactions[ txIdString ]) return false;
+        if (this.transactions[ txIdHex ]) return false;
 
         if (validateTxOnce)
             if ( await transaction.validateTransactionOnce(this._scope.mainChain) !== true) throw new Exception(this, "Signatures returned false");
@@ -367,6 +368,8 @@ export default  class MemPool {
 
         if (cloneTx && !clone)
             transaction = this._scope.mainChain.transactionsValidator.cloneTx( transaction );
+
+        if (this.transactions[ txIdHex ]) return false;
 
         /**
          * Let's update transactionsOrderedByVin0Nonce
@@ -390,19 +393,18 @@ export default  class MemPool {
                 const nonce = await this._scope.mainChain.data.accountHashMap.getNonce(vinPublicKeyHashVin);
                 const memPoolNonce = this.getMemPoolTransactionNonce(vinPublicKeyHashVin, nonce);
                 if (transaction.nonce !== memPoolNonce)
-                    throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce, txId: txIdString });
+                    throw new Exception(this, "Nonce mem pool is wrong", {txNonce: transaction.nonce, nonce, memPoolNonce, txIdHex });
             }
         }
 
-        if (this.transactions[ txIdString ]) return false; //checking again, it is an await above, so it is required
-        this.transactions[txIdString] = transaction;
+        if (this.transactions[ txIdHex ]) return false; //checking again, it is an await above, so it is required
+        this.transactions[txIdHex] = transaction;
 
         if (vinPublicKeyHashVin) {
             if (!this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin]) this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin] = [];
             ArrayHelper.addSortedArray(transaction, this.transactionsOrderedByVin0Nonce[vinPublicKeyHashVin], (a, b) => a.nonce - b.nonce);
 
         }
-
 
         //save transactionsByPublicKeyHash
         const inputsOutputs = transaction.vin.concat(transaction.vout);
@@ -419,41 +421,54 @@ export default  class MemPool {
          * Let's insert the tx in transactionsData
          */
 
-        if (propagateToSockets) {
+        if (propagateToSockets)
+            await this._propagateTransactionInMemPool(txId, awaitPropagate, senderSockets);
 
-            const out = await this._scope.mainChain.emit("mem-pool/tx-included", {
-                data: {tx: transaction, txId: txIdString},
-                senderSockets,
-                awaitPropagate,
-            });
+        if (propagateToMasterCluster && this._scope.db.isSynchronized ) {
 
-            this._scope.logger.warn(this, "Transaction Propagate to Mem Pool sockets", {txId, nonce: transaction.nonce, vin: vinPublicKeyHashVin, out  })
-        }
-
-
-        if (propagateTxMasterCluster && this._scope.db.isSynchronized )
             await this.dataSubscription.subscribeMessage("mem-pool-insert-tx", {
                 tx: transaction.toBuffer(),
-                txId: txIdString,
-                propagateToSockets,
-                awaitPropagate,
+                txIdHex,
+                propagateToSockets: false,
             }, true, false);
+
+            if (propagateToSockets)
+                await this.dataSubscription.subscribeMessage("mem-pool-propagate-tx-sockets", {
+                    txId,
+                    propagateToSockets,
+                    awaitPropagate,
+                }, true, false);
+
+        }
 
         return true;
     }
 
-    async _removeTransactionFromMemPool(transaction, propagateTxMasterCluster = true, senderSockets){
+    async _propagateTransactionInMemPool(txId,  awaitPropagate, senderSockets){
+
+        const txIdHex = txId.toString('hex');
+        if (!this.transactions[ txIdHex ]) return false;
+
+        this._scope.logger.warn(this, "Transaction Propagate to Mem Pool sockets", { txId })
+        const out = this._scope.masterCluster.broadcastToSocketsAsync("mem-pool/new-tx-id", {txId}, undefined, senderSockets);
+
+        if (awaitPropagate)
+            await out;
+
+    }
+
+    async _removeTransactionFromMemPool(transaction, propagateToMasterCluster = true, senderSockets){
 
         if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) ) {
             transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
         }
 
         const txId = transaction.hash();
-        const txIdString = transaction.hash().toString("hex");
+        const txIdHex = transaction.hash().toString("hex");
 
-        if (!this.transactions[txIdString] ) return false;
+        if (!this.transactions[txIdHex] ) return false;
 
-        delete this.transactions[txIdString];
+        delete this.transactions[txIdHex];
 
         //save transactionsByPublicKeyHash
         const inputs = transaction.vin.concat(transaction.vout);
@@ -488,14 +503,14 @@ export default  class MemPool {
                 break;
             }
 
-        if (propagateTxMasterCluster && this._scope.db.isSynchronized )
+        if (propagateToMasterCluster && this._scope.db.isSynchronized )
             await this.dataSubscription.subscribeMessage("mem-pool-remove-tx", {
                 tx: transaction.toBuffer(),
-                txId: txIdString,
+                txIdHex,
             }, true, false);
 
         await this._scope.mainChain.emit("mem-pool/tx-removed", {
-            data: { tx: transaction, txId: txIdString},
+            data: { tx: transaction, txId, txIdHex},
             senderSockets,
         });
 

@@ -11,18 +11,6 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         this._scope.events.on("start/chain-created", ()=>{
 
-            /**
-             * Sending notification that a new offer was included
-             */
-            this._scope.mainChain.on( "mem-pool/tx-included", async ( {data, senderSockets, awaitPropagate } ) =>  {
-
-                const out = this._scope.masterCluster.broadcastToSocketsAsync("mem-pool/new-tx-id", {txId: data.txId}, undefined, senderSockets);
-
-                if (awaitPropagate)
-                    await out;
-
-            } );
-
         });
 
         this._scope.events.on("master-cluster/started", ()=> this.initializePluginMasterCluster() );
@@ -177,7 +165,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
             const tx = await socket.emitAsync('transactions/get-transaction', {hash: txId, type: "buffer"}, this._scope.argv.networkSettings.networkTimeout );
 
             if (tx && tx.tx)
-                txOut = await this._scope.memPool.newTransaction(tx.tx, true, true, false, [socket] );
+                txOut = await this._scope.memPool.newTransaction(tx.tx, false, true, true, false, [socket] );
             else
                 throw new Exception(this, "Tx was not downloaded", {hash: txId, tx: tx});
 
@@ -214,7 +202,7 @@ export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin 
         let out;
 
         try{
-            out = await this._scope.memPool.newTransaction( transaction, true, true, false, [socket] );
+            out = await this._scope.memPool.newTransaction( transaction, false, true, true, false, [socket] );
         }catch(err){
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "newTx raised an error", err);

@@ -2,6 +2,17 @@ const {SocketRouterPlugin} = global.networking.sockets.protocol;
 
 export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPlugin {
 
+    constructor(scope) {
+
+        super(scope);
+
+        this._scope.events.on("master-cluster/started", ()=> this.initializePluginMasterCluster() );
+    }
+
+    async initializePluginMasterCluster(){
+
+    }
+
     getOneWayRoutes(){
 
         return {
@@ -41,7 +52,7 @@ export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPl
 
     }
 
-    async _getRawTransaction({hash, type = "buffer"}){
+    async _getRawTransaction({hash, type = "buffer"}, res, socket){
 
         if (Buffer.isBuffer(hash)) hash = txId.toString("hex");
         if (typeof hash !== "string" && hash.length !== 64) throw new Exception(this, "TxId is invalid");
@@ -53,17 +64,16 @@ export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPl
 
     }
 
-    async _getTransaction({hash, type = "json"}){
+    async _getTransaction({hash, type = "json"}, res, socket){
 
         if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
         if (typeof hash !== "string" && hash.length !== 64) throw new Exception(this, "TxId is invalid");
 
         const chainData = this._scope.mainChain.data;
 
-        
-
         //included in mem pool
         const memPoolTx = this._scope.memPool.transactions[hash];
+
         if (memPoolTx) return {
             tx: (type === "json") ? memPoolTx.toJSONRaw() : memPoolTx.toType(type),
             memPool: true,
@@ -86,7 +96,7 @@ export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPl
         return null;
     }
 
-    async _getAccountTransactionsCount({account}){
+    async _getAccountTransactionsCount({account}, res, socket){
 
         if (typeof account !== "string") return null;
 
