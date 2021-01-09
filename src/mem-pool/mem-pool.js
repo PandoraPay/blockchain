@@ -91,27 +91,6 @@ export default  class MemPool {
 
                     }
 
-                    // else if (message.name === "mem-pool-block-added-included-tx"){
-                    //
-                    //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
-                    //     const {txIdHex, blockHeight} = message.data;
-                    //
-                    //     if (!this.transactions[ txIdHex ])
-                    //         await this._insertTransactionInMemPool(message.data.tx, true, false);
-                    //
-                    //     this.transactions[ txIdHex ]._memPoolIncluded = true;
-                    // }
-                    // else if (message.name === "mem-pool-block-removed-removed-tx"){
-                    //
-                    //     const tx = this._scope.mainChain.transactionsValidator.cloneTx( message.data.tx );
-                    //     const txIdHex = message.data.txIdHex;
-                    //
-                    //     if (!this.transactions[ txIdHex ])
-                    //         await this._insertTransactionInMemPool( tx, false, false);
-                    //
-                    //     delete this.transactions[ txIdHex ]._memPoolIncluded;
-                    //
-                    // }
 
 
                 }catch(err){
@@ -162,8 +141,6 @@ export default  class MemPool {
 
             const array = this.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
             for (const tx of array) {
-
-                if ( tx._memPoolIncluded ) continue;
 
                 for (const vin of tx.vin)
                     if (  vin.publicKeyHash && vin.publicKeyHash.equals(publicKeyHash) && ( !tokenCurrency || vin.tokenCurrency.equals(tokenCurrency) ) )
@@ -243,7 +220,7 @@ export default  class MemPool {
 
             const nonces = [];
             for (const tx of array)
-                nonces.push(tx.nonce * ( ( tx._memPoolIncluded) ? -1 : 1) );
+                nonces.push(tx.nonce  );
             this._scope.logger.log(this, "nonces", { nonces, nonce} );
 
             for (let i=0; i < array.length; i++) {
@@ -271,8 +248,7 @@ export default  class MemPool {
         if (createTransactionsCallback)
             await createTransactionsCallback(block, async ( tx )=>{
 
-                if (!tx._memPoolIncluded)
-                    await this._includeTransaction(block._scope.chain, chainData, transactions, block, tx);
+                await this._includeTransaction(block._scope.chain, chainData, transactions, block, tx);
 
             });
 
@@ -289,42 +265,6 @@ export default  class MemPool {
         return transactions;
 
     }
-
-    // async onTransactionIncludedMainChain(transaction, block){
-    //
-    //     const txIdHex = transaction.hash().toString("hex");
-    //
-    //     if (!this.transactions[ txIdHex ])
-    //         await this._insertTransactionInMemPool(transaction, true, false);
-    //
-    //     this.transactions[ txIdHex ]._memPoolIncluded = true;
-    //
-    //     if (this._scope.db.isSynchronized )
-    //         await this.subscribeMessage("mem-pool-block-added-included-tx", {
-    //             txIdHex,
-    //             blockHeight: block.height,
-    //             tx: transaction.toBuffer(),
-    //         }, true, false);
-    //
-    //
-    // }
-    //
-    // async onTransactionRemovedMainChain(transaction){
-    //
-    //     const txIdHex = transaction.hash().toString("hex");
-    //
-    //     if (!this.transactions[ txIdHex ])
-    //         await this._insertTransactionInMemPool(transaction, true, false);
-    //
-    //     delete this.transactions[ txIdHex ]._memPoolIncluded;
-    //
-    //     if (this._scope.db.isSynchronized )
-    //         await this.subscribeMessage("mem-pool-block-removed-removed-tx", {
-    //             txIdHex,
-    //             tx: transaction.toBuffer(),
-    //         }, true, false);
-    //
-    // }
 
     onTransactionIncludedMainChain(transaction){
         return this._removeTransactionFromMemPool(transaction);
