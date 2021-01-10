@@ -183,7 +183,6 @@ export default class TransactionsMerkleTree extends MerkleTree {
         for (const it of leavesNonPruned) {
 
             await it.transaction.transactionSuccessfullyAdded(chain, chainData, block );
-            await this._scope.memPool.onTransactionIncludedMainChain(it.transaction, block);
 
         }
 
@@ -198,7 +197,6 @@ export default class TransactionsMerkleTree extends MerkleTree {
 
             const tx = leavesNonPruned[i].transaction;
 
-            await this._scope.memPool.onTransactionRemovedMainChain(tx);
             await tx.transactionSuccessfullyRemoved(chain, chainData, block );
         }
 

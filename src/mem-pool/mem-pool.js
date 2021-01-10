@@ -267,8 +267,28 @@ export default  class MemPool {
 
     }
 
+    async updateMemPoolWithMainChainChanges(blocksAdded, blocksRemoved){
+
+        //removing txs from the mem pool
+        const txAlreadyIncluded = {};
+        for (const block of blocksAdded) {
+            const leavesNonPruned = await block.transactionsMerkleTree.leavesNonPruned();
+            for (const it of leavesNonPruned) {
+                txAlreadyIncluded[it.transaction.hash().toString('hex')] = true;
+                await this._scope.memPool.onTransactionRemovedMainChain(it.transaction, block);
+            }
+        }
+
+        for (const blockRemoved of blocksRemoved) {
+            const leavesNonPruned = await blockRemoved.transactionsMerkleTree.leavesNonPruned();
+            for (const it of leavesNonPruned)
+                if ( !txAlreadyIncluded[ it.transaction.hash().toString('hex') ] )
+                    await this._scope.memPool.onTransactionIncludedMainChain(it.transaction, blockRemoved);
+        }
+    }
+
     onTransactionIncludedMainChain(transaction){
-        return this._removeTransactionFromMemPool(transaction);
+        return this._removeTransactionFromMemPool(transaction, true, );
     }
 
     onTransactionRemovedMainChain(transaction){

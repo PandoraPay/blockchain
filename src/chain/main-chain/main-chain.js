@@ -83,14 +83,14 @@ export default class MainChain extends BaseChain {
                     //let's reset the virtual HashMaps
                     this.data.resetState();
 
+                } else if (message.name === "propagate-new-block"){
+
+                    await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
+
                     await this.emit("blocks/included", {
                         data: { end: this.data.end},
                         senderSockets: {},
                     });
-
-                } else if (message.name === "propagate-new-block"){
-
-                    await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
 
                 }
 
@@ -156,10 +156,7 @@ export default class MainChain extends BaseChain {
         //make a copy
         const oldData = this.data;
 
-        const revertBackError = {
-            saveBlocks: [],
-            deleteBlocks: [],
-        };
+        const revertBackError = [];
 
         try{
 
@@ -241,7 +238,8 @@ export default class MainChain extends BaseChain {
 
                     //successfully deleted
                     await block.delete();
-                    revertBackError.saveBlocks.push(block);
+                    revertBackError.push({ type: "save",  block }) //mark as saved so it can be processed in case of an error
+
                     //successfully removed
                     await block.successfullyRemoved( this, newData );
                 }
@@ -260,7 +258,7 @@ export default class MainChain extends BaseChain {
 
                     const block = blocks[i];
                     await block.save();
-                    revertBackError.deleteBlocks.push(block);
+                    revertBackError.push({ type: "delete",  block }) //mark as saved so it can be processed in case of an error
 
                     this._scope.logger.warn(this, "saving block successfully added", blocks[i].height );
                     await block.successfullyAdded( this, newData );
@@ -289,7 +287,7 @@ export default class MainChain extends BaseChain {
 
             oldData.beingSaved = false; //oldData is no longer used, so it will not have any effect
 
-            if (this._scope.db.isSynchronized ) {
+            if (this._scope.db.isSynchronized )
                 await this.dataSubscription.subscribeMessage("update-main-chain", {
                     start: newData.start,
                     end: newData.end,
@@ -302,11 +300,12 @@ export default class MainChain extends BaseChain {
                     prevKernelHash: newData.prevKernelHash,
                 }, true, false);
 
-                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
-
-            }
-
             this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
+
+            await this._scope.memPool.updateMemPoolWithMainChainChanges( blocks, blocksRemoved );
+
+            if (this._scope.db.isSynchronized )
+                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
 
             await this.emit("blocks/included", {
                 data: { blocks: blocks, end: this.end},
@@ -326,11 +325,12 @@ export default class MainChain extends BaseChain {
 
                 this.data = oldData;
 
-                for (const block of revertBackError.deleteBlocks)
-                    await block.delete();
-
-                for (const block of revertBackError.saveBlocks)
-                    await block.save();
+                for (const data of revertBackError){
+                    if (data.type === "save")
+                        await data.block.save();
+                    else if (data.type === "delete")
+                        await data.block.delete();
+                }
 
                 oldData.clearOnlyLocalBlocks();
 
