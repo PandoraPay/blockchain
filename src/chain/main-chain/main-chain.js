@@ -83,10 +83,15 @@ export default class MainChain extends BaseChain {
                     //let's reset the virtual HashMaps
                     this.data.resetState();
 
-                    this.emit("blocks/included", {
+                    await this.emit("blocks/included", {
                         data: { end: this.data.end},
                         senderSockets: {},
                     });
+
+                } else if (message.name === "propagate-new-block"){
+
+                    await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
+
                 }
 
             });
@@ -284,7 +289,7 @@ export default class MainChain extends BaseChain {
 
             oldData.beingSaved = false; //oldData is no longer used, so it will not have any effect
 
-            if (this._scope.db.isSynchronized )
+            if (this._scope.db.isSynchronized ) {
                 await this.dataSubscription.subscribeMessage("update-main-chain", {
                     start: newData.start,
                     end: newData.end,
@@ -297,12 +302,18 @@ export default class MainChain extends BaseChain {
                     prevKernelHash: newData.prevKernelHash,
                 }, true, false);
 
+                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
+
+            }
+
             this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
 
-            this.emit("blocks/included", {
+            await this.emit("blocks/included", {
                 data: { blocks: blocks, end: this.end},
                 senderSockets,
             });
+
+            await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
 
             //TODO mark that the chain was saved correctly
 

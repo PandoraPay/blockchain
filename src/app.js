@@ -208,9 +208,11 @@ export default class App extends Kernel.utils.App {
         this.events.on("master-cluster/initialized", async (masterCluster) => {
 
             if (masterCluster) {
-                const commonSocketRouterPlugins = [];
 
-                const checkPlugin = async (plugins, pluginClass) => {
+                const commonSocketRouterPlugins = [];
+                const commonSocketRouterPluginsMap = {};
+
+                const checkPlugin = async (plugins, pluginsMap, pluginClass, pluginName) => {
 
                     for (let i = 0; i < plugins.length; i++)
                         if (plugins[i] instanceof pluginClass) {
@@ -220,24 +222,27 @@ export default class App extends Kernel.utils.App {
                             return;
                         }
 
-                    plugins.push(new pluginClass(masterCluster._scope));
+                    const plugin = new pluginClass(masterCluster._scope);
+                    plugins.push(plugin);
+                    pluginsMap[pluginName] = plugin;
                 };
 
                 await Promise.all([
-                    checkPlugin(commonSocketRouterPlugins, AccountCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, TokenCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, BlockchainCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, BlockchainProtocolCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, TransactionsCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, WalletCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, WalletStakesCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, ForgingCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, MemPoolCommonSocketRouterPlugin),
-                    checkPlugin(commonSocketRouterPlugins, ExchangeCommonSocketRouterPlugin),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, AccountCommonSocketRouterPlugin, 'accountCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, TokenCommonSocketRouterPlugin, 'tokenCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, BlockchainCommonSocketRouterPlugin, 'blockchainCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, BlockchainProtocolCommonSocketRouterPlugin, 'blockchainProtocolCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, TransactionsCommonSocketRouterPlugin, 'transactionsCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, WalletCommonSocketRouterPlugin, 'walletCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, WalletStakesCommonSocketRouterPlugin, 'walletStakesCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, ForgingCommonSocketRouterPlugin, 'forgingCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, MemPoolCommonSocketRouterPlugin, 'memPoolCommonSocketRouterPlugin'),
+                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, ExchangeCommonSocketRouterPlugin, 'exchangeCommonSocketRouterPlugin'),
                 ]);
 
                 //setting the clusters for clients and server
                 this.setScope({_scope: masterCluster._scope}, "commonSocketRouterPlugins", commonSocketRouterPlugins);
+                this.setScope({_scope: masterCluster._scope}, "commonSocketRouterPluginsMap", commonSocketRouterPluginsMap);
 
             }
 

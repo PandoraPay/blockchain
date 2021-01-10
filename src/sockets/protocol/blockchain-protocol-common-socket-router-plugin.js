@@ -18,16 +18,6 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
 
         this._scope.events.on("start/chain-created", ()=>{
 
-            this._scope.mainChain.on( "blocks/included", ( {data, senderSockets } ) => {
-
-                /**
-                 * Sending notification that a new block was received
-                 */
-
-                this._scope.masterCluster.broadcastToSocketsAsync("blockchain-protocol/new-block", this._getBlockchainInfo(), senderSockets);
-
-
-            });
 
         });
 
@@ -392,6 +382,10 @@ export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRo
     _propagateNewBlock(sock){
         sock.emit("blockchain-protocol/new-block", this._getBlockchainInfo() );
         return false;
+    }
+
+    async propagateNewBlock(senderSockets){
+        return this._scope.masterCluster.broadcastToSocketsAsync("blockchain-protocol/new-block", this._getBlockchainInfo(), senderSockets);
     }
 
     _getBlockchainInfo(){

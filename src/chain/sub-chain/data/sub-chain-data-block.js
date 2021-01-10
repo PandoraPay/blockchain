@@ -2,7 +2,6 @@ const {Helper, Exception} = global.kernel.helpers;
 const {DBSchema} = global.kernel.marshal.db;
 const {DBSchemaBuffer, DBSchemaString} = global.kernel.marshal.db.samples;
 
-import BaseChainData from "../../base/base-chain-data";
 import Block from "src/block/block"
 
 export default class SubChainDataBlock extends DBSchema {
