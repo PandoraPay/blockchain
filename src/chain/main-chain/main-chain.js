@@ -65,34 +65,41 @@ export default class MainChain extends BaseChain {
 
             await this.dataSubscription.subscribe();
             this.dataSubscription.subscription.on( async message => {
-                
-                if (message.name === "update-main-chain"){
 
-                    this._scope.logger.warn(this, "update-main-chain", message.data.end-1 );
+                try{
 
-                    this.data.end = message.data.end;
-                    this.data.start = message.data.start;
-                    this.data.transactionsIndex = message.data.transactionsIndex;
-                    this.data.tokensIndex = message.data.tokensIndex;
-                    this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( message.data.chainwork) );
-                    this.data.hash = Buffer.from(message.data.hash );
-                    this.data.prevHash = Buffer.from( message.data.prevHash );
-                    this.data.kernelHash = Buffer.from( message.data.kernelHash );
-                    this.data.prevKernelHash = Buffer.from( message.data.prevKernelHash );
+                    if (message.name === "update-main-chain"){
 
-                    //let's reset the virtual HashMaps
-                    this.data.resetState();
+                        this._scope.logger.warn(this, "update-main-chain", message.data.end-1 );
 
-                } else if (message.name === "propagate-new-block"){
+                        this.data.end = message.data.end;
+                        this.data.start = message.data.start;
+                        this.data.transactionsIndex = message.data.transactionsIndex;
+                        this.data.tokensIndex = message.data.tokensIndex;
+                        this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( message.data.chainwork) );
+                        this.data.hash = Buffer.from(message.data.hash );
+                        this.data.prevHash = Buffer.from( message.data.prevHash );
+                        this.data.kernelHash = Buffer.from( message.data.kernelHash );
+                        this.data.prevKernelHash = Buffer.from( message.data.prevKernelHash );
 
-                    await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
+                        //let's reset the virtual HashMaps
+                        this.data.resetState();
 
-                    await this.emit("blocks/included", {
-                        data: { end: this.data.end},
-                        senderSockets: {},
-                    });
+                    } else if (message.name === "propagate-new-block"){
 
+                        await this.emit("blocks/included", {
+                            data: { end: this.data.end},
+                            senderSockets: {},
+                        });
+
+                        await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
+
+                    }
+
+                }catch(err){
+                    this._scope.logger.error(this, "Mainchain subscription raised an error", err);
                 }
+
 
             });
 
@@ -149,16 +156,22 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.warn(this, 'Locking...', blocks.map( it => it.height ));
 
-        const lock = await this.data.lock( -1,  );
-
-        this._scope.logger.warn(this, 'Lock obtained', blocks.map( it => it.height ));
-
-        //make a copy
-        const oldData = this.data;
-
-        const revertBackError = [];
+        let lock;
 
         try{
+
+            lock = await this.data.lock( 10*60*1000, -1 );
+            if (!lock){
+                this._scope.logger.warn(this, 'Locked failed', blocks.map( it => it.height ));
+                return false;
+            }
+
+            this._scope.logger.warn(this, 'Lock obtained', blocks.map( it => it.height ));
+
+            //make a copy
+            const oldData = this.data;
+
+            const revertBackError = [];
 
             const newData = this.cloneData();
 
@@ -304,13 +317,13 @@ export default class MainChain extends BaseChain {
 
             await this._scope.memPool.updateMemPoolWithMainChainChanges( blocks, blocksRemoved );
 
-            if (this._scope.db.isSynchronized )
-                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
-
             await this.emit("blocks/included", {
                 data: { blocks: blocks, end: this.end},
                 senderSockets,
             });
+
+            if (this._scope.db.isSynchronized )
+                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
 
             await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
 
@@ -341,11 +354,10 @@ export default class MainChain extends BaseChain {
                 this._scope.logger.error(this, "addBlock catch error raised an error", err2);
             }
 
+        }finally{
+            this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
+            if (typeof lock === "function") await lock();
         }
-
-        this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
-
-        if (lock) await lock();
 
         return result;
 
