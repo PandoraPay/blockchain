@@ -16,7 +16,7 @@ export default class Forging  {
         /**
          * Reset
          */
-        this._reset = false;
+        this.reset = false;
 
 
         this.forgeBlock = new ForgeBlock({
@@ -38,7 +38,7 @@ export default class Forging  {
     initializeForging(){
 
         this._scope.mainChain.on("blocks/included", ()=>{
-            this._reset = true;
+            this.reset = true;
         });
 
         return true;
@@ -56,7 +56,7 @@ export default class Forging  {
 
     async _started(){
         this._scope.logger.info(this, "Forging was started");
-        this._reset = true;
+        this.reset = true;
         this._forgingInterval = setAsyncInterval( this._forge.bind(this), 300 );
         this._forgingResetHashRateInterval = setInterval( this._resetHashrate.bind(this), 1000);
     }
@@ -73,7 +73,7 @@ export default class Forging  {
 
     async _stopped(){
 
-        this._reset = true;
+        this.reset = true;
         await clearAsyncInterval(this._forgingInterval);
         clearInterval(this._forgingResetHashRateInterval);
 
@@ -86,16 +86,16 @@ export default class Forging  {
         try{
 
             //create a new block
-            if ( this._reset || !this._work.block ){
+            if ( this.reset || !this._work.block ){
                 this._work.block = await this.forgeBlock. createBlockForging(  );
                 if (!this._work.block) return;
                 this._work.timestamp = this._work.block.timestamp;
-                this._reset = false;
+                this.reset = false;
             }
 
             const mined = await this.forgeBlock.forgeBlockWithWallet( this._work.block);
 
-            if (mined && !this._scope._reset){
+            if (mined && !this.reset){
 
                 this._scope.logger.info( this, "BLOCK FORGED", { block: this._work.block.height, timestamp: this._work.block.timestamp, totalDifficulty: this._work.block.totalDifficulty.toString(), target: this._work.block.target.toString("hex") } );
                 this._scope.logger.info( this, "target", { target: this._work.block.target.toString("hex") } );
@@ -103,21 +103,21 @@ export default class Forging  {
                 if ( await this._work.block.validateBlock( this._scope.mainChain ) !== true )
                     throw new Exception(this, "Block is invalid");
 
-                if (!this._scope._reset) {
+                if (!this.reset) {
 
                     const out = await this._scope.mainChain.addBlocks([this._work.block]);
 
                     if (out && this.onBlockForged)
                         await this.onBlockForged(this._work.block);
                     else
-                        this._reset = true;
+                        this.reset = true;
 
                 }
 
             }
 
         }catch(err){
-            this._reset = true;
+            this.reset = true;
 
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "Error forging", err);

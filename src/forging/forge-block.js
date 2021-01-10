@@ -49,7 +49,6 @@ export default class ForgeBlock {
 
         block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
 
-
         //fill POS information into block
 
         try{
@@ -65,6 +64,8 @@ export default class ForgeBlock {
             return false;
         }
 
+        if (this._scope.forging.reset) return false;
+
         const kernelHash = block.kernelHash();
         this._hashrate++;
 
@@ -77,6 +78,8 @@ export default class ForgeBlock {
             console.log("");
 
             const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeys();
+
+            if (this._scope.forging.reset) return false;
 
             if ( delegated && delegateFee )
                 block.pos.stakeDelegateRewardPublicKeyHash = walletStakeDelegateRewardPublicKeyHash;
@@ -110,10 +113,10 @@ export default class ForgeBlock {
 
         const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].keys.decryptPublicKeyHash();
 
-        while (block.timestamp < networkTimestampDrift && !this._scope.forging._reset){
+        while (block.timestamp < networkTimestampDrift && !this._scope.forging.reset){
 
             //my own addresses
-            for (let i=0; i < this._scope.wallet.addresses.length && !this._scope.forging._reset; i++){
+            for (let i=0; i < this._scope.wallet.addresses.length && !this._scope.forging.reset; i++){
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
@@ -129,7 +132,7 @@ export default class ForgeBlock {
             }
 
             //delegatedStakes to coldStaking
-            for (let i=0; i < this._scope.walletStakes.delegatedStakes.length && !this._scope.forging._reset; i++){
+            for (let i=0; i < this._scope.walletStakes.delegatedStakes.length && !this._scope.forging.reset; i++){
 
                 const delegatedStake = this._scope.walletStakes.delegatedStakes[i];
 

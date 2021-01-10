@@ -416,7 +416,7 @@ export default  class MemPool {
             answer.resolve(true);
             delete this._transactionsInsertingPromises[txIdHex];
         }
-
+        return answer.promise;
     }
 
     async _propagateTransactionInMemPool(txId,  awaitPropagate, senderSockets){
