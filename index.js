@@ -33,11 +33,6 @@ const BaseChainData = require('src/chain/base/base-chain-data').default;
 const SubChain = require('src/chain/sub-chain/sub-chain').default;
 const TestsFiles = require("tests/tests/tests-index").default;
 const MemPool = require("src/mem-pool/mem-pool").default;
-const Exchange = require("src/exchange/exchange").default;
-const ExchangeOffer = require("src/exchange/data/exchange-offer").default;
-const ExchangeOfferPayment = require("src/exchange/data/exchange-offer-payment").default;
-const ExchangeOfferPaymentTypeEnum = require("src/exchange/data/exchange-offer-type-enum").default;
-const ExchangeAvailablePayments = require("src/exchange/data/available-payments").default;
 
 const Wallet = require("src/wallet/wallet").default;
 const WalletAddress = require("src/wallet/addresses/wallet-address").default;
@@ -108,14 +103,6 @@ const library = {
             WalletAddressTypeEnum,
         },
 
-    },
-
-    exchange:{
-        Exchange,
-        ExchangeOffer,
-        ExchangeOfferPayment,
-        ExchangeOfferPaymentTypeEnum,
-        ExchangeAvailablePayments
     },
 
     utils: {

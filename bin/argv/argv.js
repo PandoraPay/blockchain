@@ -6,7 +6,6 @@ import ArgvTransactions from "./modules/transactions/argv-transactions"
 import ArgvForging from "./modules/forging/argv-forging"
 import ArgvWallet from "./modules/wallet/argv-wallet"
 import ArgvWalletStakes from "./modules/wallet-stakes/argv-wallet-stakes"
-import ArgvExchange from "./modules/exchange/argv-exchange"
 import ArgvTestnet from "./modules/testnet/argv-testnet"
 import ArgvMemPool from "./modules/mem-pool/argv-mem-pool"
 
@@ -24,7 +23,6 @@ export default (argv) => Helper.merge( argv, {
     forging: ArgvForging,
     wallet: ArgvWallet,
     walletStakes: ArgvWalletStakes,
-    exchange: ArgvExchange,
 
     memPool: ArgvMemPool,
     testnet: ArgvTestnet,

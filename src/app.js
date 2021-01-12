@@ -21,9 +21,7 @@ import WalletStakesCommonSocketRouterPlugin from "src/sockets/protocol/wallet-st
 import ForgingCommonSocketRouterPlugin from "src/sockets/protocol/forging-common-socket-router-plugin"
 import BlockchainProtocolCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-protocol-common-socket-router-plugin"
 import MemPoolCommonSocketRouterPlugin from "src/sockets/protocol/mem-pool-common-socket-router-plugin"
-import ExchangeCommonSocketRouterPlugin from "src/sockets/protocol/exchange-common-socket-router-plugin"
 import MemPool from "src/mem-pool/mem-pool"
-import Exchange from "src/exchange/exchange"
 
 import Testnet from "./testnet/testnet"
 
@@ -55,9 +53,6 @@ export default class App extends Kernel.utils.App {
         if ( await this._scope.memPool.initializeMemPool() !== true)
             throw new Exception(this, "MemPool couldn't be initialized");
 
-        if ( await this._scope.exchange.initializeExchange() !== true)
-            throw new Exception(this, "Exchange couldn't be initialized");
-
         if ( await this._scope.forging.initializeForging() !== true)
             throw new Exception(this, "Forging couldn't be initialized");
 
@@ -85,7 +80,6 @@ export default class App extends Kernel.utils.App {
             if ( !this._scope.Genesis ) this._scope.Genesis = Genesis;
             if ( !this._scope.MemPool) this._scope.MemPool = MemPool;
             if ( !this._scope.Testnet) this._scope.Testnet = Testnet;
-            if ( !this._scope.Exchange) this._scope.Exchange = Exchange;
 
             this._scope.argv = Argv(this._scope.argv);
 
@@ -152,8 +146,6 @@ export default class App extends Kernel.utils.App {
 
             if (!this._scope.memPool) this._scope.memPool = new this._scope.MemPool(this._scope,);
             await this._scope.memPool.reload();
-
-            if (!this._scope.exchange) this._scope.exchange = new this._scope.Exchange(this._scope,);
 
             if (!this.wallet){
 
@@ -237,7 +229,6 @@ export default class App extends Kernel.utils.App {
                     checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, WalletStakesCommonSocketRouterPlugin, 'walletStakesCommonSocketRouterPlugin'),
                     checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, ForgingCommonSocketRouterPlugin, 'forgingCommonSocketRouterPlugin'),
                     checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, MemPoolCommonSocketRouterPlugin, 'memPoolCommonSocketRouterPlugin'),
-                    checkPlugin(commonSocketRouterPlugins, commonSocketRouterPluginsMap, ExchangeCommonSocketRouterPlugin, 'exchangeCommonSocketRouterPlugin'),
                 ]);
 
                 //setting the clusters for clients and server
@@ -286,6 +277,5 @@ export default class App extends Kernel.utils.App {
     get forging(){ return this._scope.forging }
     get mainChain(){ return this._scope.mainChain }
     get genesis(){ return this._scope.genesis }
-    get exchange(){ return this._scope.exchange }
 
 }
