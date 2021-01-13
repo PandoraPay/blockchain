@@ -3,7 +3,7 @@ const {Helper, Exception} = global.kernel.helpers;
 
 import TokenHashMapData from "./data/token-hash-map-data"
 
-export default class AccountHashMapElement extends HashMapElement {
+export default class TokenHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 

@@ -1,5 +1,4 @@
 
-const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
 const {Helper, Exception} = global.kernel.helpers;
 const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
@@ -31,11 +30,10 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
                 },
 
                 vout:{
-                    minSize: 0,
-                    maxSize: 0,
-                    fixedBytes: 0,
+                    minSize: 1,
+                    maxSize: 1,
+                    fixedBytes: 1,
                     specifyLength: false,
-                    emptyAllowed: true,
                 },
 
                 tokenPublicKeyHash:{
@@ -65,6 +63,15 @@ export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSi
         if (!out) return false;
 
         if ( this.tokenData.supply !== 0) throw new Exception(this, 'TokenData supply needs to be zero');
+
+        if (this.vout.length !== 1 || !this.vout[0].publicKeyHash.equals(this._scope.argv.blockchain.genesis.BURN_PUBLIC_KEY_HASH) )
+            throw new Exception(this, 'A burning fee has to be paid');
+
+        if (!this._scope.argv.transactions.tokens.validateCreateTokenFee( this.vout[0].amount, block.height ))
+            throw new Exception(this, 'Fee too small for creating a new token to avoid spamming with useless tokens');
+
+        if (!this.vout[0].tokenCurrency.equals(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id) )
+            throw new Exception(this, 'TokenCurrency for creating a new token to avoid spamming with useless tokens is invalid');
 
         const balance = await chainData.accountHashMap.getBalance( this.vin[0].publicKeyHash  ) || 0;
         if ( !balance) throw new Exception(this, "account doesn't exist");

@@ -29,7 +29,7 @@ var createToken = async (name, description, ticker, maxSupply, decimalSeparator)
             ticker,
             maxSupply,
             decimalSeparator,
-            printerPublicKeyHash: mainAddress.publicKeyHash,
+            verificationPublicKey: mainAddress.publicKey,
             supply: 0, //it needs to be 0
 
         },

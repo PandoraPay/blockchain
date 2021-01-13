@@ -28,7 +28,6 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
                     specifyLength: false,
                 },
 
-
                 vout:{
                     minSize: 0,
                     maxSize: 0,
@@ -78,8 +77,8 @@ export default class BlockchainTokenUpdateSupplySimpleTransaction extends Blockc
         const token = await chainData.tokenHashMap.getTokenNode( this.tokenPublicKeyHash );
         if (!token) throw new Exception(this, `Token doesn't exist`);
 
-        if (!token.printerPublicKeyHash.equals(this.vin[0].publicKeyHash)) //validate the printer public key hash
-            throw new Exception(this, 'printerPublicKeyHash is not matching');
+        if (!token.verificationPublicKey.equals(this.vin[0].publicKey)) //validate the printer public key hash
+            throw new Exception(this, 'verificationPublicKey is not matching');
 
         const newSupply = token.supply + this.supplySignValue * this.supplyValue;
         if ( newSupply > token.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });

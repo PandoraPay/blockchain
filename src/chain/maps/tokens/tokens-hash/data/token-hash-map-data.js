@@ -13,7 +13,8 @@ export default class TokenHashMapData extends DBSchema{
 
                 version: {
                     type: "number",
-                    fixedBytes: 1,
+                    minLength: 1,
+                    maxLength: 2,
 
                     default: 0,
                     validation(version){
@@ -42,7 +43,7 @@ export default class TokenHashMapData extends DBSchema{
                     type: 'string',
 
                     minSize: 2,
-                    maxSize: 6,
+                    maxSize: 7,
 
                     /**
                      * only lowercase ascii is allowed. No space allowed
@@ -79,10 +80,10 @@ export default class TokenHashMapData extends DBSchema{
                     position: 105,
                 },
 
-                printerPublicKeyHash:{
+                verificationPublicKey:{
 
                     type: "buffer",
-                    fixedBytes: 20,
+                    fixedBytes: 32,
 
                     position: 106,
                 },
