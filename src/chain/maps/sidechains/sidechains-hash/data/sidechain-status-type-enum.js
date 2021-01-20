@@ -1,0 +1,16 @@
+//THEY MUST BE IN HEX
+
+export default {
+
+    SIDECHAIN_STATUS_DISABLED: 0,
+
+    SIDECHAIN_STATUS_ENABLED: 1,
+
+    SIDECHAIN_STATUS_TEMPORARY_BLOCKED: 2,
+
+    SIDECHAIN_STATUS_BLOCKED: 3,
+
+    _name: "SidechainStatusTypeEnum",
+
+
+}
