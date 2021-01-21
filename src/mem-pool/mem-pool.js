@@ -4,8 +4,6 @@ const {DBSchemaBufferBig, DBSchemaString} = global.kernel.marshal.db.samples;
 const {BaseTransaction} = global.cryptography.transactions.base;
 const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
 
-import MemPoolTxData from "./data/mem-pool-tx-data";
-
 export default  class MemPool {
 
     constructor(scope){
@@ -83,12 +81,12 @@ export default  class MemPool {
                     }
                     else if (message.name === "mem-pool-propagate-tx-sockets"){
                         if (this.transactions[ message.data.txIdHex ])
-                            await this._propagateTransactionInMemPool( message.data.txId,  message.data.awaitPropagate,  );
+                            await this._propagateTransactionInMemPool( message.data.txId,  message.data.awaitPropagate );
                     }
                     else if (message.name === "mem-pool-remove-tx"){
 
                         if (this.transactions[ message.data.txIdHex ])
-                            await this._removeTransactionFromMemPool(message.data.txId, message.data.tx, false);
+                            await this._removeTransactionFromMemPool(message.data.txId, false);
 
                     }
 
@@ -225,7 +223,7 @@ export default  class MemPool {
 
                 if (tx.nonce < nonce){
                     console.log("delete tx.nonce", tx.nonce, nonce);
-                    await this._removeTransactionFromMemPool(tx);
+                    await this._removeTransactionFromMemPool( tx.hash(), true );
                     if (array[i] !== tx) i--;
                 }
                 else if (tx.nonce === nonce) { //real tx and not only reserved nonce
@@ -312,7 +310,6 @@ export default  class MemPool {
         const txIdHex = txId.toString("hex");
 
         if (this.transactions[ txIdHex ]) return false;
-
         if (this._transactionsInsertingPromises[txIdHex]) return this._transactionsInsertingPromises[txIdHex].promise;
 
         let answer;
@@ -320,6 +317,7 @@ export default  class MemPool {
             answer = { resolve, reject }
         });
         answer.promise = promise;
+        this._transactionsInsertingPromises[txIdHex] = answer;
 
         try{
 
@@ -404,7 +402,6 @@ export default  class MemPool {
                 if (propagateToSockets)
                     await this.dataSubscription.subscribeMessage("mem-pool-propagate-tx-sockets", {
                         txId, txIdHex,
-                        propagateToSockets,
                         awaitPropagate,
                     }, true, false);
 
@@ -432,7 +429,7 @@ export default  class MemPool {
 
     }
 
-    async _removeTransactionFromMemPool(txId, transaction, propagateToMasterCluster = true, senderSockets){
+    async _removeTransactionFromMemPool(txId, propagateToMasterCluster = true){
 
         if (typeof txId === "string" ){
             if ( !StringHelper.isHex(txId) || txId.length !== 64 ) throw new Exception(this, 'TxId length is invalid or is not hex');
@@ -441,11 +438,8 @@ export default  class MemPool {
         if ( !Buffer.isBuffer(txId) || txId.length !== 32) throw new Exception(this, 'TxId is invalid');
         const txIdHex = txId.toString("hex");
 
-        if (!this.transactions[txIdHex] ) return false;
-
-        if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) ) {
-            transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
-        }
+        const transaction = this.transactions[txIdHex];
+        if ( !transaction ) return false;
 
         if (!transaction.hash().equals(txId)) throw new Exception(this, 'transaction is invalid');
 
@@ -486,13 +480,11 @@ export default  class MemPool {
 
         if (propagateToMasterCluster && this._scope.db.isSynchronized )
             await this.dataSubscription.subscribeMessage("mem-pool-remove-tx", {
-                tx: transaction.toBuffer(),
                 txId, txIdHex,
             }, true, false);
 
         await this._scope.mainChain.emit("mem-pool/tx-removed", {
             data: { tx: transaction, txId, txIdHex},
-            senderSockets,
         });
 
         return true;
