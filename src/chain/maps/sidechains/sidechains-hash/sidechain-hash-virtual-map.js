@@ -1,4 +1,6 @@
 import TokenHashMapElement from "../../tokens/tokens-hash/token-hash-map-element";
+const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
+const {Helper, Exception, EnumHelper} = global.kernel.helpers;
 
 export default class SidechainHashVirtualMap extends HashVirtualMap {
 

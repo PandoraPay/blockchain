@@ -1,5 +1,4 @@
-import BlockchainTokenCreateSimpleTransaction
-    from "../../../transactions/tokens/token-create-simple-transaction/blockchain-token-create-simple-transaction";
+import BlockchainTokenCreateSimpleTransaction from "src/transactions/tokens/token-create/blockchain-token-create-simple-transaction";
 
 const {MerkleTree} = global.kernel.dataStructures.merkleTree;
 const {Helper, Exception} = global.kernel.helpers;
