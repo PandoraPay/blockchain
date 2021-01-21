@@ -21,9 +21,6 @@ import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-m
 import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
 import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
 
-import SidechainHashVirtualMap from "../maps/sidechains/sidechains-hash/sidechain-hash-virtual-map";
-import SidechainNameVirtualMap from "../maps/sidechains/sidechains-name-map/sidechain-name-virtual-map";
-
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
 
@@ -185,16 +182,6 @@ export default class BaseChainData extends DBSchema {
             chainData: this,
         });
 
-        this.sidechainHashMap = new this._sidechainHashMapClass({
-            ...this._scope,
-            chainData: this,
-        })
-
-        this.sidechainNameHashMap = new this._sidechainNameMapClass({
-            ...this._scope,
-            chainData: this,
-        })
-
         this.addressTxHashMap = new this._addressTxHashMapClass({
             ...this._scope,
             chainData: this,
@@ -253,15 +240,6 @@ export default class BaseChainData extends DBSchema {
 
     get _tokenTickerHashMapClass(){
         return TokenTickerVirtualMap;
-    }
-
-
-    get _sidechainHashMapClass(){
-        return SidechainHashVirtualMap;
-    }
-
-    get _sidechainNameMapClass(){
-        return SidechainNameVirtualMap;
     }
 
     get _addressTxHashMapClass(){
