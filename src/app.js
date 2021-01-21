@@ -128,7 +128,7 @@ export default class App extends Kernel.utils.App {
 
                 }
 
-                //this._scope.logger.info(this, 'genesisSettings.timestamp', genesisSettings.timestamp);
+                this._scope.logger.info(this, 'genesisSettings.timestamp', genesisSettings.timestamp);
 
                 /**
                  * Genesis is a block and it will use genesisSettings
