@@ -63,36 +63,34 @@ export default class MainChain extends BaseChain {
 
         if ( this._scope.db.isSynchronized ) {
 
-            await this.dataSubscription.subscribe();
-            this.dataSubscription.subscription.on( async message => {
-
+            this._scope.masterCluster.on("main-chain", async data =>{
                 try{
 
-                    if (message.name === "update-main-chain"){
+                    if (data.message === "main-chain/update-main-chain"){
 
-                        this._scope.logger.warn(this, "update-main-chain", message.data.end-1 );
+                        this._scope.logger.warn(this, "main-chain/update-main-chain", data.end-1 );
 
-                        this.data.end = message.data.end;
-                        this.data.start = message.data.start;
-                        this.data.transactionsIndex = message.data.transactionsIndex;
-                        this.data.tokensIndex = message.data.tokensIndex;
-                        this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( message.data.chainwork) );
-                        this.data.hash = Buffer.from(message.data.hash );
-                        this.data.prevHash = Buffer.from( message.data.prevHash );
-                        this.data.kernelHash = Buffer.from( message.data.kernelHash );
-                        this.data.prevKernelHash = Buffer.from( message.data.prevKernelHash );
+                        this.data.end = data.end;
+                        this.data.start = data.start;
+                        this.data.transactionsIndex = data.transactionsIndex;
+                        this.data.tokensIndex = data.tokensIndex;
+                        this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( data.chainwork) );
+                        this.data.hash = Buffer.from( data.hash );
+                        this.data.prevHash = Buffer.from( data.prevHash );
+                        this.data.kernelHash = Buffer.from( data.kernelHash );
+                        this.data.prevKernelHash = Buffer.from( data.prevKernelHash );
 
                         //let's reset the virtual HashMaps
                         this.data.resetState();
 
-                    } else if (message.name === "propagate-new-block"){
+                    } else if (data.message === "main-chain/propagate-new-block"){
 
                         await this.emit("blocks/included", {
                             data: { end: this.data.end},
                             senderSockets: {},
                         });
 
-                        await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(message.data.senderSockets);
+                        await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(data.senderSockets);
 
                     }
 
@@ -100,8 +98,8 @@ export default class MainChain extends BaseChain {
                     this._scope.logger.error(this, "Mainchain subscription raised an error", err);
                 }
 
-
             });
+
 
         }
 
@@ -301,7 +299,8 @@ export default class MainChain extends BaseChain {
             oldData.beingSaved = false; //oldData is no longer used, so it will not have any effect
 
             if (this._scope.db.isSynchronized )
-                await this.dataSubscription.subscribeMessage("update-main-chain", {
+                await this._scope.masterCluster.sendMessage("main-chain", {
+                    message: "main-chain/update-main-chain",
                     start: newData.start,
                     end: newData.end,
                     transactionsIndex: newData.transactionsIndex,
@@ -323,7 +322,7 @@ export default class MainChain extends BaseChain {
             });
 
             if (this._scope.db.isSynchronized )
-                await this.dataSubscription.subscribeMessage("propagate-new-block", { }, true, false );
+                await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/propagate-new-block" }, true, false );
 
             await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
 

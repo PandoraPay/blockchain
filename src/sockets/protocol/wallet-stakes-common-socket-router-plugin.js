@@ -59,9 +59,10 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
 
             if (this._scope.argv.walletStakes.allowDelegatingPrivateKey) throw new Exception(this, "You need to delegate first. Your stake is not delegated");
             else {
-                const privateKey = await this._scope.walletStakes.dataSubscription.subscribeMessage("get-delegator-stake-private-key", {
+                const privateKey = await this._scope.masterCluster.sendMessage("wallet-stakes", {
+                    message: "wallet-stakes/get-delegator-stake-private-key",
                     publicKey: publicKey.toString("hex"),
-                }, false, false );
+                }, false, true );
                 const privateKeyAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
                 throw new Exception(this, "You need to delegate your stake to the following public key", privateKeyAddress.publicKey );
             }
@@ -83,7 +84,8 @@ export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterP
 
         if ( !delegatePrivateKey ){
 
-            const privateKey = await this._scope.walletStakes.dataSubscription.subscribeMessage("get-delegator-stake-private-key", {
+            const privateKey = await this._scope.masterCluster.sendMessage("wallet-stakes", {
+                message: "wallet-stakes/get-delegator-stake-private-key",
                 publicKey: publicKey.toString("hex"),
             }, false, false );
 

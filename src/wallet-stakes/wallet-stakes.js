@@ -21,8 +21,6 @@ export default class WalletStakes extends DBSchema {
 
         }, schema, false), data, type, creationOptions);
 
-        this.dataSubscription = new DBSchema(this._scope, { fields: {  table: { default: "walletStakes", fixedBytes: 12 } }});
-
         this._initialized = false;
 
         this.delegatedStakes = []; //sorted by amount
@@ -34,16 +32,14 @@ export default class WalletStakes extends DBSchema {
 
         if (this._initialized) return true;
 
+        this._scope.masterCluster.on( "wallet-stakes", async data => {
 
-        await this.dataSubscription.subscribe();
-        this.dataSubscription.subscription.on( async message => {
+            this._scope.logger.warn(this, "wallet-stakes-message", data.message);
 
-            this._scope.logger.warn(this, "wallet-stakes-message", message.name);
-
-            if (message.name === "update-delegate-stake") {
+            if (data.message === "wallet-stakes/update-delegate-stake") {
 
                 try {
-                    const {publicKeyHash, delegatePublicKey, delegatePrivateKey} = message.data;
+                    const {publicKeyHash, delegatePublicKey, delegatePrivateKey} = data;
 
 
                     const oldDelegateStake = this.delegatedStakesMap[publicKeyHash];
@@ -67,9 +63,9 @@ export default class WalletStakes extends DBSchema {
                 }
 
             } else
-            if (message.name === "get-delegator-stake-private-key") { //used to get the master
+            if (data.message === "wallet-stakes/get-delegator-stake-private-key") { //used to get the master
 
-                const {publicKey} = message.data;
+                const {publicKey} = data;
 
                 const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].keys.decryptDelegatorStakePrivateAddress( publicKey );
                 return delegatorStakePrivateAddress.privateKey.toString("hex");
@@ -113,7 +109,8 @@ export default class WalletStakes extends DBSchema {
 
         try{
 
-            const exists = await this.dataSubscription.subscribeMessage("update-delegate-stake", {
+            const exists = await this._scope.masterCluster.sendMessage( "wallet-stakes", {
+                message: "wallet-stakes/update-delegate-stake",
                 publicKeyHash: publicKeyHash.toString("hex"),
                 delegatePublicKey: delegatePublicKey.toString("hex"),
                 delegatePrivateKey: delegatePrivateKey.toString("hex"),
