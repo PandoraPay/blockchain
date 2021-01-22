@@ -154,7 +154,7 @@ export default class MainChain extends BaseChain {
 
         this._scope.logger.warn(this, 'Locking...', blocks.map( it => it.height ));
 
-        let lock;
+        let lock, oldData, revertBackError = [];
 
         try{
 
@@ -167,9 +167,8 @@ export default class MainChain extends BaseChain {
             this._scope.logger.warn(this, 'Lock obtained', blocks.map( it => it.height ));
 
             //make a copy
-            const oldData = this.data;
+            oldData = this.data;
 
-            const revertBackError = [];
 
             const newData = this.cloneData();
 
@@ -333,25 +332,26 @@ export default class MainChain extends BaseChain {
             this._scope.logger.error(this, "addBlock raised an error", err);
             result = false;
 
-            try{
+            if (oldData)
+                try{
 
-                this.data = oldData;
+                    this.data = oldData;
 
-                for (const data of revertBackError){
-                    if (data.type === "save")
-                        await data.block.save();
-                    else if (data.type === "delete")
-                        await data.block.delete();
+                    for (const data of revertBackError){
+                        if (data.type === "save")
+                            await data.block.save();
+                        else if (data.type === "delete")
+                            await data.block.delete();
+                    }
+
+                    oldData.clearOnlyLocalBlocks();
+
+                    oldData.beingSaved = false;
+                    await oldData.save();
+
+                }catch(err2){
+                    this._scope.logger.error(this, "addBlock catch error raised an error", err2);
                 }
-
-                oldData.clearOnlyLocalBlocks();
-
-                oldData.beingSaved = false;
-                await oldData.save();
-
-            }catch(err2){
-                this._scope.logger.error(this, "addBlock catch error raised an error", err2);
-            }
 
         }finally{
             this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
