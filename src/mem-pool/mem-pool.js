@@ -69,17 +69,9 @@ export default  class MemPool {
 
                 try {
 
-                    if (data.message === "mem-pool-get-tx"){
-                        let tx = this.transactions[data.txIdHex];
-                        if (!tx) tx = await this._scope.mainChain.data.getTransactionByHash( data.txIdHex );
-
-                        if (tx)
-                            return tx.toHex();
-
-                    } else
                     if (data.message === "mem-pool-insert-tx"){
                         if (!this.transactions[data.txIdHex])
-                            await this._insertTransactionInMemPool( data.txId, undefined,  false, false, true, data.propagateToSockets, data.awaitPropagate, [], data._workerIndex );
+                            await this._insertTransactionInMemPool( data.txId, data.tx,  false, false, true, data.propagateToSockets, data.awaitPropagate, [], data._workerIndex );
                     }else
                     if (data.message === "mem-pool-propagate-tx-sockets"){
                         if (this.transactions[data.txIdHex])
@@ -326,25 +318,8 @@ export default  class MemPool {
 
         try{
 
-            if ( !transaction ){
-
-                this._scope.logger.log(this, 'get-tx workerIndex', { workerIndex});
-
-                const txData = await this._scope.masterCluster.sendMessage('mem-pool', {
-                    message: "mem-pool-get-tx",
-                    txIdHex,
-                }, workerIndex, false );
-
-                this._scope.logger.log(this, 'received', { txIdHex, txData});
-
-                if (!txData) throw new Exception(this, 'txData was not returned');
-
-                transaction = this._scope.mainChain.transactionsValidator.cloneTx( txData );
-
-            }else {
-                if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) )
-                    transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
-            }
+            if ( !this._scope.mainChain.transactionsValidator.isReallyATx( transaction ) )
+                transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
 
             if (!transaction.hash().equals(txId)) throw new Exception(this, 'Transaction.hash is not matching txId');
 
@@ -410,6 +385,7 @@ export default  class MemPool {
 
                 await this._scope.masterCluster.sendMessage( "mem-pool", {
                     message: "mem-pool-insert-tx",
+                    tx: transaction.toBuffer(),
                     txId, txIdHex,
                     propagateToSockets: false,
                 }, true, false );
