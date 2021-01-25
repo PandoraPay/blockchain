@@ -1,33 +1,33 @@
-const Kernel = global.kernel;
-const Network = global.networking;
-const Crytopgrahy = global.cryptography;
-const {NetworkTypeEnum} = global.kernel.enums;
-const {Helper, Exception, BufferHelper} = global.kernel.helpers;
+const kernel = require('kernel');
+const networking = require('networking');
+const cryptopgrahy = require('cryptography');
+const {NetworkTypeEnum} = require('kernel').enums;
+const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 
-import Argv from "bin/argv/argv"
-import MainChain from "src/chain/main-chain/main-chain";
-import Wallet from "src/wallet/wallet"
-import WalletStakes from "src/wallet-stakes/wallet-stakes"
-import Forging from "src/forging/forging"
+const Argv = require( "../bin/argv/argv")
+const MainChain = require( "../src/chain/main-chain/main-chain");
+const Wallet = require( "../src/wallet/wallet")
+const WalletStakes = require( "../src/wallet-stakes/wallet-stakes")
+const Forging = require( "../src/forging/forging")
 
-import Genesis from "src/block/genesis/genesis"
+const Genesis = require( "../src/block/genesis/genesis")
 
-import AccountCommonSocketRouterPlugin from "src/sockets/protocol/account-common-socket-router-plugin"
-import TokenCommonSocketRouterPlugin from "src/sockets/protocol/token-common-socket-router-plugin"
-import BlockchainCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-common-socket-router-plugin"
-import TransactionsCommonSocketRouterPlugin from "src/sockets/protocol/transactions-common-socket-router-plugin"
-import WalletCommonSocketRouterPlugin from "src/sockets/protocol/wallet-common-socket-router-plugin"
-import WalletStakesCommonSocketRouterPlugin from "src/sockets/protocol/wallet-stakes-common-socket-router-plugin"
-import ForgingCommonSocketRouterPlugin from "src/sockets/protocol/forging-common-socket-router-plugin"
-import BlockchainProtocolCommonSocketRouterPlugin from "src/sockets/protocol/blockchain-protocol-common-socket-router-plugin"
-import MemPoolCommonSocketRouterPlugin from "src/sockets/protocol/mem-pool-common-socket-router-plugin"
-import MemPool from "src/mem-pool/mem-pool"
+const AccountCommonSocketRouterPlugin = require( "../src/sockets/protocol/account-common-socket-router-plugin")
+const TokenCommonSocketRouterPlugin = require( "../src/sockets/protocol/token-common-socket-router-plugin")
+const BlockchainCommonSocketRouterPlugin = require( "../src/sockets/protocol/blockchain-common-socket-router-plugin")
+const TransactionsCommonSocketRouterPlugin = require( "../src/sockets/protocol/transactions-common-socket-router-plugin")
+const WalletCommonSocketRouterPlugin = require( "../src/sockets/protocol/wallet-common-socket-router-plugin")
+const WalletStakesCommonSocketRouterPlugin = require( "../src/sockets/protocol/wallet-stakes-common-socket-router-plugin")
+const ForgingCommonSocketRouterPlugin = require( "../src/sockets/protocol/forging-common-socket-router-plugin")
+const BlockchainProtocolCommonSocketRouterPlugin = require( "../src/sockets/protocol/blockchain-protocol-common-socket-router-plugin")
+const MemPoolCommonSocketRouterPlugin = require( "../src/sockets/protocol/mem-pool-common-socket-router-plugin")
+const MemPool = require( "../src/mem-pool/mem-pool")
 
-import Testnet from "./testnet/testnet"
+const Testnet = require( "./testnet/testnet")
 
-import Tests from 'tests/tests/tests-index';
+const Tests = require( '../tests/tests/tests-index');
 
-export default class App extends Kernel.utils.App {
+module.exports = class App extends kernel.utils.App {
 
     constructor(args){
         super(args);
@@ -68,8 +68,8 @@ export default class App extends Kernel.utils.App {
 
     setAdditionalEvents(){
 
-        Crytopgrahy.app.setAdditionalEvents.call(this);
-        Network.app.setAdditionalEvents.call(this);
+        cryptopgrahy.app.setAdditionalEvents.call(this);
+        networking.app.setAdditionalEvents.call(this);
 
         this.events.on("start/argv-set", () =>{
 

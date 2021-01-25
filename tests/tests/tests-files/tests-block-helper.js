@@ -1,4 +1,4 @@
-export default class TestsBlockHelper {
+module.exports = class TestsBlockHelper {
 
     constructor(scope){
         this._scope = scope;

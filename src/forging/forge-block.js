@@ -1,7 +1,7 @@
-const {Helper, Exception} = global.kernel.helpers;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {Helper, Exception} = require('kernel').helpers;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-export default class ForgeBlock {
+module.exports = class ForgeBlock {
 
     constructor(scope) {
         this._scope = scope;

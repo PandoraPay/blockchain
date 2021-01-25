@@ -10,7 +10,7 @@
     "node.js",
     "browser"
   ],
-  "main": "src/main-export.js",
+  "main": "main-export.js",
   "scripts": {
     "build": "webpack --config bin/webpack/webpack-config-node.js --mode production",
     "open": "node start-node.js",

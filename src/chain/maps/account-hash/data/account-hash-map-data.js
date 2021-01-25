@@ -1,12 +1,12 @@
 
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
-import AccountHashMapDataBalance from "./account-hash-map-data-balance";
-import AccountHashMapDataDelegate from "./account-hash-map-data-delegate";
+const AccountHashMapDataBalance = require( "./account-hash-map-data-balance");
+const AccountHashMapDataDelegate = require("./account-hash-map-data-delegate");
 
-export default class AccountHashMapData extends DBSchema{
+module.exports = class AccountHashMapData extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

@@ -2,7 +2,7 @@
  * Forging - Forging blocks
  */
 
-export default {
+module.exports = {
 
     start: false,
 

@@ -1,9 +1,9 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception, EnumHelper} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception, EnumHelper} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-export default class AccountHashMapDataBalance extends DBSchema{
+module.exports = class AccountHashMapDataBalance extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

@@ -1,10 +1,10 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Exception, StringHelper, BufferHelper, EnumHelper} = global.kernel.helpers;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-import TokenHashMapElement from "src/chain/maps/tokens/tokens-hash/token-hash-map-element"
+const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element")
 
-export default class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope) {
         super(scope);

@@ -1,4 +1,4 @@
-export default {
+module.exports = {
 
     WALLET_ADDRESS_TRANSPARENT: 0,
 

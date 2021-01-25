@@ -1,10 +1,10 @@
-const {Helper, Exception} = global.kernel.helpers;
-const {DBSchema} = global.kernel.marshal.db;
-const {DBSchemaBuffer, DBSchemaString} = global.kernel.marshal.db.samples;
+const {Helper, Exception} = require('kernel').helpers;
+const {DBSchema} = require('kernel').marshal.db;
+const {DBSchemaBuffer, DBSchemaString} = require('kernel').marshal.db.samples;
 
-import Block from "src/block/block"
+const Block = require("../../../block/block")
 
-export default class SubChainDataBlock extends DBSchema {
+module.exports = class SubChainDataBlock extends DBSchema {
 
 
     constructor(scope, schema = { }, data, type , creationOptions){

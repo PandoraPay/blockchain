@@ -1,8 +1,8 @@
-const {Helper, Exception} = global.kernel.helpers;
-const {DBSchema} = global.kernel.marshal.db;
-const {BN} = global.kernel.utils;
+const {Helper, Exception} = require('kernel').helpers;
+const {DBSchema} = require('kernel').marshal.db;
+const {BN} = require('kernel').utils;
 
-import Interlink from "./interlink"
+const Interlink = require( "./interlink")
 
 /**
  *
@@ -16,7 +16,7 @@ import Interlink from "./interlink"
  *
  */
 
-export default class BlockInterlinks extends DBSchema{
+module.exports = class BlockInterlinks extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

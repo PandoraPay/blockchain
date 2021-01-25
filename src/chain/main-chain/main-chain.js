@@ -1,15 +1,15 @@
-import ForkSubChain from "../fork-sub-chain/fork-sub-chain";
+const ForkSubChain = require( "../fork-sub-chain/fork-sub-chain");
 
-const {Exception, Helper} = global.kernel.helpers;
-const {MarshalData} = global.kernel.marshal;
-const {DBSchema} = global.kernel.marshal.db;
+const {Exception, Helper} = require('kernel').helpers;
+const {MarshalData} = require('kernel').marshal;
+const {DBSchema} = require('kernel').marshal.db;
 
-import Block from "src/block/block"
-import BaseChain from "../base/base-chain"
-import SubChain from "../sub-chain/sub-chain"
-import MainChainData from "./main-chain-data"
+const Block = require( "../../block/block")
+const BaseChain = require("../base/base-chain")
+const SubChain = require("../sub-chain/sub-chain")
+const MainChainData = require("./main-chain-data")
 
-export default class MainChain extends BaseChain {
+module.exports = class MainChain extends BaseChain {
 
     constructor( scope){
 

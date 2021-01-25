@@ -1,15 +1,14 @@
-import ArgvTest from "./argv/argv-test"
-const {describeList} = global.kernel.tests;
+const {describeList} = require('kernel').tests;
 
-import TestsWallet from "./tests-files/wallet/tests-wallet"
+const ArgvTest = require("./argv/argv-test")
 
-import TestRedis from "./tests-files/db/redis/test-redis"
-import TestPouchDB from "./tests-files/db/pouchdb/test-pouchdb"
-import TestCouchDB from "./tests-files/db/couchdb/test-couchdb"
+const TestsWallet = require( "./tests-files/wallet/tests-wallet")
+const TestRedis = require( "./tests-files/db/redis/test-redis")
+const TestPouchDB = require( "./tests-files/db/pouchdb/test-pouchdb")
+const TestCouchDB = require( "./tests-files/db/couchdb/test-couchdb")
+const TestsBlockHelper = require( "./tests-files/tests-block-helper")
 
-import TestsBlockHelper from "./tests-files/tests-block-helper"
-
-export default {
+module.exports = {
 
     argvTests: ArgvTest,
     tests: async scope => {

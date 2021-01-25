@@ -1,14 +1,14 @@
-import TestBlock from "../tests/block/test-block";
-import TestChainCluster from "../tests/chain/test-chain-cluster";
-import TestChain from "../tests/chain/test-chain";
-import TestTransactionsChain from "../tests/transactions/stake/test-transactions-chain"
-import TestTransactionsChainCluster from "../tests/transactions/stake/test-transactions-chain-cluster"
-import TestTransaction from "../tests/transactions/test-transaction"
+const TestBlock = require("../tests/block/test-block");
+const TestChainCluster = require("../tests/chain/test-chain-cluster");
+const TestChain = require("../tests/chain/test-chain");
+const TestTransactionsChain = require("../tests/transactions/stake/test-transactions-chain")
+const TestTransactionsChainCluster = require("../tests/transactions/stake/test-transactions-chain-cluster")
+const TestTransaction = require("../tests/transactions/test-transaction")
 
-const  {Helper} = global.kernel.helpers;
-const {describe} = global.kernel.tests;
-const {DBConstructor} = global.kernel.marshal.db;
-const cluster = require('cluster');
+const  {Helper} = require('kernel').helpers;
+const {describe} = require('kernel').tests;
+const {DBConstructor} = require('kernel').marshal.db;
+const {cluster} = require('kernel').masterCluster;
 
 /**
  *
@@ -16,7 +16,7 @@ const cluster = require('cluster');
  *
  */
 
-export default async function run() {
+module.exports = async function run() {
 
     describe("CouchDB Chain Test", {
 

@@ -1,8 +1,8 @@
-import TokenHashMapElement from "./token-hash-map-element";
+const TokenHashMapElement = require( "./token-hash-map-element");
 
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
-const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
 
 /**
  * Required for consensus.
@@ -10,7 +10,7 @@ const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
  *
  */
 
-export default class TokenHashVirtualMap extends HashVirtualMap {
+module.exports = class TokenHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

@@ -1,7 +1,7 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import TxHashMapElement from "./tx-hash-map-element"
+const TxHashMapElement = require( "./tx-hash-map-element")
 
 /**
  * Not required for consensus. Used only for explorer
@@ -11,7 +11,7 @@ import TxHashMapElement from "./tx-hash-map-element"
  *
  */
 
-export default class TxHashVirtualMap extends HashVirtualMap {
+module.exports = class TxHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

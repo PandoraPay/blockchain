@@ -1,8 +1,8 @@
-const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.kernel.dataStructures.merkleTree;
-const {Helper, Exception} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
+const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = require('kernel').dataStructures.merkleTree;
+const {Helper, Exception} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
-export default class TransactionsMerkleTreeNode extends MerkleTreeNode {
+module.exports = class TransactionsMerkleTreeNode extends MerkleTreeNode {
 
     constructor(scope, schema,  data, type, creationOptions){
 

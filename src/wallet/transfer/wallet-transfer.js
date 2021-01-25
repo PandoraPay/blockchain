@@ -1,8 +1,8 @@
-const {Exception, StringHelper, BufferHelper, EnumHelper} = global.kernel.helpers;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
-const {MarshalFields} = global.kernel.marshal;
+const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {MarshalFields} = require('kernel').marshal;
 
-export default class WalletTransfer {
+module.exports = class WalletTransfer {
 
     constructor(scope){
         this._scope = scope;

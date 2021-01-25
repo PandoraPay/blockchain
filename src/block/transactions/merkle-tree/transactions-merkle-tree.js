@@ -1,12 +1,12 @@
-import BlockchainTokenCreateSimpleTransaction from "src/transactions/tokens/token-create/blockchain-token-create-simple-transaction";
+const {MerkleTree} = require('kernel').dataStructures.merkleTree;
+const {Helper, Exception} = require('kernel').helpers;
+const {BaseTransaction} = require('cryptography').transactions.base;
 
-const {MerkleTree} = global.kernel.dataStructures.merkleTree;
-const {Helper, Exception} = global.kernel.helpers;
+const TransactionsMerkleTreeRoot = require( "./transactions-merkle-tree-root")
 
-import TransactionsMerkleTreeRoot from "./transactions-merkle-tree-root"
-const {BaseTransaction} = global.cryptography.transactions.base;
+const BlockchainTokenCreateSimpleTransaction = require( "../../../transactions/tokens/token-create/blockchain-token-create-simple-transaction")
 
-export default class TransactionsMerkleTree extends MerkleTree {
+module.exports = class TransactionsMerkleTree extends MerkleTree {
 
     constructor(scope, schema,  data, type, creationOptions){
 

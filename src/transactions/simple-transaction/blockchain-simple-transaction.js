@@ -1,7 +1,7 @@
-const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
-const {Helper, Exception} = global.kernel.helpers;
+const {SimpleTransaction} = require('cryptography').transactions.simpleTransaction;
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class BlockainSimpleTransaction extends SimpleTransaction {
+module.exports = class BlockainSimpleTransaction extends SimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 

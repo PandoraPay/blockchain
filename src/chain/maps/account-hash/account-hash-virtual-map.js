@@ -1,8 +1,8 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
-const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
 
-import AddressHashMapElement from "./account-hash-map-element"
+const AddressHashMapElement = require( "./account-hash-map-element")
 
 /**
  * Required for consensus.
@@ -10,7 +10,7 @@ import AddressHashMapElement from "./account-hash-map-element"
  *
  */
 
-export default class AccountHashVirtualMap extends HashVirtualMap {
+module.exports = class AccountHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

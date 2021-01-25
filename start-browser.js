@@ -2,7 +2,10 @@
  * Load Library and run it
  */
 
-const library  = require("./build/output/build-browser").default;
+if ( typeof BROWSER !== "undefined" )
+    global.BROWSER = true;
+
+const library  = require("./build/output/build-browser");
 
 library.app.start();
 

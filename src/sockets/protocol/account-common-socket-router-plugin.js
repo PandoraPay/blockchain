@@ -1,12 +1,12 @@
-const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = global.networking.sockets.protocol;
-const {Exception} = global.kernel.helpers;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = require('networking').sockets.protocol;
+const {Exception} = require('kernel').helpers;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-export default class AccountCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope){
         super(scope);

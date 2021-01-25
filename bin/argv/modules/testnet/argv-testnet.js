@@ -1,4 +1,4 @@
-export default {
+module.exports = {
 
     activated: false,
 
@@ -23,7 +23,7 @@ export default {
                 timestamp: Math.floor(new Date("05/13/2019 10:04 pm").getTime() / 1000),
 
                 stakes: {
-                    publicKeyHash: Buffer.from("bd9aecb961b47f622f419b3e2305f69ab11f8142", "hex"),
+                    publicKeyHash: Buffer.from("48678502c8bc537fe7dde5f8fbfe476a77282624", "hex"),
                 },
 
                 /**

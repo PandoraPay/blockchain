@@ -1,6 +1,6 @@
-const {BN} = global.kernel.utils;
+const {BN} = require('kernel').utils;
 
-export default {
+module.exports = {
 
     blockTime: 60, //in seconds
 

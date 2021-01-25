@@ -1,11 +1,10 @@
 
-const {Helper, Exception} = global.kernel.helpers;
+const {Helper, Exception} = require('kernel').helpers;
 
-import Block from "../block";
+const Block = require( "../block");
+const GenesisInterlinks = require("./interlinks/genesis-interlinks");
 
-import GenesisInterlinks from "./interlinks/genesis-interlinks";
-
-export default class Genesis extends Block{
+module.exports = class Genesis extends Block{
 
     constructor(scope, schema = { }, data, type , creationOptions ){
 

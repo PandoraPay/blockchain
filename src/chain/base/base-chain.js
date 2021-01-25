@@ -1,14 +1,14 @@
-import Block from "../../block/block";
-import BaseChainData from "./base-chain-data"
-import TransactionsCreator from "src/transactions/creator/transactions-creator"
-import TransactionsValidator from "../../transactions/validator/transactions-validator";
+const {BN} = require('kernel').utils;
 
-const {BN} = global.kernel.utils;
+const {AsyncEvents} = require('kernel').helpers.events;
+const {Helper, Exception} = require('kernel').helpers;
 
-const {AsyncEvents} = global.kernel.helpers.events;
-const {Helper, Exception} = global.kernel.helpers;
+const Block = require("../../block/block");
+const BaseChainData = require("./base-chain-data")
+const TransactionsCreator = require("../../transactions/creator/transactions-creator")
+const TransactionsValidator = require( "../../transactions/validator/transactions-validator");
 
-export default class BaseChain extends AsyncEvents{
+module.exports = class BaseChain extends AsyncEvents{
 
     constructor(scope){
 

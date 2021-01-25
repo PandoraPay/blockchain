@@ -1,7 +1,7 @@
-import ArgvDifficulty from "./modules/argv-difficulty"
-import ArgvTimestamp from "./modules/argv-timestamp"
+const ArgvDifficulty = require("./modules/argv-difficulty")
+const ArgvTimestamp = require( "./modules/argv-timestamp")
 
-export default {
+module.exports = {
 
     hashSize: 32,
     sizeMax: 1e6, // 1 mb

@@ -1,8 +1,8 @@
-import BaseChain from "../base/base-chain"
-import SubChainData from "./data/sub-chain-data";
-import SubChainDataBlock from "./data/sub-chain-data-block"
+const BaseChain = require( "../base/base-chain")
+const SubChainData = require("./data/sub-chain-data");
+const SubChainDataBlock = require( "./data/sub-chain-data-block")
 
-export default class SubChain extends BaseChain{
+module.exports = class SubChain extends BaseChain{
 
     async _clearChainData() {
         await super._clearChainData();

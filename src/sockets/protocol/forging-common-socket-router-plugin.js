@@ -1,6 +1,6 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
 
-export default class ForgingCommonSocketRouterPlugin extends  SocketRouterPlugin {
+module.exports = class ForgingCommonSocketRouterPlugin extends  SocketRouterPlugin {
 
     getOneWayRoutes(){
 

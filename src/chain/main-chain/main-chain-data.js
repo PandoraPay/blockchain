@@ -1,12 +1,12 @@
-import Block from "../../block/block";
-import TransactionsMerkleTreeNode from "../../block/transactions/merkle-tree/transactions-merkle-tree-node"
+const Block = require( "../../block/block");
+const TransactionsMerkleTreeNode = require( "../../block/transactions/merkle-tree/transactions-merkle-tree-node")
 
-const {Helper, Exception} = global.kernel.helpers;
-const {MarshalData} = global.kernel.marshal;
+const {Helper, Exception} = require('kernel').helpers;
+const {MarshalData} = require('kernel').marshal;
 
-import BaseChainData from "./../base/base-chain-data";
+const BaseChainData = require( "./../base/base-chain-data");
 
-export default class MainChainData extends BaseChainData {
+module.exports = class MainChainData extends BaseChainData {
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

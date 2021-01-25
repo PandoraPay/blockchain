@@ -1,11 +1,11 @@
 
-const {Helper, Exception} = global.kernel.helpers;
-const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {Helper, Exception} = require('kernel').helpers;
+const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-import BlockchainSimpleTransaction from "./../../simple-transaction/blockchain-simple-transaction"
-import TokenHashMapData from "../../../chain/maps/tokens/tokens-hash/data/token-hash-map-data";
+const BlockchainSimpleTransaction = require("./../../simple-transaction/blockchain-simple-transaction")
+const TokenHashMapData = require( "../../../chain/maps/tokens/tokens-hash/data/token-hash-map-data");
 
-export default class BlockchainTokenCreateSimpleTransaction extends BlockchainSimpleTransaction {
+module.exports = class BlockchainTokenCreateSimpleTransaction extends BlockchainSimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 

@@ -1,8 +1,8 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
-export default class AccountHashMapDataDelegate extends DBSchema{
+module.exports = class AccountHashMapDataDelegate extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

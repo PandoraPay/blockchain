@@ -1,13 +1,13 @@
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
-const {Helper, Exception, BufferHelper} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
-const {Address} = global.cryptography.addresses.public;
+const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
+const {Helper, Exception, BufferHelper} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
+const {Address} = require('cryptography').addresses.public;
 
-import WalletAddress from "../addresses/wallet-address";
-import WalletAddressTypeEnum from "../addresses/data/wallet-address-type-enum";
+const WalletAddress = require( "../addresses/wallet-address");
+const WalletAddressTypeEnum = require( "../addresses/data/wallet-address-type-enum");
 
 
-export default class WalletManager{
+module.exports = class WalletManager{
 
     constructor(scope){
         this._scope = scope;

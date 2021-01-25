@@ -1,14 +1,14 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import TokenTickerMapElement from "./tocker-ticker-map-element"
+const TokenTickerMapElement = require( "./tocker-ticker-map-element")
 
 /**
  * Required for consensus.
  * It assures unique token ticker
  */
 
-export default class TokenTickerVirtualMap extends HashVirtualMap {
+module.exports = class TokenTickerVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

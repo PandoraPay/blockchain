@@ -1,7 +1,7 @@
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
-const {Helper, Exception} = global.kernel.helpers;
+const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class WalletEncryption {
+module.exports = class WalletEncryption {
 
     constructor(scope) {
         this._scope = scope;

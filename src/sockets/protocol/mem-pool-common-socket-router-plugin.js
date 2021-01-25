@@ -1,7 +1,7 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, Exception, StringHelper, EnumHelper} = global.kernel.helpers;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
 
-export default class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope){
 

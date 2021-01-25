@@ -1,4 +1,4 @@
-export default {
+module.exports = {
 
     protocolMaxTransactions: 10,
     protocolMaxTransactionsIds: 40,

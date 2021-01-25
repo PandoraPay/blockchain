@@ -1,9 +1,9 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, EnumHelper, Exception} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
-const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, EnumHelper, Exception} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
+const {DBEncryptedSchema} = require('cryptography').marshal.db.samples;
 
-export default class WalletAddressTransparentKeys extends DBSchema{
+module.exports = class WalletAddressTransparentKeys extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

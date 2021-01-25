@@ -1,6 +1,6 @@
-const {Exception, Helper} = global.kernel.helpers;
+const {Exception, Helper} = require('kernel').helpers;
 
-export default class TestNet{
+module.exports = class TestNet{
 
     constructor(scope){
 

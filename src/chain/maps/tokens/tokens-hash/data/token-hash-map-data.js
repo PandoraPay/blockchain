@@ -1,9 +1,9 @@
 
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception, StringHelper} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception, StringHelper} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
-export default class TokenHashMapData extends DBSchema{
+module.exports = class TokenHashMapData extends DBSchema{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

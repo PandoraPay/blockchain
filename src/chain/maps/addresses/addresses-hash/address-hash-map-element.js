@@ -1,9 +1,9 @@
-const {HashMapElement} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashMapElement} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import AddressHashMapData from "./data/address-hash-map-data"
+const AddressHashMapData = require( "./data/address-hash-map-data")
 
-export default class AddressHashMapElement extends HashMapElement {
+module.exports = class AddressHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 

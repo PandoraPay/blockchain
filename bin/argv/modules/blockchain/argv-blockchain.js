@@ -1,6 +1,6 @@
-import ArgvGenesis from "./genesis/argv-genesis"
+const ArgvGenesis = require( "./genesis/argv-genesis")
 
-export default {
+module.exports = {
 
     maxForkAllowed: 50, // used to solve "Long Range Attacks" for POS. It could be increased later on
     

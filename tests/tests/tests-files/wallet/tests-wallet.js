@@ -1,8 +1,8 @@
-const {describe} = global.kernel.tests;
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = global.cryptography.marshal.db.samples;
-const {Helper, BufferHelper} = global.kernel.helpers;
+const {describe} = require('kernel').tests;
+const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
+const {Helper, BufferHelper} = require('kernel').helpers;
 
-export default function run () {
+module.exports = function run () {
 
     const count = 10;
     let wallet;

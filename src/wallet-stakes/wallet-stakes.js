@@ -1,10 +1,10 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception, BufferHelper, StringHelper} = global.kernel.helpers;
-const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception, BufferHelper, StringHelper} = require('kernel').helpers;
+const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
 
-import DelegatedStake from "./delegated-stake/delegated-stake"
+const DelegatedStake = require( "./delegated-stake/delegated-stake")
 
-export default class WalletStakes extends DBSchema {
+module.exports = class WalletStakes extends DBSchema {
 
     constructor(scope, schema = {}, data, type, creationOptions) {
 

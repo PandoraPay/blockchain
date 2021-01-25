@@ -1,14 +1,14 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import TokenNameMapElement from "./token-name-map-element"
+const TokenNameMapElement = require( "./token-name-map-element")
 
 /**
  * Required for consensus.
  * It assures unique token name
  */
 
-export default class TokenNameVirtualMap extends HashVirtualMap {
+module.exports = class TokenNameVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

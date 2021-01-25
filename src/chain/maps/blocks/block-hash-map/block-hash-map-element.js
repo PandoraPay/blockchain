@@ -1,7 +1,7 @@
-const {HashMapElement} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashMapElement} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class BlockHashMapElement extends HashMapElement {
+module.exports = class BlockHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 

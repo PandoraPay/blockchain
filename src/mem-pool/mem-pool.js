@@ -1,10 +1,10 @@
-const {Helper, Exception, StringHelper, ArrayHelper} = global.kernel.helpers;
-const {DBSchema} = global.kernel.marshal.db;
-const {DBSchemaBufferBig, DBSchemaString} = global.kernel.marshal.db.samples;
-const {BaseTransaction} = global.cryptography.transactions.base;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const {Helper, Exception, StringHelper, ArrayHelper} = require('kernel').helpers;
+const {DBSchema} = require('kernel').marshal.db;
+const {DBSchemaBufferBig, DBSchemaString} = require('kernel').marshal.db.samples;
+const {BaseTransaction} = require('cryptography').transactions.base;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-export default  class MemPool {
+module.exports =  class MemPool {
 
     constructor(scope){
 

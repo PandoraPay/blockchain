@@ -1,4 +1,4 @@
-export default {
+module.exports = {
 
     stakingMinimumStake: 1000, //coins
     stakingMinimumStakeEffect: 100,

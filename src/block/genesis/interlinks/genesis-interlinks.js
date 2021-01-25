@@ -1,8 +1,8 @@
-const {Helper} = global.kernel.helpers;
+const {Helper} = require('kernel').helpers;
 
-import BlockInterlinks from "../../interlinks/block-interlinks"
+const BlockInterlinks = require( "../../interlinks/block-interlinks")
 
-export default class GenesisInterlinks extends BlockInterlinks {
+module.exports = class GenesisInterlinks extends BlockInterlinks {
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

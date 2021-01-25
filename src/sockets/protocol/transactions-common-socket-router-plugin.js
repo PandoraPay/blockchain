@@ -1,6 +1,6 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
 
-export default class TransactionsCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope) {
 

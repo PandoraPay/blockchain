@@ -1,9 +1,9 @@
-const  {Helper} = global.kernel.helpers;
-const {describe} = global.kernel.tests;
+const  {Helper} = require('kernel').helpers;
+const {describe} = require('kernel').tests;
 
-const {asyncTimeout} = global.kernel.helpers.AsyncInterval;
+const {asyncTimeout} = require('kernel').helpers.AsyncInterval;
 
-export default function run (dbType) {
+module.exports = function run (dbType) {
 
     async function _createBlocks(count){
 

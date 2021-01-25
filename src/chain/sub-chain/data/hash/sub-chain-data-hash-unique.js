@@ -1,7 +1,7 @@
-const {DBSchemaBufferUnique} = global.kernel.marshal.db.samples;
-const {Helper, Exception} = global.kernel.helpers;
+const {DBSchemaBufferUnique} = require('kernel').marshal.db.samples;
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class SubChainDataHashUnique extends DBSchemaBufferUnique {
+module.exports = class SubChainDataHashUnique extends DBSchemaBufferUnique {
 
     constructor(scope, schema = {},  data, type, creationOptions){
 

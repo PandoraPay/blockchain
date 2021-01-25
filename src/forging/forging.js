@@ -1,8 +1,9 @@
-import ForgeBlock from "./forge-block"
-const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
-const {Helper, Exception} = global.kernel.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class Forging  {
+const ForgeBlock = require( "./forge-block")
+
+module.exports = class Forging  {
 
     constructor(scope){
 

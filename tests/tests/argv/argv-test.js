@@ -1,6 +1,6 @@
-const {Helper, BufferHelper} = global.kernel.helpers;
+const {Helper, BufferHelper} = require('kernel').helpers;
 
-export default (argv) =>  Helper.merge( argv, {
+module.exports = (argv) =>  Helper.merge( argv, {
 
     testnet:{
 

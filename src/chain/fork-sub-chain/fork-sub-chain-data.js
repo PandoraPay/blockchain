@@ -1,7 +1,7 @@
-import SubChainData from "../sub-chain/data/sub-chain-data";
-const {Helper, Exception} = global.kernel.helpers;
+const SubChainData = require( "../sub-chain/data/sub-chain-data");
+const {Helper, Exception} = require('kernel').helpers;
 
-export default class ForkSubChainData extends SubChainData{
+module.exports = class ForkSubChainData extends SubChainData{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

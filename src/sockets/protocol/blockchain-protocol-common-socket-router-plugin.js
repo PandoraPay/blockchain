@@ -1,16 +1,16 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, Exception} = global.kernel.helpers;
-const {MarshalData} = global.kernel.marshal;
-const  {setAsyncInterval, clearAsyncInterval} = global.kernel.helpers.AsyncInterval;
-const {BN, BigNumber} = global.kernel.utils;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {Helper, Exception} = require('kernel').helpers;
+const {MarshalData} = require('kernel').marshal;
+const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
+const {BN, BigNumber} = require('kernel').utils;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-import Block from "src/block/block";
+const Block = require("../../block/block");
 
-export default class BlockchainProtocolCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope){
 

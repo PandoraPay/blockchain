@@ -1,10 +1,10 @@
-const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = global.kernel.dataStructures.merkleTree;
-const {MerkleTreeRoot} = global.kernel.dataStructures.merkleTree;
-const {Helper, Exception} = global.kernel.helpers;
+const {MerkleTreeNode, MerkleTreeNodeTypeEnum} = require('kernel').dataStructures.merkleTree;
+const {MerkleTreeRoot} = require('kernel').dataStructures.merkleTree;
+const {Helper, Exception} = require('kernel').helpers;
 
-import TransactionsMerkleTreeNode from "./transactions-merkle-tree-node"
+const TransactionsMerkleTreeNode = require( "./transactions-merkle-tree-node")
 
-export default class TransactionsMerkleTreeRoot extends MerkleTreeRoot {
+module.exports = class TransactionsMerkleTreeRoot extends MerkleTreeRoot {
 
     constructor(scope, schema,  data, type, creationOptions){
 

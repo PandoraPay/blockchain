@@ -1,30 +1,30 @@
 
-const {MarshalData} = global.kernel.marshal;
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception} = global.kernel.helpers;
-const {BN, BigNumber} = global.kernel.utils;
-const {StringHelper} = global.networking.sockets.protocol;
-const {TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
-const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
-const {DBSchemaBuffer} = global.kernel.marshal.db.samples;
+const {MarshalData} = require('kernel').marshal;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception} = require('kernel').helpers;
+const {BN, BigNumber} = require('kernel').utils;
+const {StringHelper} = require('networking').sockets.protocol;
+const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {SimpleTransaction} = require('cryptography').transactions.simpleTransaction;
+const {DBSchemaBuffer} = require('kernel').marshal.db.samples;
 
-import TxHashVirtualMap from "src/chain/maps/txs/tx-hash/tx-hash-virtual-map";
-import TxRevertInfoHashVirtualMap from "src/chain/maps/txs/tx-revert-info-hash/tx-revert-info-hash-virtual-map";
+const TxHashVirtualMap = require("../maps/txs/tx-hash/tx-hash-virtual-map");
+const TxRevertInfoHashVirtualMap = require("../maps/txs/tx-revert-info-hash/tx-revert-info-hash-virtual-map");
 
-import AddressHashVirtualMap from "src/chain/maps/addresses/addresses-hash/address-hash-virtual-map";
-import AddressTxHashVirtualMap from "src/chain/maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map";
+const AddressHashVirtualMap = require("../maps/addresses/addresses-hash/address-hash-virtual-map");
+const AddressTxHashVirtualMap = require("../maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map");
 
-import BlockHashVirtualMap from "../maps/blocks/block-hash-map/block-hash-virtual-map";
-import HashBlockVirtualMap from "../maps/blocks/hash-block-map/hash-block-virtual-map";
-import AccountHashVirtualMap from "../maps/account-hash/account-hash-virtual-map";
-import TokenHashVirtualMap from "../maps/tokens/tokens-hash/token-hash-virtual-map";
-import TokenNameVirtualMap from "../maps/tokens/tokens-name-map/token-name-virtual-map";
-import TokenTickerVirtualMap from "../maps/tokens/tokens-ticker-map/token-ticker-virtual-map";
+const BlockHashVirtualMap = require("../maps/blocks/block-hash-map/block-hash-virtual-map");
+const HashBlockVirtualMap = require("../maps/blocks/hash-block-map/hash-block-virtual-map");
+const AccountHashVirtualMap = require("../maps/account-hash/account-hash-virtual-map");
+const TokenHashVirtualMap = require("../maps/tokens/tokens-hash/token-hash-virtual-map");
+const TokenNameVirtualMap = require("../maps/tokens/tokens-name-map/token-name-virtual-map");
+const TokenTickerVirtualMap = require("../maps/tokens/tokens-ticker-map/token-ticker-virtual-map");
 
 const MAX_CHANGE_FACTOR = 2;
 const MIN_CHANGE_FACTOR = 1 / MAX_CHANGE_FACTOR;
 
-export default class BaseChainData extends DBSchema {
+module.exports = class BaseChainData extends DBSchema {
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

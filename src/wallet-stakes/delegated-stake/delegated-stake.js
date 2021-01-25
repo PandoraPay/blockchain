@@ -1,7 +1,7 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, Exception, BufferHelper} = global.kernel.helpers;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 
-export default class DelegatedStake extends DBSchema {
+module.exports = class DelegatedStake extends DBSchema {
 
     constructor(scope, schema = {}, data, type, creationOptions) {
 

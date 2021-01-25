@@ -1,7 +1,7 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import AddressHashMapElement from "./address-hash-map-element"
+const AddressHashMapElement = require( "./address-hash-map-element")
 
 /**
  * Not required for consensus. Used only for explorer
@@ -11,7 +11,7 @@ import AddressHashMapElement from "./address-hash-map-element"
  *
  */
 
-export default class AddressHashVirtualMap extends HashVirtualMap {
+module.exports = class AddressHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

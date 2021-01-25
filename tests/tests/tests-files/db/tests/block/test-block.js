@@ -1,8 +1,7 @@
-const {describe} = global.kernel.tests;
+const {describe} = require('kernel').tests;
 
-import Block from "src/block/block"
-
-import BlockVersionEnum from "src/block/block-version-enum"
+const Block = require( "../../../../../../src/block/block")
+const BlockVersionEnum = require("../../../../../../src/block/block-version-enum")
 
 async function validateBlockZero( block ){
 
@@ -33,7 +32,7 @@ async function validateBlockZero( block ){
 
 }
 
-export default function run (dbType) {
+module.exports = function run (dbType) {
 
     describe( ()=> `${dbType} Simple Block Creation`, {
 

@@ -1,9 +1,9 @@
-const {HashMapElement} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashMapElement} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import TokenHashMapData from "./data/token-hash-map-data"
+const TokenHashMapData = require( "./data/token-hash-map-data")
 
-export default class TokenHashMapElement extends HashMapElement {
+module.exports = class TokenHashMapElement extends HashMapElement {
 
     constructor(scope, schema, data, type, creationOptions) {
 

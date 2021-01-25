@@ -1,11 +1,11 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Exception} = global.kernel.helpers;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {Exception} = require('kernel').helpers;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-export default class BlockchainCommonSocketRouterPlugin extends SocketRouterPlugin {
+module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPlugin {
 
     constructor(scope){
         super(scope);

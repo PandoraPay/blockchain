@@ -1,8 +1,8 @@
-const {describe} = global.kernel.tests;
+const {describe} = require('kernel').tests;
 
-import Block from "src/block/block"
+const Block = require("../../../../../../src/block/block")
 
-export default function run () {
+module.exports = function run () {
 
     describe("Block Interlinks", {
 

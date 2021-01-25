@@ -1,15 +1,15 @@
-import WalletAddress from "./addresses/wallet-address"
-import WalletAddressTypeEnum from "./addresses/data/wallet-address-type-enum"
-import WalletManager from "./manager/wallet-manager"
-import WalletEncryption from "./encryption/wallet-encryption"
-import WalletTransfer from "./transfer/wallet-transfer"
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, EnumHelper, Exception} = require('kernel').helpers;
 
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, EnumHelper, Exception} = global.kernel.helpers;
+const {DBEncryptedSchema} = require('cryptography').marshal.db.samples;
 
-const {DBEncryptedSchema} = global.cryptography.marshal.db.samples;
+const WalletAddress = require("./addresses/wallet-address")
+const WalletAddressTypeEnum = require("./addresses/data/wallet-address-type-enum")
+const WalletManager = require("./manager/wallet-manager")
+const WalletEncryption = require("./encryption/wallet-encryption")
+const WalletTransfer = require("./transfer/wallet-transfer")
 
-export default class Wallet extends DBSchema {
+module.exports = class Wallet extends DBSchema {
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

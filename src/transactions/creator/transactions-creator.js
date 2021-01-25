@@ -1,12 +1,12 @@
-const {Exception} = global.kernel.helpers;
-const {TransactionTypeEnum} = global.cryptography.transactions;
+const {Exception} = require('kernel').helpers;
+const {TransactionTypeEnum} = require('cryptography').transactions;
 
-import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
-import BlockchainDelegateStakeSimpleTransaction from "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
-import BlockchainTokenCreateSimpleTransaction from  "./../tokens/token-create/blockchain-token-create-simple-transaction"
-import BlockchainTokenUpdateSupplySimpleTransaction from  "./../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction"
+const BlockchainSimpleTransaction = require( "./../simple-transaction/blockchain-simple-transaction")
+const BlockchainDelegateStakeSimpleTransaction = require( "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction")
+const BlockchainTokenCreateSimpleTransaction = require(  "./../tokens/token-create/blockchain-token-create-simple-transaction")
+const BlockchainTokenUpdateSupplySimpleTransaction = require(  "./../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction")
 
-export default class TransactionsCreator {
+module.exports = class TransactionsCreator {
     
     constructor(scope){
         this._scope = scope;

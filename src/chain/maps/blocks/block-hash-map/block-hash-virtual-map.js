@@ -1,14 +1,14 @@
-const {HashVirtualMap} = global.kernel.dataStructures.hashMap;
-const {Helper, Exception} = global.kernel.helpers;
+const {HashVirtualMap} = require('kernel').dataStructures.hashMap;
+const {Helper, Exception} = require('kernel').helpers;
 
-import BlockHashMapElement from "./block-hash-map-element"
+const BlockHashMapElement = require( "./block-hash-map-element")
 
 /**
  * Not required for consensus. Used only for explorer
  * It stores height and returns hash
  */
 
-export default class BlockHashVirtualMap extends HashVirtualMap {
+module.exports = class BlockHashVirtualMap extends HashVirtualMap {
 
     constructor(scope, schema, data, type, creationOptions) {
 

@@ -1,9 +1,9 @@
-const  {Helper} = global.kernel.helpers;
-const {describe} = global.kernel.tests;
+const  {Helper} = require('kernel').helpers;
+const {describe} = require('kernel').tests;
 
 const hashes = {}, kernelHashes = {};
 
-export default function run () {
+module.exports = function run () {
 
     describe("Simple MainChain Creation", {
 

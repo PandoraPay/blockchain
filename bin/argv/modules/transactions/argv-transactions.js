@@ -1,10 +1,10 @@
-import ArgvCoinbase from "./coinbase/argv-coinbase"
-import ArgvStaking from "./staking/argv-staking"
-import ArgvCoins from "./coins/argv-coins"
-import ArgvProtocol from "./protocol/argv-protocol"
-import ArgvTokens from "./tokens/argv-tokens"
+const ArgvCoinbase = require( "./coinbase/argv-coinbase")
+const ArgvStaking = require("./staking/argv-staking")
+const ArgvCoins = require("./coins/argv-coins")
+const ArgvProtocol = require("./protocol/argv-protocol")
+const ArgvTokens = require("./tokens/argv-tokens")
 
-export default {
+module.exports = {
 
 
     //10 blocks lockTime for tx

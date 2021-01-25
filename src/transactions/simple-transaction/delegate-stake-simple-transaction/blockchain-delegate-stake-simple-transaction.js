@@ -1,12 +1,11 @@
+const {SimpleTransaction} = require('cryptography').transactions.simpleTransaction;
+const {Helper, Exception} = require('kernel').helpers;
+const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-const {SimpleTransaction} = global.cryptography.transactions.simpleTransaction;
-const {Helper, Exception} = global.kernel.helpers;
-const {TransactionTypeEnum, TransactionScriptTypeEnum, TransactionTokenCurrencyTypeEnum} = global.cryptography.transactions;
+const BlockchainSimpleTransaction = require( "./../blockchain-simple-transaction")
+const AccountHashMapDataDelegate = require( "../../../chain/maps/account-hash/data/account-hash-map-data-delegate");
 
-import BlockchainSimpleTransaction from "./../blockchain-simple-transaction"
-import AccountHashMapDataDelegate from "../../../chain/maps/account-hash/data/account-hash-map-data-delegate";
-
-export default class BlockchainDelegateStakeSimpleTransaction extends BlockchainSimpleTransaction {
+module.exports = class BlockchainDelegateStakeSimpleTransaction extends BlockchainSimpleTransaction {
 
     constructor(scope, schema={}, data, type, creationOptions) {
 

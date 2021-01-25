@@ -1,14 +1,14 @@
-const {DBSchema} = global.kernel.marshal.db;
-const {Helper, EnumHelper, Exception, BufferHelper} = global.kernel.helpers;
-const {CryptoHelper} = global.kernel.helpers.crypto;
+const {DBSchema} = require('kernel').marshal.db;
+const {Helper, EnumHelper, Exception, BufferHelper} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
-const {DBSchemaBuffer, DBSchemaNumber} = global.kernel.marshal.db.samples;
-const {DBEncryptedSchema, } = global.cryptography.marshal.db.samples;
+const {DBSchemaBuffer, DBSchemaNumber} = require('kernel').marshal.db.samples;
+const {DBEncryptedSchema, } = require('cryptography').marshal.db.samples;
 
-import WalletAddressTypeEnum from "./data/wallet-address-type-enum"
-import WalletAddressTransparentKeys from "./data/wallet-address-transparent-keys";
+const WalletAddressTypeEnum = require( "./data/wallet-address-type-enum")
+const WalletAddressTransparentKeys = require( "./data/wallet-address-transparent-keys");
 
-export default class WalletAddress extends DBSchema {
+module.exports = class WalletAddress extends DBSchema {
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

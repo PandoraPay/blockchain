@@ -1,43 +1,39 @@
-if (!global.kernel) require('kernel');
-if (!global.cryptography) require('cryptography');
-if (!global.networking) require('networking');
+const kernel = require('kernel');
+const cryptography = require('cryptography');
+const networking = require('networking');
 
-const kernel = global.kernel;
-const cryptography = global.cryptography;
-const networking = global.networking;
+const App = require('./src/app');
+const Block = require('./src/block/block');
+const BlockVersionEnum = require('./src/block/block-version-enum');
+const TransactionsMerkleTree = require('./src/block/transactions/merkle-tree/transactions-merkle-tree');
+const TransactionsMerkleTreeNode = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-node');
+const TransactionsMerkleTreeRoot = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-root');
+const AccountHashVirtualMap = require("./src/chain/maps/account-hash/account-hash-virtual-map");
+const AccountHashMapElement = require("./src/chain/maps/account-hash/account-hash-map-element");
+const AccountHashMapData = require("./src/chain/maps/account-hash/data/account-hash-map-data");
+const AccountHashMapDataDelegate = require ("./src/chain/maps/account-hash/data/account-hash-map-data-delegate");
+const AccountHashMapDataBalance = require("./src/chain/maps/account-hash/data/account-hash-map-data-balance");
+const TokenHashVirtualMap = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map");
+const TokenHashMapElement = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element");
+const TokenHashMapData = require("./src/chain/maps/tokens/tokens-hash/data/token-hash-map-data");
 
-const App = require('src/app').default;
-const Block = require('src/block/block').default;
-const BlockVersionEnum = require('src/block/block-version-enum').default;
-const TransactionsMerkleTree = require('src/block/transactions/merkle-tree/transactions-merkle-tree').default;
-const TransactionsMerkleTreeNode = require('src/block/transactions/merkle-tree/transactions-merkle-tree-node').default;
-const TransactionsMerkleTreeRoot = require('src/block/transactions/merkle-tree/transactions-merkle-tree-root').default;
-const AccountHashVirtualMap = require("src/chain/maps/account-hash/account-hash-virtual-map").default;
-const AccountHashMapElement = require("src/chain/maps/account-hash/account-hash-map-element").default;
-const AccountHashMapData = require("src/chain/maps/account-hash/data/account-hash-map-data").default;
-const AccountHashMapDataDelegate = require ("src/chain/maps/account-hash/data/account-hash-map-data-delegate").default;
-const AccountHashMapDataBalance = require("src/chain/maps/account-hash/data/account-hash-map-data-balance").default;
-const TokenHashVirtualMap = require("src/chain/maps/tokens/tokens-hash/token-hash-virtual-map").default;
-const TokenHashMapElement = require("src/chain/maps/tokens/tokens-hash/token-hash-map-element").default;
-const TokenHashMapData = require("src/chain/maps/tokens/tokens-hash/data/token-hash-map-data").default;
+const BlockchainSimpleTransaction = require("./src/transactions/simple-transaction/blockchain-simple-transaction");
+const BlockchainDelegateStakeSimpleTransaction = require("./src/transactions/simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction");
+const BlockchainTokenCreateSimpleTransaction = require("./src/transactions/tokens/token-create/blockchain-token-create-simple-transaction");
+const BlockchainUpdateSupplySimpleTransaction = require("./src/transactions/tokens/token-update-supply/blockchain-token-update-supply-simple-transaction");
+const Genesis = require('./src/block/genesis/genesis');
+const MainChain = require('./src/chain/main-chain/main-chain');
+const MainChainData = require('./src/chain/main-chain/main-chain-data');
+const BaseChain = require('./src/chain/base/base-chain');
+const BaseChainData = require('./src/chain/base/base-chain-data');
+const SubChain = require('./src/chain/sub-chain/sub-chain');
+const TestsFiles = require("./tests/tests/tests-index");
+const MemPool = require("./src/mem-pool/mem-pool");
 
-const BlockchainSimpleTransaction = require("src/transactions/simple-transaction/blockchain-simple-transaction").default;
-const BlockchainDelegateStakeSimpleTransaction = require("src/transactions/simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction").default;
-const BlockchainTokenCreateSimpleTransaction = require("src/transactions/tokens/token-create/blockchain-token-create-simple-transaction").default;
-const BlockchainUpdateSupplySimpleTransaction = require("src/transactions/tokens/token-update-supply/blockchain-token-update-supply-simple-transaction").default;
-const Genesis = require('src/block/genesis/genesis').default;
-const MainChain = require('src/chain/main-chain/main-chain').default;
-const MainChainData = require('src/chain/main-chain/main-chain-data').default;
-const BaseChain = require('src/chain/base/base-chain').default;
-const BaseChainData = require('src/chain/base/base-chain-data').default;
-const SubChain = require('src/chain/sub-chain/sub-chain').default;
-const TestsFiles = require("tests/tests/tests-index").default;
-const MemPool = require("src/mem-pool/mem-pool").default;
-
-const Wallet = require("src/wallet/wallet").default;
-const WalletAddress = require("src/wallet/addresses/wallet-address").default;
-const WalletAddressTypeEnum = require("src/wallet/addresses/data/wallet-address-type-enum").default;
-const WalletAddressTransparentKeys = require("src/wallet/addresses/data/wallet-address-transparent-keys").default;
+const Wallet = require("./src/wallet/wallet");
+const WalletAddress = require("./src/wallet/addresses/wallet-address");
+const WalletAddressTypeEnum = require("./src/wallet/addresses/data/wallet-address-type-enum");
+const WalletAddressTransparentKeys = require("./src/wallet/addresses/data/wallet-address-transparent-keys");
 
 const library = {
 
@@ -135,4 +131,4 @@ if (typeof global !== "undefined"){
     global.blockchain = library;
 }
 
-export default library;
+module.exports = library;

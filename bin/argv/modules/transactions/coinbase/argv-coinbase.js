@@ -1,4 +1,4 @@
-export default {
+module.exports = {
 
     coinDenomination : 10000,
 

@@ -1,16 +1,16 @@
 
-const {TransactionTypeEnum, TransactionScriptTypeEnum} = global.cryptography.transactions;
-const {BaseTransaction} = global.cryptography.transactions.base;
+const {TransactionTypeEnum, TransactionScriptTypeEnum} = require('cryptography').transactions;
+const {BaseTransaction} = require('cryptography').transactions.base;
 
-const {Exception, EnumHelper, StringHelper, BufferHelper} = global.kernel.helpers;
-const {DBSchema} = global.kernel.marshal.db;
+const {Exception, EnumHelper, StringHelper, BufferHelper} = require('kernel').helpers;
+const {DBSchema} = require('kernel').marshal.db;
 
-import BlockchainSimpleTransaction from "./../simple-transaction/blockchain-simple-transaction"
-import BlockchainDelegateStakeSimpleTransaction from "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction"
-import BlockchainTokenCreateSimpleTransaction from "./../tokens/token-create/blockchain-token-create-simple-transaction"
-import BlockchainTokenUpdateSupplySimpleTransaction from "./../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction"
+const BlockchainSimpleTransaction = require( "./../simple-transaction/blockchain-simple-transaction")
+const BlockchainDelegateStakeSimpleTransaction = require( "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction")
+const BlockchainTokenCreateSimpleTransaction = require( "./../tokens/token-create/blockchain-token-create-simple-transaction")
+const BlockchainTokenUpdateSupplySimpleTransaction = require( "./../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction")
 
-export default class TransactionsValidator{
+module.exports = class TransactionsValidator{
     
     constructor(scope){
         this._scope = scope;

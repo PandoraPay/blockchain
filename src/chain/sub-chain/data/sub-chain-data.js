@@ -1,13 +1,13 @@
-const {Helper, Exception} = global.kernel.helpers;
-const {DBSchemaString} = global.kernel.marshal.db.samples;
+const {Helper, Exception} = require('kernel').helpers;
+const {DBSchemaString} = require('kernel').marshal.db.samples;
 
-import BaseChainData from "../../base/base-chain-data";
-import Block from "src/block/block"
+const BaseChainData = require( "../../base/base-chain-data");
+const Block = require( "../../../block/block")
 
-import SubChainDataHashUnique from "./hash/sub-chain-data-hash-unique";
-import SubChainDataKernelHashUnique from "./hash/sub-chain-data-kernel-hash-unique";
+const SubChainDataHashUnique = require( "./hash/sub-chain-data-hash-unique");
+const SubChainDataKernelHashUnique = require( "./hash/sub-chain-data-kernel-hash-unique");
 
-export default class SubChainData extends BaseChainData{
+module.exports = class SubChainData extends BaseChainData{
 
     constructor(scope, schema = { }, data, type , creationOptions){
 

@@ -1,13 +1,13 @@
-const {Helper} = global.kernel.helpers;
+const {Helper} = require('kernel').helpers;
 
-import ArgvBlockchain from "./modules/blockchain/argv-blockchain"
-import ArgvBlock from "./modules/block/argv-block"
-import ArgvTransactions from "./modules/transactions/argv-transactions"
-import ArgvForging from "./modules/forging/argv-forging"
-import ArgvWallet from "./modules/wallet/argv-wallet"
-import ArgvWalletStakes from "./modules/wallet-stakes/argv-wallet-stakes"
-import ArgvTestnet from "./modules/testnet/argv-testnet"
-import ArgvMemPool from "./modules/mem-pool/argv-mem-pool"
+const ArgvBlockchain = require("./modules/blockchain/argv-blockchain")
+const ArgvBlock = require("./modules/block/argv-block")
+const ArgvTransactions = require( "./modules/transactions/argv-transactions")
+const ArgvForging = require( "./modules/forging/argv-forging")
+const ArgvWallet = require("./modules/wallet/argv-wallet")
+const ArgvWalletStakes = require( "./modules/wallet-stakes/argv-wallet-stakes")
+const ArgvTestnet = require("./modules/testnet/argv-testnet")
+const ArgvMemPool = require( "./modules/mem-pool/argv-mem-pool")
 
 /**
  *
@@ -15,7 +15,7 @@ import ArgvMemPool from "./modules/mem-pool/argv-mem-pool"
  *
  */
 
-export default (argv) => Helper.merge( argv, {
+module.exports = (argv) => Helper.merge( argv, {
 
     blockchain: ArgvBlockchain,
     block: ArgvBlock,

@@ -1,7 +1,7 @@
-const {SocketRouterPlugin} = global.networking.sockets.protocol;
-const {Helper, BufferHelper, StringHelper, Exception} = global.kernel.helpers;
+const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {Helper, BufferHelper, StringHelper, Exception} = require('kernel').helpers;
 
-export default class WalletStakesCommonSocketRouterPlugin extends  SocketRouterPlugin {
+module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRouterPlugin {
 
     constructor(scope){
 
