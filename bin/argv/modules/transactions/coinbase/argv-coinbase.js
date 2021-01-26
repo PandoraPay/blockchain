@@ -15,7 +15,7 @@ module.exports = {
             const  cycle = Math.trunc( blockHeight / blocksPerCycle );
 
             for (let i=0 ; i < cycle; i++)
-                sum += blocksPerCycle * this.getBlockRewardAt( blocksPerCycle * i );
+                sum += blocksPerCycle * this.getBlockRewardAt( blocksPerCycle * i);
 
             sum += ( blockHeight % blocksPerCycle ) * this.getBlockRewardAt(blockHeight);
 

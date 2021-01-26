@@ -84,6 +84,13 @@ module.exports = class BaseChainData extends DBSchema {
                         position: 104,
                     },
 
+                    circulatingSupply: {
+                        type: "number",
+                        default: 0,
+
+                        position: 105,
+                    },
+
                     /**
                      * Total Work (sum of difficulties)
                      */
@@ -99,7 +106,7 @@ module.exports = class BaseChainData extends DBSchema {
                             return chainwork;
                         },
 
-                        position: 105,
+                        position: 106,
                     },
 
 
@@ -111,7 +118,7 @@ module.exports = class BaseChainData extends DBSchema {
                         type: "buffer",
                         fixedBytes: 32,
 
-                        position: 106,
+                        position: 107,
                     },
 
                     /**
@@ -122,7 +129,7 @@ module.exports = class BaseChainData extends DBSchema {
                         type: "buffer",
                         fixedBytes: 32,
 
-                        position: 107,
+                        position: 108,
                     },
 
                     /**
@@ -135,7 +142,7 @@ module.exports = class BaseChainData extends DBSchema {
 
                         removeLeadingZeros: true,
 
-                        position: 108,
+                        position: 109,
                     },
 
                     /**
@@ -148,7 +155,7 @@ module.exports = class BaseChainData extends DBSchema {
 
                         removeLeadingZeros: true,
 
-                        position: 109,
+                        position: 110,
                     },
 
                 }
@@ -216,6 +223,7 @@ module.exports = class BaseChainData extends DBSchema {
         this.end = 0;
         this.transactionsIndex = 0;
         this.tokensIndex = 0;
+        this.circulatingSupply = 0;
         this.chainwork = new BN(0);
         this.hash = Buffer.alloc(32);
         this.prevHash = Buffer.alloc(32);

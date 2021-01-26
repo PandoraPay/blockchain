@@ -12,6 +12,23 @@ module.exports = {
             networkType: 1,
         },
 
+        crypto:{
+
+            addresses:{
+
+                publicAddress:{
+
+                    networkByte: 128, //testnet addresses
+                    networkPrefix: "PAND_TESTNET",
+                    networkPrefixBuffer: Buffer.from("PAND_TESTNET", 'ascii'),
+                    networkPrefixLength: 12,
+
+                }
+
+            },
+
+        },
+
         blockchain: {
 
             genesis: {

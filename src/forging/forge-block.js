@@ -21,10 +21,7 @@ module.exports = class ForgeBlock {
         const lockedFunds = await chainData.getGrindingLockedTransfersFunds(block.pos.stakeForgerPublicKeyHash);
         funds = funds - lockedFunds;
 
-        if (block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && funds < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
-            throw new Exception(this, "not enough coins for staking");
-
-        if (funds < this._scope.argv.transactions.coinbase.getBlockRewardAt(0) ) throw new Exception(this, "for staking it requires at least 1 coin");
+        if (funds < this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(block.height) ) throw new Exception(this, "for staking it requires at least 1 coin");
 
         block.pos.stakingAmount = funds;
 

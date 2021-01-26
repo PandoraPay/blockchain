@@ -75,6 +75,7 @@ module.exports = class MainChain extends BaseChain {
                         this.data.transactionsIndex = data.transactionsIndex;
                         this.data.tokensIndex = data.tokensIndex;
                         this.data.chainwork = MarshalData.decompressBigNumber( Buffer.from( data.chainwork) );
+                        this.data.circulatingSupply = data.circulatingSupply;
                         this.data.hash = Buffer.from( data.hash );
                         this.data.prevHash = Buffer.from( data.prevHash );
                         this.data.kernelHash = Buffer.from( data.kernelHash );
@@ -115,8 +116,11 @@ module.exports = class MainChain extends BaseChain {
         await super._clearChainData();
 
         this._scope.logger.info(this, `Balance updated for Genesis ${this._scope.genesis.settings.stakes.publicKeyHash.toString('hex')}`)
-        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster)
-            await this.data.accountHashMap.updateBalance( this._scope.genesis.settings.stakes.publicKeyHash, this._scope.argv.transactions.coinbase.getBlockRewardAt( 0 ) );
+        if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
+            const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0 );
+            await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
+            this.data.circulatingSupply = reward;
+        }
 
         this.data.beingSaved = false;
     }
@@ -305,6 +309,7 @@ module.exports = class MainChain extends BaseChain {
                     transactionsIndex: newData.transactionsIndex,
                     tokensIndex: newData.tokensIndex,
                     chainwork: newData.chainworkBuffer,
+                    circulatingSupply: newData.circulatingSupply,
                     hash: newData.hash,
                     prevHash: newData.prevHash,
                     kernelHash: newData.kernelHash,
@@ -381,6 +386,7 @@ module.exports = class MainChain extends BaseChain {
         forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
         forkSubChain.data.tokensIndex = this.data.tokensIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
+        forkSubChain.data.circulatingSupply = this.data.circulatingSupply;
         forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
         forkSubChain.data._fallback = this.data;
 

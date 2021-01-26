@@ -139,10 +139,9 @@ module.exports = class BlockPoS extends DBSchema {
 
     async validatePOS(chain = this._scope.chain, chainData = chain.data){
 
-        if (this.block.height >= this._scope.argv.transactions.staking.stakingMinimumStakeEffect && this.stakingAmount < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
-            throw new Exception(this, "not enough coins for staking");
-
-        if (this.stakingAmount < this._scope.argv.transactions.coinbase.getBlockRewardAt(0)) throw new Exception(this, "for staking it requires at least 1 coin");
+        const minimumStake = this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(this.block.height );
+        if (this.stakingAmount < minimumStake)
+            throw new Exception(this, "for staking it requires a minimum threshold", {minimumStake, availableStake: this.stakingAmount});
 
         let funds = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
@@ -203,7 +202,10 @@ module.exports = class BlockPoS extends DBSchema {
 
         }
 
-        return distributions;
+        return {
+            distributions,
+            coinbase,
+        };
 
     }
 
@@ -212,7 +214,9 @@ module.exports = class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const distributions = await this._getRewardDistribution(chain, chainData);
+            const {distributions, coinbase} = await this._getRewardDistribution(chain, chainData);
+
+            chainData.circulatingSupply = chainData.circulatingSupply + coinbase;
 
             for (const tokenCurrency in distributions){
 
@@ -241,7 +245,7 @@ module.exports = class BlockPoS extends DBSchema {
         //update miner balance with coinbase reward and fee
         try{
 
-            const distributions = await this._getRewardDistribution(chain, chainData);
+            const {distributions, coinbase} = await this._getRewardDistribution(chain, chainData);
 
             for (const tokenCurrency in distributions){
 
@@ -253,6 +257,8 @@ module.exports = class BlockPoS extends DBSchema {
                 if ( distributions[tokenCurrency].owner > 0 )
                     await chainData.accountHashMap.updateBalance( this.stakeForgerPublicKeyHash, -distributions[tokenCurrency].owner, tokenCurrency );
             }
+
+            chainData.circulatingSupply = chainData.circulatingSupply - coinbase;
 
         }catch(err){
 

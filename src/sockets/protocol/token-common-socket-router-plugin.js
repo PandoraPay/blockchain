@@ -57,10 +57,11 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
             return {
                 version:0,
                 name: "PANDORA",
-                ticker: "PAN",
-                description: "Privacy Coin",
+                ticker: "PAND",
+                description: "Native token",
                 tokenPublicKeyHash: token,
                 decimalSeparator: 5,
+                supply: this._scope.mainChain.data.circulatingSupply,
             };
 
         const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token);
