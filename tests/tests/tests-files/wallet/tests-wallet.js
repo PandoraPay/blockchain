@@ -1,5 +1,4 @@
 const {describe} = require('kernel').tests;
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
 const {Helper, BufferHelper} = require('kernel').helpers;
 
 module.exports = function run () {
@@ -109,6 +108,7 @@ module.exports = function run () {
             this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
 
             for (let i = 0; i < count; i++) {
+
                 await wallet.manager.createNewAddress();
                 this.expect(wallet.addresses.length, i + 1);
 
@@ -121,11 +121,10 @@ module.exports = function run () {
                 this.expect(wallet.mnemonicSequenceCounter.value.length, 32);
             }
 
-
             //try to load it again
             await wallet.load();
-            wallet.encryption.logoutEncryptionWallet();
 
+            wallet.encryption.logoutEncryptionWallet();
 
             this.expect(wallet.encrypted, true);
             this.expect(wallet.mnemonic.value.length >= 100, true);

@@ -128,10 +128,10 @@ module.exports = class ForgeBlock {
 
             }
 
-            //delegatedStakes to coldStaking
-            for (let i=0; i < this._scope.walletStakes.delegatedStakes.length && !this._scope.forging.reset; i++){
+            //delegatedStakesList to coldStaking
+            for (let i=0; i < this._scope.walletStakes.delegatedStakesList.length && !this._scope.forging.reset; i++){
 
-                const delegatedStake = this._scope.walletStakes.delegatedStakes[i];
+                const delegatedStake = this._scope.walletStakes.delegatedStakesList[i];
 
                 if ( !delegatedStake.checkStake() ) break; //they are all sorted
 

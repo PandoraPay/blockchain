@@ -1,6 +1,6 @@
 const {describe} = require('kernel').tests;
 
-const Block = require("../../../../../../src/block/block")
+const BlockDBModel = require("../../../../../../src/block/block-db-model")
 
 module.exports = function run () {
 

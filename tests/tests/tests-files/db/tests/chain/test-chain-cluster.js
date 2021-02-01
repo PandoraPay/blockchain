@@ -52,7 +52,7 @@ module.exports = function run (dbType) {
             }
 
 
-            masterCluster.sendMessage("blocks-received-confirmed", true, true);
+            masterCluster.sendMessage("blocks-received-confirmed", {result: true}, true);
 
             await Helper.waitUntilCondition( () => masterCluster.stickyMaster.workers.length === 0, undefined, 55000 );
 

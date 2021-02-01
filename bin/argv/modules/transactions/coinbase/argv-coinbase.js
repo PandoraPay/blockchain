@@ -2,6 +2,8 @@ module.exports = {
 
     coinDenomination : 10000,
 
+    tokenTicker: "pand",
+
     getSupplyBefore(blockHeight){
 
         if (typeof blockHeight !== "number") throw "blockHeight is invalid";

@@ -2,7 +2,7 @@ const {SocketRouterPlugin} = require('networking').sockets.protocol;
 const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
 const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element")
+const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-db-schema-build")
 
 module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 

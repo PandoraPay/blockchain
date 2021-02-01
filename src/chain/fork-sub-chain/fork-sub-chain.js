@@ -14,7 +14,7 @@ module.exports = class ForkSubChain extends SubChain{
     }
 
 
-    get _chainDataClass(){
+    get _chainDataClassDBModel(){
         return ForkSubChainData
     }
 

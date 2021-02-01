@@ -1,21 +1,7 @@
 const BaseChain = require( "../base/base-chain")
 const SubChainData = require("./data/sub-chain-data");
-const SubChainDataBlock = require( "./data/sub-chain-data-block")
 
 module.exports = class SubChain extends BaseChain{
-
-    async _clearChainData() {
-        await super._clearChainData();
-
-        this.listBlocks = [];
-        this.blocks = {};
-
-        this.listKernelHashes = [];
-        this.kernelHashes = {};
-
-        this.listHashes = [];
-        this.hashes = {};
-    }
 
     async clearChain(free = true){
 
@@ -117,7 +103,7 @@ module.exports = class SubChain extends BaseChain{
 
     }
 
-    get _chainDataClass(){
+    get _chainDataClassDBModel(){
         return SubChainData;
     }
 

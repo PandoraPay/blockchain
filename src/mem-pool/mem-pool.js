@@ -1,8 +1,4 @@
 const {Helper, Exception, StringHelper, ArrayHelper} = require('kernel').helpers;
-const {DBSchema} = require('kernel').marshal.db;
-const {DBSchemaBufferBig, DBSchemaString} = require('kernel').marshal.db.samples;
-const {BaseTransaction} = require('cryptography').transactions.base;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 module.exports =  class MemPool {
 

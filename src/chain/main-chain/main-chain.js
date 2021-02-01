@@ -2,12 +2,12 @@ const ForkSubChain = require( "../fork-sub-chain/fork-sub-chain");
 
 const {Exception, Helper} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
-const {DBSchema} = require('kernel').marshal.db;
+const {DBSchemaBuild} = require('kernel').db;
 
-const Block = require( "../../block/block")
+const BlockDBModel = require( "../../block/block-db-model")
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")
-const MainChainData = require("./main-chain-data")
+const MainChainDataDBModel = require("./main-chain-data")
 
 module.exports = class MainChain extends BaseChain {
 
@@ -17,8 +17,6 @@ module.exports = class MainChain extends BaseChain {
 
         this._init = false;
         this.isMainChain = true;
-
-        this.dataSubscription = new DBSchema(this._scope, { fields: {  table: { default: "mainChain", fixedBytes: 9 } }});
 
     }
 
@@ -64,6 +62,7 @@ module.exports = class MainChain extends BaseChain {
         if ( this._scope.db.isSynchronized ) {
 
             this._scope.masterCluster.on("main-chain", async data =>{
+
                 try{
 
                     if (data.message === "main-chain/update-main-chain"){
@@ -279,7 +278,7 @@ module.exports = class MainChain extends BaseChain {
 
                 }
             }catch(err){
-                throw new Exception(this, "Error deleting block");
+                throw new Exception(this, "Error saving the new blocks");
             }
 
             //saving it
@@ -328,7 +327,8 @@ module.exports = class MainChain extends BaseChain {
             if (this._scope.db.isSynchronized )
                 await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/propagate-new-block" }, true, false );
 
-            await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
+            if (this._scope.commonSocketRouterPluginsMap)
+                await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
 
             //TODO mark that the chain was saved correctly
 
@@ -413,8 +413,8 @@ module.exports = class MainChain extends BaseChain {
 
     }
 
-    get _chainDataClass(){
-        return MainChainData;
+    get _chainDataClassDBModel(){
+        return MainChainDataDBModel;
     }
 
 }

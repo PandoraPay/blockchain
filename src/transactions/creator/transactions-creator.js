@@ -1,10 +1,10 @@
 const {Exception} = require('kernel').helpers;
 const {TransactionTypeEnum} = require('cryptography').transactions;
 
-const BlockchainSimpleTransaction = require( "./../simple-transaction/blockchain-simple-transaction")
-const BlockchainDelegateStakeSimpleTransaction = require( "./../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction")
-const BlockchainTokenCreateSimpleTransaction = require(  "./../tokens/token-create/blockchain-token-create-simple-transaction")
-const BlockchainTokenUpdateSupplySimpleTransaction = require(  "./../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction")
+const BlockchainSimpleTransactionDBModel = require( "../simple-transaction/blockchain-simple-transaction-db-model")
+const BlockchainDelegateStakeSimpleTransaction = require( "../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction-db-model")
+const BlockchainTokenCreateSimpleTransactionDBModel = require(  "../tokens/token-create/blockchain-token-create-simple-transaction-db-model")
+const BlockchainTokenUpdateSupplySimpleTransactionDBModel = require(  "../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction-db-model")
 
 module.exports = class TransactionsCreator {
     
@@ -119,7 +119,7 @@ module.exports = class TransactionsCreator {
 
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
-        const tx = new BlockchainTokenUpdateSupplySimpleTransaction( this._scope, undefined, {
+        const tx = new BlockchainTokenUpdateSupplySimpleTransactionDBModel( this._scope, undefined, {
 
             vin: input,
             vout: [],

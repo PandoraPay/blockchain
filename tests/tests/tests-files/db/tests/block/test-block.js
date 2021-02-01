@@ -1,6 +1,7 @@
 const {describe} = require('kernel').tests;
 
-const Block = require( "../../../../../../src/block/block")
+const BlockDBModel = require( "../../../../../../src/block/block-db-model")
+const {BlockDBSchemaBuild} = require( "../../../../../../src/block/block-db-schema-build")
 const BlockVersionEnum = require("../../../../../../src/block/block-version-enum")
 
 async function validateBlockZero( block ){
@@ -10,9 +11,9 @@ async function validateBlockZero( block ){
 
     this.expect( block.hash().equals( Buffer.alloc(32) ), false);
 
-    let json = block.toJSON(true);
+    const json = block.toJSON(true);
 
-    const newBlock = new Block(this._scope, {
+    const BlockNewDBSchemaBuilt = new BlockDBSchemaBuild({
 
         fields: {
             prevHash: {
@@ -24,6 +25,8 @@ async function validateBlockZero( block ){
         },
 
     });
+
+    const newBlock = new BlockDBModel(this._scope, BlockNewDBSchemaBuilt );
 
     newBlock.fromJSON(json);
 
@@ -38,7 +41,7 @@ module.exports = function run (dbType) {
 
         'block initialization': async function () {
 
-            const block = new Block(this._scope, {
+            const BlockNewDBSchemaBuilt = new BlockDBSchemaBuild({
 
                 fields: {
                     prevHash: {
@@ -49,7 +52,9 @@ module.exports = function run (dbType) {
                     },
                 },
 
-            }, {
+            })
+
+            const block = new BlockDBModel(this._scope, BlockNewDBSchemaBuilt , {
                 pos:{
                     stakingAmount: 10000,
                 },

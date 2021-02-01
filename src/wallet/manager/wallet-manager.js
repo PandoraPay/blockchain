@@ -1,10 +1,11 @@
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
+const {EncryptedDBModel} = require('cryptography').models;
+const {EncryptedTypeEnum} = require('cryptography').enums;
 const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
 const {Address} = require('cryptography').addresses.public;
 
-const WalletAddress = require( "../addresses/wallet-address");
-const WalletAddressTypeEnum = require( "../addresses/data/wallet-address-type-enum");
+const WalletAddressDBModel = require( "../addresses/wallet-address-db-model");
+const WalletAddressTypeEnum = require( "../addresses/wallet-address-type-enum");
 
 
 module.exports = class WalletManager{
@@ -25,7 +26,7 @@ module.exports = class WalletManager{
 
             const walletAddress = this.wallet.addresses[i];
             const publicAddress = walletAddress.keys.decryptPublicAddress();
-            if ( (address instanceof WalletAddress && address === walletAddress) || (typeof address === "string" && publicAddress.calculateAddress() === address ) || (address instanceof Address && address.calculateAddress() === publicAddress.calculateAddress() ) )
+            if ( (address instanceof WalletAddressDBModel && address === walletAddress) || (typeof address === "string" && publicAddress.calculateAddress() === address ) || (address instanceof Address && address.calculateAddress() === publicAddress.calculateAddress() ) )
                 return returnIndex ? i : walletAddress;
         }
 
@@ -64,9 +65,9 @@ module.exports = class WalletManager{
         const mnemonic = this._scope.cryptography.addressGenerator.generateMnemonic( language );
         const mnemonicString = mnemonic.join(' ');
 
-        this.wallet.mnemonic = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonic", {
+        this.wallet.mnemonic = this.wallet._createSimpleModelObject( EncryptedDBModel, undefined, "mnemonic", {
 
-            encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
+            encryption: EncryptedTypeEnum.PLAIN_TEXT,
             value: Buffer.from( mnemonicString, "utf8"),
 
         }, "object" );
@@ -75,9 +76,9 @@ module.exports = class WalletManager{
 
         this.wallet.mnemonicChecksum = checksum;
 
-        this.wallet.mnemonicSequenceCounter = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonicSequenceCounter", {
+        this.wallet.mnemonicSequenceCounter = this.wallet._createSimpleModelObject( EncryptedDBModel, undefined, "mnemonicSequenceCounter", {
 
-            encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
+            encryption: EncryptedTypeEnum.PLAIN_TEXT,
             value: Buffer.from( "01", "hex" ), //00 is reservered
 
         }, "object" );
@@ -102,11 +103,11 @@ module.exports = class WalletManager{
 
         if (accountPassword){ //it is encrypted, let's decrypt
 
-            const walletAddress = this.wallet._createSimpleObject( WalletAddress, "addresses", json, "object");
+            const walletAddress = this.wallet._createSimpleModelObject(  WalletAddressDBModel, undefined, "addresses", json, "object");
 
-            if (walletAddress.keys.private.encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED) json.keys.private.value = walletAddress.keys.private.decryptKey( accountPassword );
-            if (walletAddress.keys.public.encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED) json.keys.public.value = walletAddress.keys.public.decryptKey( accountPassword );
-            if (walletAddress.mnemonicSequenceIndex.encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED) json.mnemonicSequenceIndex.value = walletAddress.mnemonicSequenceIndex.decryptKey(accountPassword);
+            if (walletAddress.keys.private.encryption === EncryptedTypeEnum.ENCRYPTED) json.keys.private.value = walletAddress.keys.private.decryptKey( accountPassword );
+            if (walletAddress.keys.public.encryption === EncryptedTypeEnum.ENCRYPTED) json.keys.public.value = walletAddress.keys.public.decryptKey( accountPassword );
+            if (walletAddress.mnemonicSequenceIndex.encryption === EncryptedTypeEnum.ENCRYPTED) json.mnemonicSequenceIndex.value = walletAddress.mnemonicSequenceIndex.decryptKey(accountPassword);
 
             if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT ){
 
@@ -148,7 +149,7 @@ module.exports = class WalletManager{
         if (!privateAddress.privateKey.equals( privateAddressMnemonic.privateKey ))
             mnemonicSequenceIndex = 0;
 
-        const walletAddress = this.wallet._createSimpleObject( WalletAddress, "addresses", {
+        const walletAddress = this.wallet._createSimpleModelObject( WalletAddressDBModel, undefined, "addresses", {
 
             version: 0,
 
@@ -157,18 +158,18 @@ module.exports = class WalletManager{
             name: mnemonicSequenceIndex ? ('Account' +  mnemonicSequenceIndex) : 'New Account',
 
             mnemonicSequenceIndex:{
-                encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
+                encryption: EncryptedTypeEnum.PLAIN_TEXT,
                 value: BufferHelper.convertNumberToBuffer(mnemonicSequenceIndex),
             },
 
             keys:{
 
                 private:{
-                    encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
+                    encryption: EncryptedTypeEnum.PLAIN_TEXT,
                     value: privateAddress.privateKey,
                 },
                 public:{
-                    encryption: DBSchemaEncryptionTypeEnum.PLAIN_TEXT,
+                    encryption: EncryptedTypeEnum.PLAIN_TEXT,
                     value: privateAddress.publicKey,
                 },
 
@@ -195,9 +196,10 @@ module.exports = class WalletManager{
         await this.importPrivateKeyAddress( privateKey.privateAddress, type,  mnemonicSequenceCounter, undefined, false );
 
         let mnemonicSequenceCounterObject;
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) mnemonicSequenceCounterObject = this.wallet.mnemonicSequenceCounter = this.wallet._createSimpleObject( DBEncryptedSchema, "mnemonicSequenceCounter",{ }, "object" );
+        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT)
+            mnemonicSequenceCounterObject = this.wallet.mnemonicSequenceCounter = this.wallet._createSimpleModelObject( EncryptedDBModel, undefined, "mnemonicSequenceCounter",{ }, "object" );
 
-        mnemonicSequenceCounterObject.encryption = DBSchemaEncryptionTypeEnum.PLAIN_TEXT;
+        mnemonicSequenceCounterObject.encryption = EncryptedTypeEnum.PLAIN_TEXT;
         mnemonicSequenceCounterObject.value = BufferHelper.convertNumberToBuffer( mnemonicSequenceCounter + 1 );
 
 
@@ -224,8 +226,8 @@ module.exports = class WalletManager{
 
             for (const key of ["private", "public"])
                 if (walletAddress.keys[key] && address.keys[key]){
-                    if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.PLAIN_TEXT && address.keys[key].value.equals(walletAddress.keys[key].value)) return address;
-                    if (walletAddress.keys[key].encryption === DBSchemaEncryptionTypeEnum.ENCRYPTED && address.keys[key]._unlocked.equals(walletAddress.keys[key].value)) return address;
+                    if (walletAddress.keys[key].encryption === EncryptedTypeEnum.PLAIN_TEXT && address.keys[key].value.equals(walletAddress.keys[key].value)) return address;
+                    if (walletAddress.keys[key].encryption === EncryptedTypeEnum.ENCRYPTED && address.keys[key]._unlocked.equals(walletAddress.keys[key].value)) return address;
                 }
 
         }

@@ -1,16 +1,15 @@
-const Block = require( "../../block/block");
-const TransactionsMerkleTreeNode = require( "../../block/transactions/merkle-tree/transactions-merkle-tree-node")
+const BlockDBModel = require( "../../block/block-db-model");
+const TransactionsMerkleTreeNodeDBModel = require( "../../block/transactions/merkle-tree/transactions-merkle-tree-node-db-model")
 
 const {Helper, Exception} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
 
-const BaseChainData = require( "./../base/base-chain-data");
+const BaseChainDataDBModel = require( "../base/base-chain-data-db-model");
+const {BaseChainDataDBSchemaBuild} = require( "../base/base-chain-data-db-schema-build");
 
-module.exports = class MainChainData extends BaseChainData {
-
-    constructor(scope, schema = { }, data, type , creationOptions){
-
-        super(scope, Helper.merge( {
+class MainChainDataDBSchemaBuild extends BaseChainDataDBSchemaBuild{
+    constructor(schema) {
+        super(Helper.merge( {
 
                 fields:{
 
@@ -37,7 +36,16 @@ module.exports = class MainChainData extends BaseChainData {
                 }
 
             },
-            schema, false), data, type, creationOptions);
+            schema, true ));
+    }
+}
+const MainChainDataDBSchemaBuilt = new MainChainDataDBSchemaBuild()
+
+module.exports = class MainChainDataDBModel extends BaseChainDataDBModel {
+
+    constructor(scope, schema = MainChainDataDBSchemaBuilt, data, type , creationOptions){
+
+        super(scope, schema, data, type, creationOptions);
 
         this.clearOnlyLocalBlocks();
 
@@ -84,9 +92,9 @@ module.exports = class MainChainData extends BaseChainData {
         const promises = [
 
             this.blockHashMap.clearHashMap(),
-            this.hashBlockMap.clearHashMap(),
+            this.blockHeightMap.clearHashMap(),
 
-            this.txHashMap.clearHashMap(),
+            this.txInfoHashMap.clearHashMap(),
             this.txRevertInfoHashMap.clearHashMap(),
             this.addressHashMap.clearHashMap(),
             this.addressTxHashMap.clearHashMap(),
@@ -129,9 +137,9 @@ module.exports = class MainChainData extends BaseChainData {
 
         const promises = [
             this.blockHashMap.saveVirtualMap(),
-            this.hashBlockMap.saveVirtualMap(),
+            this.blockHeightMap.saveVirtualMap(),
 
-            this.txHashMap.saveVirtualMap(),
+            this.txInfoHashMap.saveVirtualMap(),
             this.txRevertInfoHashMap.saveVirtualMap(),
             this.addressHashMap.saveVirtualMap(),
             this.addressTxHashMap.saveVirtualMap(),
@@ -158,7 +166,7 @@ module.exports = class MainChainData extends BaseChainData {
 
         if (this.blocksMap[height]) return this.blocksMap[height];
 
-        const block  = new Block( this._scope, undefined, {
+        const block  = new BlockDBModel( this._scope, undefined, {
             height: height
         } );
         await block.load();
@@ -186,11 +194,11 @@ module.exports = class MainChainData extends BaseChainData {
 
         if (this.blocksMap[height]) return this.blocksMap[height].hash();
 
-        const element = await this.blockHashMap.getMap( height.toString() );
+        const element = await this.blockHeightMap.getMap( height.toString() );
 
         if (!element) throw new Exception(this, "Block not found", {height});
 
-        return element.data;
+        return element.hash;
 
     }
 
@@ -200,7 +208,7 @@ module.exports = class MainChainData extends BaseChainData {
 
         if (this.blocksHashesMap[hash]) return this.blocksHashesMap[hash];
 
-        const element = await this.hashBlockMap.getMap( hash );
+        const element = await this.blockHashMap.getMap( hash );
 
         if (!element) throw new Exception(this, "Block not found", {hash});
 
@@ -217,13 +225,13 @@ module.exports = class MainChainData extends BaseChainData {
 
         if (this.transactionsHashesMap[hash]) return this.transactionsHashesMap[hash];
 
-        const hashExistence = await this.txHashMap.getMap( hash, );
+        const hashExistence = await this.txInfoHashMap.getMap( hash, );
         if (!hashExistence) return undefined;
 
         const blockHeight = hashExistence.data.blockHeight;
         const merkleHeight = hashExistence.data.merkleHeight;
 
-        const txMerkleNode  = new TransactionsMerkleTreeNode( {
+        const txMerkleNode  = new TransactionsMerkleTreeNodeDBModel( {
             ...this._scope,
             parent: {
                 tree: {
@@ -231,9 +239,6 @@ module.exports = class MainChainData extends BaseChainData {
                     levels: 0,
                 },
                 level: -1,
-                __changes: {},
-                _propagateChanges: a=>a,
-                _propagateHashingChanges: a => a,
             },
             parentFieldName: "children",
         }, undefined, { } );

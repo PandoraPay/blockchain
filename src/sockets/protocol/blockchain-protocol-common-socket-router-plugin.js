@@ -8,7 +8,7 @@ const {BN, BigNumber} = require('kernel').utils;
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-const Block = require("../../block/block");
+const BlockDBModel = require("../../block/block-db-model");
 
 module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends SocketRouterPlugin {
 
@@ -74,39 +74,9 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
         if (this._scope.db.isSynchronized){
 
-            await this._scope.mainChain.dataSubscription.subscribe();
-
-            this._scope.mainChain.dataSubscription.subscription.on( message => {
-
-                //it the message was sent by me
-                if (message.except && message.except === this._scope.masterCluster.workerName) return;
-
-                const id = message.data.forkSubchain;
-
-                if (message.name === "new-hash" && this.forkSubchains[message.data.forkSubchain]){
-
-                    if ( message.forkEnd - this.forkSubchains[id].data.forkEnd === message.newKernelHashes.length && message.newKernelHashes.length === message.data.newHashes.length ){
-
-                        this.forkSubchains[id].data.forkEnd = Math.max( this.forkSubchains[id].data.forkEnd, message.forkEnd);
-                        this.forkSubchains[id].data.forkStart = Math.min( this.forkSubchains[id].data.forkStart, message.forkStart);
-
-                        for ( const kernelHash of message.data.newKernelHashes)
-                            if ( !this.forkSubchains[id].data.listKernelHashes.reduce( (res, listKernelHash) => res || listKernelHash.buffer.equals( kernelHash ), false ) )
-                                this.forkSubchains[id].data.pushArray( "listKernelHashes", kernelHash );
-
-                        for ( const hash of message.data.newHashes)
-                            if ( !this.forkSubchains[id].data.listHashes.reduce( (res, listHash) => res || listHash.buffer.equals( hash ), false ) )
-                                this.forkSubchains[id].data.pushArray( "listHashes", hash )
-
-                    }
-
-                }
-
-                if (message.name === "delete-chain" && this.forkSubchains[id])
-                    this._deleteForkSubchain( this.forkSubchains[id] );
+            this._scope.masterCluster.on("main-chain", async data =>{
 
             });
-
 
         }
 

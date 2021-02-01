@@ -1,6 +1,6 @@
 const  {Helper} = require('kernel').helpers;
 const {describe} = require('kernel').tests;
-const {DBConstructor} = require('kernel').marshal.db;
+const {DBConstructor} = require('kernel').db;
 const {cluster} = require('kernel').masterCluster;
 
 const TestBlock = require("../tests/block/test-block");

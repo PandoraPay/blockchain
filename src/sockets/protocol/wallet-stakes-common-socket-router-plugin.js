@@ -103,11 +103,11 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
 
         const out = [];
 
-        const delegatedStakes = this._scope.walletStakes.delegatedStakes;
-        for (let i=0; i < delegatedStakes.length; i++){
+        const delegatedStakesList = this._scope.walletStakes.delegatedStakesList;
+        for (let i=0; i < delegatedStakesList.length; i++){
             out.push({
-                publicKeyHash: delegatedStakes.publicKeyHash,
-                delegatePublicKey: delegatedStakes.delegatePublicKey,
+                publicKeyHash: delegatedStakesList[i].publicKeyHash,
+                delegatePublicKey: delegatedStakesList[i].delegatePublicKey,
             });
         }
 

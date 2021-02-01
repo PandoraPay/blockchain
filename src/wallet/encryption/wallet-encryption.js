@@ -1,4 +1,4 @@
-const {DBEncryptedSchema, DBSchemaEncryptionTypeEnum} = require('cryptography').marshal.db.samples;
+const {EncryptedTypeEnum} = require('cryptography').enums;
 const {Helper, Exception} = require('kernel').helpers;
 
 module.exports = class WalletEncryption {
@@ -20,7 +20,7 @@ module.exports = class WalletEncryption {
         if ( !this.wallet.encrypted ) return true;
         if (this._isDecrypted) return true;
 
-        if (this.wallet.mnemonic.encryption === DBSchemaEncryptionTypeEnum.NON_EXISTENT ) throw new Exception(this, "Mnemonic is missing");
+        if (this.wallet.mnemonic.encryption === EncryptedTypeEnum.NON_EXISTENT ) throw new Exception(this, "Mnemonic is missing");
 
         if ( !Buffer.isBuffer(password) || password.length !== 32 ){
 
@@ -163,7 +163,7 @@ module.exports = class WalletEncryption {
     }
 
     checkIfIsReallyEncrypted(encrypted){
-        const map = this._operate( it => it.encryption === (encrypted ? DBSchemaEncryptionTypeEnum.ENCRYPTED : DBSchemaEncryptionTypeEnum.PLAIN_TEXT) );
+        const map = this._operate( it => it.encryption === (encrypted ? EncryptedTypeEnum.ENCRYPTED : EncryptedTypeEnum.PLAIN_TEXT) );
         return map.reduce( (res, it) => res && it, true )
     }
 

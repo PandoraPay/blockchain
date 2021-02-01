@@ -6,11 +6,11 @@ const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 
 const Argv = require( "../bin/argv/argv")
 const MainChain = require( "../src/chain/main-chain/main-chain");
-const Wallet = require( "../src/wallet/wallet")
-const WalletStakes = require( "../src/wallet-stakes/wallet-stakes")
+const WalletDBModel = require( "./wallet/wallet-db-model")
+const WalletStakesDBModel = require( "./wallet-stakes/wallet-stakes-db-model")
 const Forging = require( "../src/forging/forging")
 
-const Genesis = require( "../src/block/genesis/genesis")
+const GenesisDBModel = require( "./block/genesis/genesis-db-model")
 
 const AccountCommonSocketRouterPlugin = require( "../src/sockets/protocol/account-common-socket-router-plugin")
 const TokenCommonSocketRouterPlugin = require( "../src/sockets/protocol/token-common-socket-router-plugin")
@@ -74,10 +74,10 @@ module.exports = class App extends kernel.utils.App {
         this.events.on("start/argv-set", () =>{
 
             if ( !this._scope.MainChain ) this._scope.MainChain = MainChain;
-            if ( !this._scope.Wallet ) this._scope.Wallet = Wallet;
-            if ( !this._scope.WalletStakes ) this._scope.WalletStakes = WalletStakes;
+            if ( !this._scope.WalletDBModel ) this._scope.WalletDBModel = WalletDBModel;
+            if ( !this._scope.WalletStakesDBModel ) this._scope.WalletStakesDBModel = WalletStakesDBModel;
             if ( !this._scope.Forging ) this._scope.Forging = Forging;
-            if ( !this._scope.Genesis ) this._scope.Genesis = Genesis;
+            if ( !this._scope.GenesisDBModel ) this._scope.GenesisDBModel = GenesisDBModel;
             if ( !this._scope.MemPool) this._scope.MemPool = MemPool;
             if ( !this._scope.Testnet) this._scope.Testnet = Testnet;
 
@@ -135,7 +135,7 @@ module.exports = class App extends kernel.utils.App {
                  */
                 this._scope.genesisSettings = genesisSettings;
                 this._scope.genesis = { settings: genesisSettings };
-                this._scope.genesis = new this._scope.Genesis( this._scope, undefined, undefined, undefined, undefined, genesisSettings );
+                this._scope.genesis = new this._scope.GenesisDBModel( this._scope, undefined, undefined, undefined, undefined, genesisSettings );
 
             }
 
@@ -149,10 +149,10 @@ module.exports = class App extends kernel.utils.App {
 
             if (!this.wallet){
 
-                this._scope.wallet = new this._scope.Wallet({
+                this._scope.wallet = new this._scope.WalletDBModel({
                     ...this._scope,
                     db: this._scope.dbPrivate,
-                }, undefined, undefined, undefined, { emptyObject: true } );
+                }, undefined, undefined, undefined, { loading: true } );
 
                 try{
 
@@ -170,7 +170,7 @@ module.exports = class App extends kernel.utils.App {
 
             if (!this.walletStakes){
 
-                this._scope.walletStakes = new this._scope.WalletStakes({
+                this._scope.walletStakes = new this._scope.WalletStakesDBModel({
                     ...this._scope,
                     db: this._scope.dbPrivate,
                 });

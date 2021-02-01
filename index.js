@@ -3,56 +3,56 @@ const cryptography = require('cryptography');
 const networking = require('networking');
 
 const App = require('./src/app');
-const Block = require('./src/block/block');
+const BlockDBModel = require('./src/block/block-db-model');
 const BlockVersionEnum = require('./src/block/block-version-enum');
-const TransactionsMerkleTree = require('./src/block/transactions/merkle-tree/transactions-merkle-tree');
-const TransactionsMerkleTreeNode = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-node');
-const TransactionsMerkleTreeRoot = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-root');
-const AccountHashVirtualMap = require("./src/chain/maps/account-hash/account-hash-virtual-map");
-const AccountHashMapElement = require("./src/chain/maps/account-hash/account-hash-map-element");
-const AccountHashMapData = require("./src/chain/maps/account-hash/data/account-hash-map-data");
-const AccountHashMapDataDelegate = require ("./src/chain/maps/account-hash/data/account-hash-map-data-delegate");
-const AccountHashMapDataBalance = require("./src/chain/maps/account-hash/data/account-hash-map-data-balance");
-const TokenHashVirtualMap = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map");
-const TokenHashMapElement = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element");
-const TokenHashMapData = require("./src/chain/maps/tokens/tokens-hash/data/token-hash-map-data");
+const TransactionsMerkleTree = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-db-model');
+const TransactionsMerkleTreeNodeDBModel = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-node-db-model');
+const TransactionsMerkleTreeRootDBModel = require('./src/block/transactions/merkle-tree/transactions-merkle-tree-root-db-model');
+const AccountHashVirtualMapDBModel = require("./src/chain/maps/account-hash/account-hash-virtual-map-db-model");
+const AccountHashMapElementDBSchemaBuild = require("./src/chain/maps/account-hash/element/account-hash-map-element-db-schema-build");
+const AccountHashMapDataDelegateDBSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-delegate-schema-build");
+const AccountHashMapDataBalanceDBSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-balance-schema-build");
+const TokenHashVirtualMapDBModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map-db-model");
+const TokenHashMapElementDBSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-db-schema-build");
 
-const BlockchainSimpleTransaction = require("./src/transactions/simple-transaction/blockchain-simple-transaction");
-const BlockchainDelegateStakeSimpleTransaction = require("./src/transactions/simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction");
-const BlockchainTokenCreateSimpleTransaction = require("./src/transactions/tokens/token-create/blockchain-token-create-simple-transaction");
-const BlockchainUpdateSupplySimpleTransaction = require("./src/transactions/tokens/token-update-supply/blockchain-token-update-supply-simple-transaction");
-const Genesis = require('./src/block/genesis/genesis');
+const BlockchainSimpleTransactionDBModel = require("./src/transactions/simple-transaction/blockchain-simple-transaction-db-model");
+const BlockchainDelegateStakeSimpleTransactionDBModel = require("./src/transactions/simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction-db-model");
+const BlockchainTokenCreateSimpleTransactionDBModel = require("./src/transactions/tokens/token-create/blockchain-token-create-simple-transaction-db-model");
+const BlockchainUpdateSupplySimpleTransactionDBModel = require("./src/transactions/tokens/token-update-supply/blockchain-token-update-supply-simple-transaction-db-model");
+const GenesisDBModel = require('./src/block/genesis/genesis-db-model');
 const MainChain = require('./src/chain/main-chain/main-chain');
-const MainChainData = require('./src/chain/main-chain/main-chain-data');
+const MainChainDataDBModel = require('./src/chain/main-chain/main-chain-data');
 const BaseChain = require('./src/chain/base/base-chain');
-const BaseChainData = require('./src/chain/base/base-chain-data');
+const BaseChainDataDBModel = require('./src/chain/base/base-chain-data-db-model');
 const SubChain = require('./src/chain/sub-chain/sub-chain');
 const TestsFiles = require("./tests/tests/tests-index");
 const MemPool = require("./src/mem-pool/mem-pool");
 
-const Wallet = require("./src/wallet/wallet");
-const WalletAddress = require("./src/wallet/addresses/wallet-address");
-const WalletAddressTypeEnum = require("./src/wallet/addresses/data/wallet-address-type-enum");
-const WalletAddressTransparentKeys = require("./src/wallet/addresses/data/wallet-address-transparent-keys");
+const WalletDBModel = require("./src/wallet/wallet-db-model");
+const WalletAddressDBModel = require("./src/wallet/addresses/wallet-address-db-model");
+const WalletAddressTypeEnum = require("./src/wallet/addresses/wallet-address-type-enum");
+const WalletAddressTransparentKeysDBModel = require("./src/wallet/addresses/keys/wallet-address-transparent-keys-db-model");
 
-const library = {
+const {Helper} = require('kernel').helpers;
 
-    ...kernel,
-    ...cryptography,
-    ...networking,
+let merged = Helper.merge( kernel, {} , true)
+merged = Helper.merge(  cryptography, merged , true)
+merged = Helper.merge( networking, merged , true)
+
+const library = Helper.merge(merged, {
 
     app: new App({}),
 
     blockchain:{
 
         block: {
-            Block,
-            Genesis,
+            BlockDBModel,
+            GenesisDBModel,
             BlockVersionEnum,
             merkleTree:{
                 TransactionsMerkleTree,
-                TransactionsMerkleTreeNode,
-                TransactionsMerkleTreeRoot,
+                TransactionsMerkleTreeNodeDBModel,
+                TransactionsMerkleTreeRootDBModel,
             },
         },
 
@@ -65,58 +65,52 @@ const library = {
             BaseChain,
             SubChain,
             data:{
-                MainChainData,
-                BaseChainData,
+                MainChainDataDBModel,
+                BaseChainDataDBModel,
             },
 
             account:{
-                AccountHashVirtualMap,
-                AccountHashMapElement,
-                AccountHashMapData,
-                AccountHashMapDataBalance,
-                AccountHashMapDataDelegate,
+                AccountHashVirtualMapDBModel,
+                AccountHashMapElementDBSchemaBuild,
+                AccountHashMapDataBalanceDBSchemaBuild,
+                AccountHashMapDataDelegateDBSchemaBuild,
             },
 
             token: {
-                TokenHashVirtualMap,
-                TokenHashMapElement,
-                TokenHashMapData,
+                TokenHashVirtualMapDBModel,
             },
 
         },
 
         transactions:{
-            BlockchainSimpleTransaction,
-            BlockchainDelegateStakeSimpleTransaction,
-            BlockchainTokenCreateSimpleTransaction,
-            BlockchainUpdateSupplySimpleTransaction,
+            BlockchainSimpleTransactionDBModel,
+            BlockchainDelegateStakeSimpleTransactionDBModel,
+            BlockchainTokenCreateSimpleTransactionDBModel,
+            BlockchainUpdateSupplySimpleTransactionDBModel,
         },
 
         wallet:{
-            Wallet,
-            WalletAddress,
-            WalletAddressTransparentKeys,
+            WalletDBModel,
+            WalletAddressDBModel,
+            WalletAddressTransparentKeysDBModel,
             WalletAddressTypeEnum,
         },
 
     },
 
     utils: {
-        ...kernel.utils,
-        ...cryptography.utils,
-        ...networking.utils,
         App: App,
     },
 
+    enums: {
+        WalletAddressTypeEnum
+    },
+
     tests: {
-        ...kernel.tests,
-        ...cryptography.tests,
-        ...networking.tests,
         TestsFiles,
     }
 
-};
-
+}, false);
 
 
 if (typeof window !== "undefined") {

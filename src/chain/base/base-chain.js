@@ -3,8 +3,8 @@ const {BN} = require('kernel').utils;
 const {AsyncEvents} = require('kernel').helpers.events;
 const {Helper, Exception} = require('kernel').helpers;
 
-const Block = require("../../block/block");
-const BaseChainData = require("./base-chain-data")
+const BlockDBModel = require("../../block/block-db-model");
+const BaseChainDataDBModel = require("./base-chain-data-db-model")
 const TransactionsCreator = require("../../transactions/creator/transactions-creator")
 const TransactionsValidator = require( "../../transactions/validator/transactions-validator");
 
@@ -28,7 +28,7 @@ module.exports = class BaseChain extends AsyncEvents{
     }
 
     createData(){
-        return new this._chainDataClass( this._scope );
+        return new this._chainDataClassDBModel( this._scope );
     }
 
     cloneData(){
@@ -71,7 +71,7 @@ module.exports = class BaseChain extends AsyncEvents{
                 height: height,
             };
 
-            let BlockClass;
+            let BlockDBModelClass;
 
             if ( height ) {
 
@@ -80,7 +80,7 @@ module.exports = class BaseChain extends AsyncEvents{
                 data.timestamp = await chainData.getBlockTimestamp(height -1 ) + 1;
                 data.prevKernelHash = prevBlock.kernelHash();
 
-                BlockClass = Block;
+                BlockDBModelClass = BlockDBModel;
 
             } else { //Genesis
 
@@ -89,14 +89,14 @@ module.exports = class BaseChain extends AsyncEvents{
                 data.prevKernelHash = prevBlock.prevKernelHash;
                 data.timestamp = prevBlock.timestamp;
 
-                BlockClass = this._scope.genesis.constructor;
+                BlockDBModelClass = this._scope.genesis.constructor;
 
             }
 
-            block = new BlockClass( {
+            block = new BlockDBModelClass( {
                 ...this._scope,
                 chain: this,
-            }, undefined, data , "object", {skipProcessingConstructionValues: true}  );
+            }, undefined, data , "object", { skipProcessingConstructionValues: true}  );
 
             block.height = height;
 
@@ -143,8 +143,8 @@ module.exports = class BaseChain extends AsyncEvents{
         return blocks;
     }
 
-    get _chainDataClass(){
-        return BaseChainData;
+    get _chainDataClassDBModel(){
+        return BaseChainDataDBModel;
     }
 
     get isForkSubChain(){

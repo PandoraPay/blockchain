@@ -1,58 +1,15 @@
 const {Helper, Exception} = require('kernel').helpers;
-const {DBSchemaString} = require('kernel').marshal.db.samples;
 
-const BaseChainData = require( "../../base/base-chain-data");
-const Block = require( "../../../block/block")
+const BaseChainDataDBModel = require( "../../base/base-chain-data-db-model");
+const BlockDBModel = require( "../../../block/block-db-model")
 
-const SubChainDataHashUnique = require( "./hash/sub-chain-data-hash-unique");
-const SubChainDataKernelHashUnique = require( "./hash/sub-chain-data-kernel-hash-unique");
+const {SubChainDataDBSchemaBuilt} = require('./sub-chain-data-db-schema-build')
 
-module.exports = class SubChainData extends BaseChainData{
+module.exports = class SubChainData extends BaseChainDataDBModel{
 
-    constructor(scope, schema = { }, data, type , creationOptions){
+    constructor(scope, schema = SubChainDataDBSchemaBuilt, data, type , creationOptions){
 
-        super(scope, Helper.merge( {
-
-                fields:{
-
-                    table: {
-                        default: "chain",
-                        fixedBytes: 5,
-                    },
-
-                    version: {
-                        default: 0,
-                    },
-
-                    listBlocks: {
-                        type: "array",
-                        maxSize: scope.argv.blockchain.maxForkAllowed,
-                        classObject: Block,
-
-                        position: 200,
-                    },
-
-                    listHashes: {
-                        type: "array",
-                        maxSize: scope.argv.blockchain.maxForkAllowed,
-
-                        classObject: SubChainDataHashUnique,
-
-                        position: 201,
-                    },
-
-                    listKernelHashes: {
-                        type: "array",
-                        maxSize: scope.argv.blockchain.maxForkAllowed,
-                        classObject: SubChainDataKernelHashUnique,
-
-                        position: 202,
-                    },
-
-                }
-
-            },
-            schema, false), data, type, creationOptions);
+        super(scope, schema, data, type, creationOptions);
 
         if (!this.hashes) this.hashes = {};
         if (!this.kernelHashes) this.kernelHashes = {};
@@ -60,12 +17,17 @@ module.exports = class SubChainData extends BaseChainData{
 
     }
 
-
-
     async clearData(){
-
         await super.clearData(this);
 
+        this.listBlocks = [];
+        this.blocks = {};
+
+        this.listKernelHashes = [];
+        this.kernelHashes = {};
+
+        this.listHashes = [];
+        this.hashes = {};
 
     }
 
