@@ -1,10 +1,10 @@
 const {Exception} = require('kernel').helpers;
-const {TransactionTypeEnum} = require('cryptography').transactions;
+const {TxTypeEnum} = require('cryptography').transactions;
 
-const BlockchainSimpleTransactionDBModel = require( "../simple-transaction/blockchain-simple-transaction-db-model")
-const BlockchainDelegateStakeSimpleTransaction = require( "../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction-db-model")
-const BlockchainTokenCreateSimpleTransactionDBModel = require(  "../tokens/token-create/blockchain-token-create-simple-transaction-db-model")
-const BlockchainTokenUpdateSupplySimpleTransactionDBModel = require(  "../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction-db-model")
+const ChainSimpleTxModel = require( "../simple-transaction/chain-simple-tx-model")
+const ChainDelegateStakeSimpleTxModel = require( "../simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model")
+const ChainTokenCreateSimpleTxModel = require(  "../tokens/token-create/chain-token-create-simple-tx-model")
+const ChainTokenUpdateSupplySimpleTxModel = require(  "../tokens/token-update-supply/chain-token-update-supply-simple-tx-model")
 
 module.exports = class TransactionsCreator {
     
@@ -31,7 +31,7 @@ module.exports = class TransactionsCreator {
 
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
-        const tx = new BlockchainSimpleTransaction( this._scope, undefined, {
+        const tx = new ChainSimpleTxModel( this._scope, undefined, {
 
             vin: input,
             vout,
@@ -57,7 +57,7 @@ module.exports = class TransactionsCreator {
 
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
-        const tx = new BlockchainDelegateStakeSimpleTransaction( this._scope, undefined, {
+        const tx = new ChainDelegateStakeSimpleTxModel ( this._scope, undefined, {
 
             vin: input,
             vout: [],
@@ -84,7 +84,7 @@ module.exports = class TransactionsCreator {
 
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
-        const tx = new BlockchainTokenCreateSimpleTransaction( this._scope, undefined, {
+        const tx = new ChainTokenCreateSimpleTxModel( this._scope, undefined, {
 
             vin: input,
             vout: [],
@@ -119,7 +119,7 @@ module.exports = class TransactionsCreator {
 
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
-        const tx = new BlockchainTokenUpdateSupplySimpleTransactionDBModel( this._scope, undefined, {
+        const tx = new ChainTokenUpdateSupplySimpleTxModel( this._scope, undefined, {
 
             vin: input,
             vout: [],

@@ -1,6 +1,6 @@
 const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = require('networking').sockets.protocol;
 const {Exception} = require('kernel').helpers;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
@@ -151,7 +151,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
 
     }
 
-    async _getBalanceIncludingMemPool({account, tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id}){
+    async _getBalanceIncludingMemPool({account, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         if (!address) throw "Transparent Account is invalid";

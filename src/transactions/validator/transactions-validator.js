@@ -1,13 +1,13 @@
 
-const {TransactionTypeEnum, TransactionScriptTypeEnum} = require('cryptography').transactions;
-const {BaseTransaction} = require('cryptography').transactions.base;
+const {TxTypeEnum, TxScriptTypeEnum} = require('cryptography').transactions;
+const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
 
 const {Exception, EnumHelper, StringHelper, BufferHelper} = require('kernel').helpers;
 
-const BlockchainSimpleTransactionDBModel = require( "../simple-transaction/blockchain-simple-transaction-db-model")
-const BlockchainDelegateStakeSimpleTransaction = require( "../simple-transaction/delegate-stake-simple-transaction/blockchain-delegate-stake-simple-transaction-db-model")
-const BlockchainTokenCreateSimpleTransactionDBModel = require( "../tokens/token-create/blockchain-token-create-simple-transaction-db-model")
-const BlockchainTokenUpdateSupplySimpleTransactionDBModel = require( "../tokens/token-update-supply/blockchain-token-update-supply-simple-transaction-db-model")
+const ChainSimpleTxModel = require( "../simple-transaction/chain-simple-tx-model")
+const ChainDelegateStakeSimpleTxModel = require( "../simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model")
+const ChainTokenCreateSimpleTxModel = require( "../tokens/token-create/chain-token-create-simple-tx-model")
+const ChainTokenUpdateSupplySimpleTxModel = require( "../tokens/token-update-supply/chain-token-update-supply-simple-tx-model")
 
 module.exports = class TransactionsValidator{
     
@@ -17,17 +17,17 @@ module.exports = class TransactionsValidator{
     
     validateTxVersion(version){
         
-        if (EnumHelper.validateEnum( version , TransactionTypeEnum) ) return true;
+        if (EnumHelper.validateEnum( version , TxTypeEnum) ) return true;
 
     }
     
     validateTxScript(scriptVersion){
-        if (EnumHelper.validateEnum( version , TransactionScriptTypeEnum) ) return true;
+        if (EnumHelper.validateEnum( scriptVersion , TxScriptTypeEnum) ) return true;
     }
 
     isReallyATx(tx){
 
-        if (tx && tx instanceof BlockchainSimpleTransaction) return true;
+        if (tx && tx instanceof ChainSimpleTxModel) return true;
 
         return false;
     }
@@ -46,13 +46,13 @@ module.exports = class TransactionsValidator{
         let scriptVersion;
 
         if (Buffer.isBuffer(input )) scriptVersion = input[1];
-        else if ( input instanceof BaseTransaction) scriptVersion = input.scriptVersion;
+        else if ( input instanceof BaseTxModel) scriptVersion = input.scriptVersion;
         else if ( typeof input === "object" ) scriptVersion = input.scriptVersion;
 
-        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return BlockchainSimpleTransaction;
-        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return BlockchainDelegateStakeSimpleTransaction;
-        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_CREATE_TRANSACTION ) return BlockchainTokenCreateSimpleTransaction;
-        if ( scriptVersion === TransactionScriptTypeEnum.TX_SCRIPT_TOKEN_UPDATE_SUPPLY_TRANSACTION ) return BlockchainTokenUpdateSupplySimpleTransaction;
+        if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return ChainSimpleTxModel;
+        if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return ChainDelegateStakeSimpleTxModel;
+        if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_TOKEN_CREATE_TRANSACTION ) return ChainTokenCreateSimpleTxModel;
+        if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_TOKEN_UPDATE_SUPPLY_TRANSACTION ) return ChainTokenUpdateSupplySimpleTxModel;
 
         throw new Exception(this, "Transaction class couldn't be identified by script version", scriptVersion);
             

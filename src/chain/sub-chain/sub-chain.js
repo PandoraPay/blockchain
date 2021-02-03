@@ -1,5 +1,5 @@
 const BaseChain = require( "../base/base-chain")
-const SubChainData = require("./data/sub-chain-data");
+const SubChainData = require("./data/sub-chain-data-model");
 
 module.exports = class SubChain extends BaseChain{
 
@@ -103,7 +103,7 @@ module.exports = class SubChain extends BaseChain{
 
     }
 
-    get _chainDataClassDBModel(){
+    get _chainDataClassModel(){
         return SubChainData;
     }
 

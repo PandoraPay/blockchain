@@ -4,10 +4,10 @@ const {Exception, Helper} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
 const {DBSchemaBuild} = require('kernel').db;
 
-const BlockDBModel = require( "../../block/block-db-model")
+const BlockModel = require( "../../block/block-model")
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")
-const MainChainDataDBModel = require("./main-chain-data")
+const MainChainDataModel = require("./main-chain-data")
 
 module.exports = class MainChain extends BaseChain {
 
@@ -413,8 +413,8 @@ module.exports = class MainChain extends BaseChain {
 
     }
 
-    get _chainDataClassDBModel(){
-        return MainChainDataDBModel;
+    get _chainDataClassModel(){
+        return MainChainDataModel;
     }
 
 }

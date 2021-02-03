@@ -1,14 +1,16 @@
-const BlockDBModel = require( "../../block/block-db-model");
-const TransactionsMerkleTreeNodeDBModel = require( "../../block/transactions/merkle-tree/transactions-merkle-tree-node-db-model")
+const BlockModel = require( "../../block/block-model");
+const TxMerkleTreeNodeModel = require( "../../block/transactions/merkle-tree/tx-merkle-tree-node-model")
 
 const {Helper, Exception} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
 
-const BaseChainDataDBModel = require( "../base/base-chain-data-db-model");
-const {BaseChainDataDBSchemaBuild} = require( "../base/base-chain-data-db-schema-build");
+const BaseChainDataModel = require( "../base/base-chain-data-model");
+const {BaseChainDataSchemaBuild} = require( "../base/base-chain-data-schema-build");
 
-class MainChainDataDBSchemaBuild extends BaseChainDataDBSchemaBuild{
+class MainChainDataSchemaBuild extends BaseChainDataSchemaBuild {
+
     constructor(schema) {
+
         super(Helper.merge( {
 
                 fields:{
@@ -39,11 +41,11 @@ class MainChainDataDBSchemaBuild extends BaseChainDataDBSchemaBuild{
             schema, true ));
     }
 }
-const MainChainDataDBSchemaBuilt = new MainChainDataDBSchemaBuild()
+const MainChainDataSchemaBuilt = new MainChainDataSchemaBuild()
 
-module.exports = class MainChainDataDBModel extends BaseChainDataDBModel {
+module.exports = class MainChainDataModel extends BaseChainDataModel {
 
-    constructor(scope, schema = MainChainDataDBSchemaBuilt, data, type , creationOptions){
+    constructor(scope, schema = MainChainDataSchemaBuilt, data, type , creationOptions){
 
         super(scope, schema, data, type, creationOptions);
 
@@ -166,7 +168,7 @@ module.exports = class MainChainDataDBModel extends BaseChainDataDBModel {
 
         if (this.blocksMap[height]) return this.blocksMap[height];
 
-        const block  = new BlockDBModel( this._scope, undefined, {
+        const block  = new BlockModel( this._scope, undefined, {
             height: height
         } );
         await block.load();
@@ -231,7 +233,7 @@ module.exports = class MainChainDataDBModel extends BaseChainDataDBModel {
         const blockHeight = hashExistence.data.blockHeight;
         const merkleHeight = hashExistence.data.merkleHeight;
 
-        const txMerkleNode  = new TransactionsMerkleTreeNodeDBModel( {
+        const txMerkleNode  = new TxMerkleTreeNodeModel( {
             ...this._scope,
             parent: {
                 tree: {

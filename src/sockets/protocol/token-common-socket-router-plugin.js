@@ -1,8 +1,8 @@
 const {SocketRouterPlugin} = require('networking').sockets.protocol;
 const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-db-schema-build")
+const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build")
 
 module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
@@ -53,7 +53,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (!token) throw new Exception(this, 'token was not specified');
         if (!Buffer.isBuffer(token) && StringHelper.isHex(token) ) token = Buffer.from(token, "hex");
 
-        if (token.equals(TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
+        if (token.equals(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             return {
                 version:0,
                 name: "PANDORA",

@@ -8,7 +8,7 @@ const {BN, BigNumber} = require('kernel').utils;
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-const BlockDBModel = require("../../block/block-db-model");
+const BlockModel = require("../../block/block-model");
 
 module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends SocketRouterPlugin {
 

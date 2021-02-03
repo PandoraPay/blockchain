@@ -1,6 +1,6 @@
 const {DBSchemaBuild} = require('kernel').db;
 const {Helper, Exception, EnumHelper} = require('kernel').helpers;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
 
@@ -28,10 +28,10 @@ class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
                     minSize: 1,
                     maxSize: 20,
 
-                    default: TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
+                    default: TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 
                     validation(value) {
-                        return value.equals( TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ) || (value.length === 20);
+                        return value.equals( TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ) || (value.length === 20);
                     },
 
                     position: 101,

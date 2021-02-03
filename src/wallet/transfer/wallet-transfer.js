@@ -1,5 +1,5 @@
 const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 const {MarshalFields} = require('kernel').marshal;
 
 module.exports = class WalletTransfer {
@@ -26,7 +26,7 @@ module.exports = class WalletTransfer {
 
     }
 
-    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
 
         if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
         if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
@@ -50,7 +50,7 @@ module.exports = class WalletTransfer {
 
     async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
 
-        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
+        const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
@@ -94,7 +94,7 @@ module.exports = class WalletTransfer {
 
     async tokenCreate({address, fee, nonce, tokenData, memPoolValidateTxData, paymentId, password, networkByte}){
 
-        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
+        const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
@@ -132,7 +132,7 @@ module.exports = class WalletTransfer {
 
     async tokenUpdateSupply({address, fee, nonce, tokenPublicKeyHash, supplySign, supplyValue, memPoolValidateTxData, paymentId, password, networkByte}){
 
-        const tokenCurrency = TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
+        const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
@@ -175,7 +175,7 @@ module.exports = class WalletTransfer {
         const requiredFunds = {};
 
         for (let i = 0 ; i < txDsts.length; i++) {
-            let tokenCurrency = txDsts[i].tokenCurrency || TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ;
+            let tokenCurrency = txDsts[i].tokenCurrency || TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ;
             if ( Buffer.isBuffer(tokenCurrency) ) tokenCurrency = tokenCurrency.toString('hex');
 
             requiredFunds[ tokenCurrency ] = (requiredFunds[ tokenCurrency ] || 0) + txDsts[i].amount;

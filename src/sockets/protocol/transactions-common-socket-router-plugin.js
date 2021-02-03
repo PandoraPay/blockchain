@@ -107,7 +107,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
 
         const addressHashMapOut = await chainData.addressHashMap.getMap( publicKeyHash );
         if (addressHashMapOut)
-            return addressHashMapOut.data.txsCount;
+            return addressHashMapOut.txsCount;
 
         return null;
     }
@@ -128,7 +128,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
 
         const addressHashMapOut = await chainData.addressHashMap.getMap( publicKeyHash );
         if (addressHashMapOut)
-            index = Math.min( index, addressHashMapOut.data.txsCount);
+            index = Math.min( index, addressHashMapOut.txsCount);
         else return null;
 
         const startIndex = Math.max(0, index-limit );

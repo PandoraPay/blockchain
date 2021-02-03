@@ -1,5 +1,5 @@
 const {Helper, Exception} = require('kernel').helpers;
-const {TransactionTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 module.exports = class ForgeBlock {
 
@@ -11,7 +11,7 @@ module.exports = class ForgeBlock {
 
     async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
 
-        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TransactionTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
 
         //showing the number of coins
         //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);

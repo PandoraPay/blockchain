@@ -1,4 +1,4 @@
-const SubChainData = require( "../sub-chain/data/sub-chain-data");
+const SubChainData = require( "../sub-chain/data/sub-chain-data-model");
 const {Helper, Exception} = require('kernel').helpers;
 
 module.exports = class ForkSubChainData extends SubChainData{
