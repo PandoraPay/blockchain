@@ -191,7 +191,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
                 this._scope.logger.info(this,'spliceBlocks', { height:i, transactionsIndex: this.transactionsIndex, tokensIndex: this.tokensIndex, txCount: block.txCount() });
                 this.transactionsIndex = this.transactionsIndex - block.txCount();
-                this.tokensIndex = this.tokensIndex - block.tokensCount();
+                this.tokensIndex = this.tokensIndex - block.newTokensCount();
                 delete this._grindingLockedTransfersFunds[i];
 
                 await block.removeBlock( chain, this);

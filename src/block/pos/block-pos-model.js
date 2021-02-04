@@ -233,7 +233,7 @@ module.exports = class BlockPoSModel extends DBModel {
                 target: true,
                 totalDifficulty: true,
                 transactionsMerkleTree: true,
-                tokens: true,
+                newTokens: true,
                 pos:{
                     stakingAmount: true,
                     stakeForgerPublicKey: true,

@@ -154,8 +154,9 @@ class BlockSchemaBuild extends DBSchemaBuild {
                     position: 108,
                 },
 
-                tokens: {
+                newTokens: {
                     type: "number",
+                    default: 0,
 
                     position: 109,
                 },

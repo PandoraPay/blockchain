@@ -87,7 +87,7 @@ module.exports = class ForgeBlock {
 
             await this._scope.memPool.includeTransactions( block, createTransactionsCallback, block._scope.chain, chainData  );
 
-            block.tokens = await block.transactionsMerkleTree.tokensCount();
+            block.newTokens = await block.transactionsMerkleTree.newTokensCount();
             block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
 
             await block.pos.signBlockUsingForgerPrivateKey( stakeForgerDelegatePrivateKey );

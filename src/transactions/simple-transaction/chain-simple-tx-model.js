@@ -101,7 +101,9 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
             if (addressHashMapOut)
                 txsCount = addressHashMapOut.txsCount;
 
-            await chainData.addressTxHashMap.updateMap(address+"_"+txsCount, this.hash() );
+            await chainData.addressTxHashMap.updateMap(address+"_"+txsCount, {
+                hash: this.hash(),
+            } );
 
             await chainData.addressHashMap.updateMap(address, {
                 txsCount: ++txsCount

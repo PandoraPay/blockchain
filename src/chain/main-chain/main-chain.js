@@ -213,7 +213,7 @@ module.exports = class MainChain extends BaseChain {
 
                 newData.end = newData.end + 1;
                 newData.transactionsIndex = newData.transactionsIndex + block.txCount();
-                newData.tokensIndex = newData.tokensIndex + block.tokensCount();
+                newData.tokensIndex = newData.tokensIndex + block.newTokensCount();
                 newData.chainwork = newData.chainwork.add(  block.work );
                 newData.hash = block.hash();
                 newData.prevHash = block.prevHash;

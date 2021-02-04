@@ -61,6 +61,7 @@ const library = Helper.merge(merged, {
         },
 
         chain:{
+
             MainChain,
             BaseChain,
             SubChain,

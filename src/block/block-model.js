@@ -73,7 +73,7 @@ module.exports = class BlockModel extends DBModel {
         /**
          * validate the number of tokens in the block
          */
-        if (this.tokens !== await this.transactionsMerkleTree.tokensCount() ) return false;
+        if (this.newTokens !== await this.transactionsMerkleTree.newTokensCount() ) return false;
 
         /**
          * validate pos
@@ -188,8 +188,8 @@ module.exports = class BlockModel extends DBModel {
         return this.transactionsMerkleTree.txCount();
     }
 
-    tokensCount(){
-        return this.tokens;
+    newTokensCount(){
+        return this.newTokens;
     }
 
     async txIds(){

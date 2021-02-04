@@ -3,6 +3,7 @@ const {Helper, Exception} = require('kernel').helpers;
 const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
 
 const {TxMerkleTreeSchemaBuilt} = require('./schema/tx-merkle-tree-schema-build')
+const ChainTokenCreateSimpleTxModel = require( "../../../transactions/tokens/token-create/chain-token-create-simple-tx-model")
 
 module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
 
@@ -188,7 +189,7 @@ module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
         return this.count;
     }
 
-    async tokensCount(){
+    async newTokensCount(){
 
         let count = 0;
 

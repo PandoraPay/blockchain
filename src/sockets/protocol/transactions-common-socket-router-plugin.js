@@ -141,7 +141,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
 
         const result = {};
         for (let i=0; i < out.length; i++)
-            result[startIndex+i] = out[i] ? out[i].data : undefined;
+            result[startIndex+i] = out[i];
 
         return {
             out: result,
