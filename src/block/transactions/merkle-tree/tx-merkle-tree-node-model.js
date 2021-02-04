@@ -1,13 +1,13 @@
 const {MerkleTreeNodeModel, MerkleTreeNodeTypeEnum} = require('kernel').dataStructures.merkleTree;
 const {CryptoHelper} = require('kernel').helpers.crypto;
 
-module.exports = class TxMerkleTreeNodeModel extends MerkleTreeNodeModel {
+const {TxMerkleTreeNodeSchemaBuilt} = require('./schema/tx-merkle-tree-node-schema-build')
 
-    constructor(scope, schema,  data, type, creationOptions){
+class TxMerkleTreeNodeModel extends MerkleTreeNodeModel {
 
+    constructor(scope, schema = TxMerkleTreeNodeSchemaBuilt,  data, type, creationOptions){
         super(scope, schema, data, type, creationOptions);
         this._transaction = undefined;
-
     }
 
     get transaction(){
@@ -23,3 +23,7 @@ module.exports = class TxMerkleTreeNodeModel extends MerkleTreeNodeModel {
     }
 
 }
+
+TxMerkleTreeNodeSchemaBuilt.fields.children.modelClass = TxMerkleTreeNodeModel;
+
+module.exports = TxMerkleTreeNodeModel;

@@ -3,9 +3,9 @@ const {Helper, Exception} = require('kernel').helpers;
 
 class SubChainDataKernelHashUniqueSchemaBuild extends BufferUniqueSchemaBuild {
 
-    constructor(scope, schema = {},  data, type, creationOptions){
+    constructor( schema){
 
-        super(scope, Helper.merge( {
+        super( Helper.merge( {
 
                 fields: {
 
@@ -17,7 +17,7 @@ class SubChainDataKernelHashUniqueSchemaBuild extends BufferUniqueSchemaBuild {
                 },
 
             },
-            schema, true),  data, type, creationOptions);
+            schema, true) );
 
     }
 

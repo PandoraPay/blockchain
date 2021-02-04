@@ -1,56 +1,18 @@
-const BlockModel = require( "../../block/block-model");
-const TxMerkleTreeNodeModel = require( "../../block/transactions/merkle-tree/tx-merkle-tree-node-model")
+const BlockModel = require( "../../../block/block-model");
+const TxMerkleTreeNodeModel = require( "../../../block/transactions/merkle-tree/tx-merkle-tree-node-model")
 
 const {Helper, Exception} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
 
-const BaseChainDataModel = require( "../base/base-chain-data-model");
-const {BaseChainDataSchemaBuild} = require( "../base/base-chain-data-schema-build");
+const BaseChainDataModel = require( "../../base/base-chain-data-model");
 
-class MainChainDataSchemaBuild extends BaseChainDataSchemaBuild {
-
-    constructor(schema) {
-
-        super(Helper.merge( {
-
-                fields:{
-
-                    table: {
-                        default: "mainchain",
-                        fixedBytes: 9,
-                    },
-
-                    id: {
-                        default: "main",
-                        fixedBytes: 4,
-                    },
-
-                    version: {
-                        default: 0,
-                    },
-
-                    beingSaved:{
-                        type: "boolean",
-                        default: false,
-                        position: 1000,
-                    }
-
-                }
-
-            },
-            schema, true ));
-    }
-}
-const MainChainDataSchemaBuilt = new MainChainDataSchemaBuild()
+const {MainChainDataSchemaBuilt} = require('./main-chain-data-schema-build')
 
 module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     constructor(scope, schema = MainChainDataSchemaBuilt, data, type , creationOptions){
-
         super(scope, schema, data, type, creationOptions);
-
         this.clearOnlyLocalBlocks();
-
     }
 
     clearOnlyLocalBlocks(){

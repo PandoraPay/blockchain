@@ -1,7 +1,7 @@
 const {MerkleTreeSchemaBuild} = require('kernel').dataStructures.merkleTree.schema.MerkleTreeSchemaBuild;
 const {Helper} = require('kernel').helpers;
 
-import {TransactionsMerkleTreeRootSchemaBuilt} from "./tx-merkle-tree-root-schema-build";
+const {TxMerkleTreeRootSchemaBuilt} = require("./tx-merkle-tree-root-schema-build");
 const TxMerkleTreeRootModel = require('../tx-merkle-tree-root-model')
 
 class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
@@ -29,7 +29,7 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
                 },
 
                 root:{
-                    schemaBuiltClass: TransactionsMerkleTreeRootSchemaBuilt,
+                    schemaBuiltClass: TxMerkleTreeRootSchemaBuilt,
                     modelClass: TxMerkleTreeRootModel,
                 },
 
@@ -42,6 +42,6 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
 }
 
 module.exports = {
-    TransactionsMerkleTreeSchemaBuild: TxMerkleTreeSchemaBuild,
-    TransactionsMerkleTreeSchemaBuilt: new TxMerkleTreeSchemaBuild(),
+    TxMerkleTreeSchemaBuild,
+    TxMerkleTreeSchemaBuilt: new TxMerkleTreeSchemaBuild(),
 }

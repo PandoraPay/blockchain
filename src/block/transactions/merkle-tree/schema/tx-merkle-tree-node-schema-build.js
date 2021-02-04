@@ -2,13 +2,11 @@ const {MerkleTreeNodeSchemaBuild} = require('kernel').dataStructures.merkleTree.
 const {Helper, Exception} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
 
-const TxMerkleTreeNodeModel = require('../tx-merkle-tree-node-model')
-
 class TxMerkleTreeNodeSchemaBuild extends MerkleTreeNodeSchemaBuild {
 
-    constructor(scope, schema, data, type, creationOptions) {
+    constructor(schema) {
 
-        super(scope, Helper.merge({
+        super(Helper.merge({
 
             fields: {
 
@@ -17,13 +15,9 @@ class TxMerkleTreeNodeSchemaBuild extends MerkleTreeNodeSchemaBuild {
                     fixedBytes: 6,
                 },
 
-                children: {
-                    modelClass: TxMerkleTreeNodeModel,
-                },
-
             },
 
-        }, schema, false), data, type, creationOptions);
+        }, schema, true) );
 
     }
 

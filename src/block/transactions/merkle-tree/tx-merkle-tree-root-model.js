@@ -3,30 +3,15 @@ const {Helper, Exception} = require('kernel').helpers;
 
 const TxMerkleTreeNodeModel = require( "./tx-merkle-tree-node-model")
 
+const {TxMerkleTreeRootSchemaBuilt} = require('./schema/tx-merkle-tree-root-schema-build')
+
 module.exports = class TxMerkleTreeRootModel extends MerkleTreeRootModel {
 
-    constructor(scope, schema,  data, type, creationOptions){
-
-        super(scope, Helper.merge({
-
-            fields: {
-
-                table: {
-                    default: "TNode",
-                    fixedBytes: 6,
-                },
-
-                children: {
-                    modelClass: TxMerkleTreeNodeModel,
-                }
-
-            },
-
-
-        }, schema, false), data, type, creationOptions);
-
-
+    constructor(scope, schema = TxMerkleTreeRootSchemaBuilt,  data, type, creationOptions){
+        super(scope, schema, data, type, creationOptions);
     }
     
 
 }
+
+TxMerkleTreeRootSchemaBuilt.fields.children.modelClass = TxMerkleTreeNodeModel;

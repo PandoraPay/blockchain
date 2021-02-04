@@ -2,13 +2,11 @@ const {MerkleTreeRootSchemaBuild} = require('kernel').dataStructures.merkleTree.
 const {MerkleTreeRoot} = require('kernel').dataStructures.merkleTree;
 const {Helper, Exception} = require('kernel').helpers;
 
-const TxMerkleTreeRootModel = require('../tx-merkle-tree-root-model')
+class TxMerkleTreeRootSchemaBuild extends MerkleTreeRootSchemaBuild {
 
-module.exports = class TransactionsMerkleTreeRootSchemaBuild extends MerkleTreeRootSchemaBuild {
+    constructor(schema){
 
-    constructor(scope, schema,  data, type, creationOptions){
-
-        super(scope, Helper.merge({
+        super(Helper.merge({
 
             fields: {
 
@@ -17,19 +15,15 @@ module.exports = class TransactionsMerkleTreeRootSchemaBuild extends MerkleTreeR
                     fixedBytes: 6,
                 },
 
-                children: {
-                    modelClass: TxMerkleTreeRootModel,
-                }
-
             },
 
-        }, schema, false), data, type, creationOptions);
+        }, schema, true));
 
     }
 
 }
 
 module.exports = {
-    TransactionsMerkleTreeRootSchemaBuild,
-    TransactionsMerkleTreeRootSchemaBuilt: new TransactionsMerkleTreeRootSchemaBuild()
+    TxMerkleTreeRootSchemaBuild,
+    TxMerkleTreeRootSchemaBuilt: new TxMerkleTreeRootSchemaBuild()
 }

@@ -2,7 +2,7 @@ const {EncryptedModel} = require('cryptography').models;
 const {EncryptedTypeEnum} = require('cryptography').enums;
 const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
-const {Address} = require('cryptography').addresses.public;
+const {AddressModel} = require('cryptography').addresses.public;
 
 const WalletAddressModel = require( "../addresses/wallet-address-model");
 const WalletAddressTypeEnum = require( "../addresses/wallet-address-type-enum");
@@ -26,7 +26,7 @@ module.exports = class WalletManager{
 
             const walletAddress = this.wallet.addresses[i];
             const publicAddress = walletAddress.keys.decryptPublicAddress();
-            if ( (address instanceof WalletAddressModel && address === walletAddress) || (typeof address === "string" && publicAddress.calculateAddress() === address ) || (address instanceof Address && address.calculateAddress() === publicAddress.calculateAddress() ) )
+            if ( (address instanceof WalletAddressModel && address === walletAddress) || (typeof address === "string" && publicAddress.calculateAddress() === address ) || (address instanceof AddressModel && address.calculateAddress() === publicAddress.calculateAddress() ) )
                 return returnIndex ? i : walletAddress;
         }
 

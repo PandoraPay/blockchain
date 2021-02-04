@@ -4,7 +4,7 @@ const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
 
-    constructor(schema = { }){
+    constructor(schema){
 
         super(Helper.merge({
 

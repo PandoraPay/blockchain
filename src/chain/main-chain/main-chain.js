@@ -7,7 +7,7 @@ const {DBSchemaBuild} = require('kernel').db;
 const BlockModel = require( "../../block/block-model")
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")
-const MainChainDataModel = require("./main-chain-data")
+const MainChainDataModel = require("./data/main-chain-data-model")
 
 module.exports = class MainChain extends BaseChain {
 

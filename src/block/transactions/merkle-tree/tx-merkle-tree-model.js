@@ -2,9 +2,11 @@ const {MerkleTreeModel} = require('kernel').dataStructures.merkleTree;
 const {Helper, Exception} = require('kernel').helpers;
 const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
 
+const {TxMerkleTreeSchemaBuilt} = require('./schema/tx-merkle-tree-schema-build')
+
 module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
 
-    constructor(scope, schema,  data, type, creationOptions){
+    constructor(scope, schema = TxMerkleTreeSchemaBuilt,  data, type, creationOptions){
         super(scope, schema, data, type, creationOptions);
     }
 
