@@ -1,7 +1,5 @@
 module.exports = {
 
-    coinDenomination : 10000,
-
     tokenTicker: "pand",
 
     getSupplyBefore(blockHeight){
@@ -55,6 +53,8 @@ module.exports = {
 
     _initArgv( parents ){
         this._argvBlock = parents[0].block;
+        if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
+        this.coinDenomination = parents[0].transactions.coins.coinDenomination;
     }
 
 }

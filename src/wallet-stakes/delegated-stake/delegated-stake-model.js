@@ -8,20 +8,20 @@ module.exports = class DelegatedStakeModel extends DBModel {
         super(scope, schema, data, type, creationOptions);
     }
 
-    checkAmount(){
+    _checkAmount(blockHeight){
 
         //let's check balance
 
-        if (this.amount >= this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+        if (this.amount >= this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging( blockHeight ) )
             return true;
 
         return false;
 
     }
 
-    checkStake(){
+    checkStake(blockHeight){
 
-        return (!this.errorDelegatePrivateKeyChanged) && this.checkAmount();
+        return (!this.errorDelegatePrivateKeyChanged) && this._checkAmount(blockHeight);
 
     }
 

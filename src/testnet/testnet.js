@@ -152,12 +152,12 @@ module.exports = class TestNet{
         let processing = false;
 
         //funding other worker wallets
-        this._scope.mainChain.on("blocks/included", async ()=>{
+        this._scope.mainChain.on("blocks/included", async ( {data} )=>{
 
             if (this._testnetWalletsSent || processing) return;
 
             processing = true;
-            const value = this._scope.argv.transactions.staking.stakingMinimumStake * 80;
+            const value = this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(data.end) * 80;
             const amount = this._scope.argv.transactions.coins.convertToUnits(value ) ;
             const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amount * (this._testnetWallets.length + 1)  );
 
@@ -214,7 +214,7 @@ module.exports = class TestNet{
                 const txs = Math.floor( Math.random()*10 ) + 2;
                 const value = Math.floor( Math.random() * 5 +1 );
                 const amount = this._scope.argv.transactions.coins.convertToUnits( value ) * count;
-                const amountRequired = txs * amount + this._scope.argv.transactions.coins.convertToUnits( 2 * this._scope.argv.transactions.staking.stakingMinimumStake  );
+                const amountRequired = txs * amount + 2 * this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging( end );
                 const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amountRequired  );
 
                 if (wallet){

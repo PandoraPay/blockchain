@@ -29,7 +29,6 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
                 },
 
                 root:{
-                    schemaBuiltClass: TxMerkleTreeRootSchemaBuilt,
                     modelClass: TxMerkleTreeRootModel,
                 },
 

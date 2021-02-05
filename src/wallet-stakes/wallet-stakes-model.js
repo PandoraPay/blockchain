@@ -86,7 +86,7 @@ module.exports = class WalletStakesModel extends DBModel{
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
 
         const stakingAmount = await this._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash );
-        if ( (stakingAmount || 0 ) < this._scope.argv.transactions.coins.convertToUnits(this._scope.argv.transactions.staking.stakingMinimumStake) )
+        if ( (stakingAmount || 0 ) < this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging( this._scope.mainChain.data.end ) )
             throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
@@ -170,7 +170,8 @@ module.exports = class WalletStakesModel extends DBModel{
     }
 
     _sortDelegatedStakes(){
-        return this.delegatedStakesList.sort( (a,b) => ( b.checkStake() ? b.amount : 0 ) - ( a.checkStake() ? a.amount : 0) ); //from max to min
+        const blockHeight = this._scope.mainChain.data.end;
+        return this.delegatedStakesList.sort( (a,b) => ( b.checkStake(blockHeight) ? b.amount : 0 ) - ( a.checkStake(blockHeight) ? a.amount : 0) ); //from max to min
     }
 
     async _updateDelegatedStakesAmount(){

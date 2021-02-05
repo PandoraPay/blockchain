@@ -133,7 +133,7 @@ module.exports = class ForgeBlock {
 
                 const delegatedStake = this._scope.walletStakes.delegatedStakesList[i];
 
-                if ( !delegatedStake.checkStake() ) break; //they are all sorted
+                if ( !delegatedStake.checkStake(block.height) ) break; //they are all sorted
 
                 const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
