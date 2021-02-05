@@ -35,9 +35,9 @@ const WalletAddressTransparentKeysModel = require("./src/wallet/addresses/keys/w
 
 const {Helper} = require('kernel').helpers;
 
-let merged = Helper.merge( kernel, {} , true)
-merged = Helper.merge(  cryptography, merged , true)
-merged = Helper.merge( networking, merged , true)
+let merged = Helper.merge( {}, kernel, true)
+merged = Helper.merge(  merged, cryptography, true)
+merged = Helper.merge( merged, networking, true)
 
 const library = Helper.merge(merged, {
 
@@ -111,8 +111,7 @@ const library = Helper.merge(merged, {
         TestsFiles,
     }
 
-}, false);
-
+}, true );
 
 if (typeof window !== "undefined") {
     window.library = library;

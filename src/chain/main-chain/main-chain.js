@@ -79,6 +79,7 @@ module.exports = class MainChain extends BaseChain {
                         this.data.prevHash = Buffer.from( data.prevHash );
                         this.data.kernelHash = Buffer.from( data.kernelHash );
                         this.data.prevKernelHash = Buffer.from( data.prevKernelHash );
+                        this.data._grindingLockedTransfersFunds = data.grindingLockedTransfersFunds;
 
                         //let's reset the virtual HashMaps
                         this.data.resetState();
@@ -313,6 +314,7 @@ module.exports = class MainChain extends BaseChain {
                     prevHash: newData.prevHash,
                     kernelHash: newData.kernelHash,
                     prevKernelHash: newData.prevKernelHash,
+                    grindingLockedTransfersFunds: Helper.merge( {}, newData._grindingLockedTransfersFunds, false ), //not necessary to be cloned as it is immutable
                 }, true, false);
 
             this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
@@ -389,7 +391,7 @@ module.exports = class MainChain extends BaseChain {
         forkSubChain.data.tokensIndex = this.data.tokensIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
         forkSubChain.data.circulatingSupply = this.data.circulatingSupply;
-        forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, true );
+        forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, false ); //not necessary to be cloned as it is immutable
         forkSubChain.data._fallback = this.data;
 
         forkSubChain.data.setFallbacks(this.data);

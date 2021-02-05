@@ -192,7 +192,11 @@ module.exports = class BaseChainDataModel extends DBModel {
                 this._scope.logger.info(this,'spliceBlocks', { height:i, transactionsIndex: this.transactionsIndex, tokensIndex: this.tokensIndex, txCount: block.txCount() });
                 this.transactionsIndex = this.transactionsIndex - block.txCount();
                 this.tokensIndex = this.tokensIndex - block.newTokensCount();
-                delete this._grindingLockedTransfersFunds[i];
+
+                if (this._grindingLockedTransfersFunds[block.height].hash !== block.hash().toString('hex')  )
+                    throw new Exception(this, 'grinding hash is not matching');
+
+                delete this._grindingLockedTransfersFunds[block.height];
 
                 await block.removeBlock( chain, this);
 
@@ -328,7 +332,10 @@ module.exports = class BaseChainDataModel extends DBModel {
 
             }
 
-        this._grindingLockedTransfersFunds[height] = transfers;
+        this._grindingLockedTransfersFunds[height] = {
+            hash: block.hash().toString('hex'),
+            transfers
+        };
 
     }
     
@@ -347,6 +354,9 @@ module.exports = class BaseChainDataModel extends DBModel {
         //clear old ones
         let height = startHeight-1;
         while (height >= 0 && this._grindingLockedTransfersFunds[height] ){
+            const blockHash = await this.getBlockHash(height);
+            if (!blockHash || blockHash.toString('hex') !== this._grindingLockedTransfersFunds[height].hash )
+                throw new Exception(this, 'BlockHash is not matching Grinding', {height});
             delete this._grindingLockedTransfersFunds[height];
             height--;
         }
@@ -368,7 +378,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         let sum = 0;
         for (let height = startHeight; height < this.end; height++){
-            const transfers = this._grindingLockedTransfersFunds[height];
+            const transfers = this._grindingLockedTransfersFunds[height].transfers;
             if (transfers[publicKeyHashHex])
                 sum += transfers[publicKeyHashHex];
         }
