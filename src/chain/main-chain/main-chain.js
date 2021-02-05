@@ -86,7 +86,7 @@ module.exports = class MainChain extends BaseChain {
                     } else if (data.message === "main-chain/propagate-new-block"){
 
                         await this.emit("blocks/included", {
-                            data: { end: this.data.end},
+                            ...data.data,
                             senderSockets: {},
                         });
 
@@ -320,12 +320,14 @@ module.exports = class MainChain extends BaseChain {
             await this._scope.memPool.updateMemPoolWithMainChainChanges( blocks, blocksRemoved );
 
             await this.emit("blocks/included", {
-                data: { blocks: blocks, end: this.end},
+                blocks: blocks,
+                start: newData.start,
+                end: newData.end,
                 senderSockets,
             });
 
             if (this._scope.db.isSynchronized )
-                await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/propagate-new-block" }, true, false );
+                await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/propagate-new-block", data: { start: newData.start, end: newData.end } }, true, false );
 
             if (this._scope.commonSocketRouterPluginsMap)
                 await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );

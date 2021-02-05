@@ -152,46 +152,47 @@ module.exports = class TestNet{
         let processing = false;
 
         //funding other worker wallets
-        this._scope.mainChain.on("blocks/included", async ( {data} )=>{
+        this._scope.mainChain.on("blocks/included", async ( {end} )=>{
 
             if (this._testnetWalletsSent || processing) return;
 
-            processing = true;
-            const value = this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(data.end) * 80;
-            const amount = this._scope.argv.transactions.coins.convertToUnits(value ) ;
-            const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amount * (this._testnetWallets.length + 1)  );
+            try{
+                processing = true;
 
-            if (wallet && !this._testnetWalletsSent){
+                if (end < this._scope.argv.transactions.staking.stakingMinimumStakeEffectBlockHeight)
+                    return;
 
-                this._testnetWalletsSent = true;
+                const amount = this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(end) * 80;
+                const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amount * (this._testnetWallets.length + 1)  );
 
-                try{
+                if (wallet && !this._testnetWalletsSent){
 
-                    for (let address of this._testnetWallets)
-                        await this._scope.wallet.transfer.transferSimple({
-                            address: wallet.keys.decryptPublicAddress(),
-                            txDsts: [{
-                                address,
-                                amount,
-                            }]
-                        });
+                    this._testnetWalletsSent = true;
 
-                    moneySent = true;
+                    try{
 
-                }catch(err){
-                    console.log(err);
+                        for (let address of this._testnetWallets)
+                            await this._scope.wallet.transfer.transferSimple({
+                                address: wallet.keys.decryptPublicAddress(),
+                                txDsts: [{
+                                    address,
+                                    amount,
+                                }]
+                            });
+
+                        moneySent = true;
+
+                    }catch(err){
+                        console.log(err);
+                    }
                 }
+            }finally{
+                processing = false;
             }
-
-            processing = false;
-
 
         });
 
-        this._scope.mainChain.on("blocks/included", async (  { data } )=>{
-
-            const {end} = data;
-
+        this._scope.mainChain.on("blocks/included", async (  { end } )=>{
 
             if (this._prevBlockEnd >= end) return;
             this._prevBlockEnd = end;

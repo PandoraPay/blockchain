@@ -335,7 +335,7 @@ module.exports = class BaseChainDataModel extends DBModel {
     async _computeGrindingLockedTransfersFunds(){
 
 
-        const startHeight = Math.max(0, this.end-1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
+        const startHeight = Math.max( 0, this.end - 1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
 
         for (let height = startHeight; height < this.end; height++){
 
@@ -364,7 +364,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         const publicKeyHashHex = publicKeyHash.toString('hex');
 
-        const startHeight = Math.max(0, this.end-1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
+        const startHeight = Math.max( 0, this.end - 1 - this._scope.argv.transactions.staking.stakingGrindingLockedTransfersBlocks );
 
         let sum = 0;
         for (let height = startHeight; height < this.end; height++){

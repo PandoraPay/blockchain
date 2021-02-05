@@ -27,7 +27,7 @@ module.exports = class WalletModel extends DBModel {
     async initializeWallet(){
 
 
-        this._scope.mainChain.on("blocks/included", async ()=>{
+        this._scope.mainChain.on("blocks/included", async ({end})=>{
 
             if (this._scope.argv.wallet.printWalletBalances) await this.manager.printWalletBalances();
 

@@ -1,6 +1,6 @@
 module.exports = {
 
-    stakingMinimumStakeEffect: 100,
+    stakingMinimumStakeEffectBlockHeight: 100, // to avoid forks
 
     stakingGrindingLockedTransfersBlocks: 50, // Used to solve "Stake Griding Attack Vector" for POS by locking the funds sent from transactions
 
@@ -8,7 +8,7 @@ module.exports = {
 
     getMinimumStakeRequiredForForging(blockHeight){
 
-        if (blockHeight < this.stakingMinimumStakeEffect) return 1 * this.coinDenomination;
+        if (blockHeight < this.stakingMinimumStakeEffectBlockHeight) return 1 * this.coinDenomination;
         return 1000 * this.coinDenomination;
 
     },

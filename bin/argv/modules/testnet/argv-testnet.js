@@ -64,6 +64,7 @@ module.exports = {
             staking: {
 
                 stakingGrindingLockedTransfersBlocks: 10, //making it less for testnet
+                stakingMinimumStakeEffectBlockHeight: 50,
 
             }
 
