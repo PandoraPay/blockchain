@@ -185,19 +185,17 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
         if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
 
-        if (this.transactionsHashesMap[hash]) return this.transactionsHashesMap[hash];
+        if (this.transactionsHashesMap[hash])
+            return this.transactionsHashesMap[hash];
 
-        const hashExistence = await this.txInfoHashMap.getMap( hash, );
-        if (!hashExistence) return undefined;
-
-        const blockHeight = hashExistence.blockHeight;
-        const merkleHeight = hashExistence.merkleHeight;
+        const txInfo = await this.txInfoHashMap.getMap( hash, );
+        if (!txInfo) return undefined;
 
         const txMerkleNode  = new TxMerkleTreeNodeModel( {
             ...this._scope,
             parent: {
                 tree: {
-                    levelsCounts: [merkleHeight],
+                    levelsCounts: [txInfo.merkleHeight],
                     levels: 0,
                 },
                 level: -1,
@@ -205,14 +203,45 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             parentFieldName: "children",
         }, undefined, { } );
 
-        await txMerkleNode.load(undefined, `block:b_${blockHeight}:Tmerkle:m_${blockHeight}`);
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:Tmerkle:m_${txInfo.merkleHeight}`);
+        return txMerkleNode.transaction;
+    }
 
-        return {
-            tx: txMerkleNode.transaction,
-            block: blockHeight,
-            blockTimestamp: hashExistence.blockTimestamp,
-            merkleLeafHeight: hashExistence.merkleLeafHeight,
-        };
+    async getTransactionWithInfoByHash(hash){
+
+        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
+        if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
+
+        const txInfo = await this.txInfoHashMap.getMap( hash, );
+        if (!txInfo) return undefined;
+
+        const out = {
+            block: txInfo.blockHeight,
+            blockTimestamp: txInfo.blockTimestamp,
+            merkleLeafHeight: txInfo.merkleLeafHeight,
+        }
+
+        if (this.transactionsHashesMap[hash]){
+            out.tx = this.transactionsHashesMap[hash].toBuffer();
+            return out;
+        }
+
+        const txMerkleNode  = new TxMerkleTreeNodeModel( {
+            ...this._scope,
+            parent: {
+                tree: {
+                    levelsCounts: [txInfo.merkleHeight],
+                    levels: 0,
+                },
+                level: -1,
+            },
+            parentFieldName: "children",
+        }, undefined, { } );
+
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:Tmerkle:m_${txInfo.merkleHeight}`);
+        out.tx = txMerkleNode.transaction;
+
+        return out;
     }
 
 

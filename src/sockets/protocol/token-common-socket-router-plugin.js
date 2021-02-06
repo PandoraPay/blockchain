@@ -2,7 +2,7 @@ const {SocketRouterPlugin} = require('networking').sockets.protocol;
 const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-const TokenHashMapElement = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build")
+const TokenHashMapElementModel = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-model")
 
 module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin {
 
@@ -50,8 +50,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
 
     async _getToken( { token }){
 
-        if (!token) throw new Exception(this, 'token was not specified');
-        if (!Buffer.isBuffer(token) && StringHelper.isHex(token) ) token = Buffer.from(token, "hex");
+        if (!Buffer.isBuffer(token) && ( StringHelper.isHex(token) || !token ) ) token = Buffer.from(token, "hex");
 
         if (token.equals(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             return {
@@ -69,6 +68,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (out) {
 
             const json = out.toJSON();
+
             return json;
         }
 
@@ -89,7 +89,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxTokensIds) );
 
-        const obj = new TokenHashMapElement(this._scope);
+        const obj = new TokenHashMapElementModel(this._scope);
 
         const elements = await this._scope.db._scanMiddleware( obj, '', '',  index, limit, undefined );
         const out  = elements.filter ( obj => obj );
@@ -107,7 +107,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         limit = Math.max( 1, Math.min(limit, this._scope.argv.transactions.protocol.protocolMaxTokens) );
 
-        const out = await this._scope.db.scan( TokenHashMapElement,  index, limit, '', '', undefined );
+        const out = await this._scope.db.scan( TokenHashMapElementModel, undefined, index, limit, '', '', undefined );
 
         return {
             out,

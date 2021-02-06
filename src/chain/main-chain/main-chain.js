@@ -210,7 +210,7 @@ module.exports = class MainChain extends BaseChain {
 
                 const txs = await block.getTransactions();
                 for (const tx of txs)
-                    newData.transactionsHashesMap[tx.hash().toString("hex")] = tx;
+                    newData.transactionsHashesMap[txs[i].hash().toString("hex")] = tx;
 
                 newData.end = newData.end + 1;
                 newData.transactionsIndex = newData.transactionsIndex + block.txCount();

@@ -275,6 +275,10 @@ module.exports = class BaseChainDataModel extends DBModel {
         throw new Exception(this, "Not implemented");
     }
 
+    async getTransactionWithInfoByHash(hash){
+        throw new Exception(this, "Not implemented");
+    }
+
     async getBlock( height = this.end-1){
         throw new Exception(this, "Not implemented");
     }

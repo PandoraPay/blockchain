@@ -15,6 +15,7 @@ const AccountHashMapDataBalanceSchemaBuild = require("./src/chain/maps/account-h
 
 const TokenHashVirtualMapModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map-model");
 const TokenHashMapElementSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build");
+const TokenHashMapElementModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-model");
 
 const ChainSimpleTxModel = require("./src/transactions/simple-transaction/chain-simple-tx-model");
 const ChainDelegateStakeSimpleTxModel = require("./src/transactions/simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model");
@@ -80,7 +81,8 @@ const library = Helper.merge(merged, {
 
             token: {
                 TokenHashVirtualMapModel,
-                TokenHashMapElementSchemaBuild
+                TokenHashMapElementSchemaBuild,
+                TokenHashMapElementModel,
             },
 
         },

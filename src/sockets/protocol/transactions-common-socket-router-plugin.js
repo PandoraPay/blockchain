@@ -57,9 +57,9 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
         if (Buffer.isBuffer(hash)) hash = txId.toString("hex");
         if (typeof hash !== "string" && hash.length !== 64) throw new Exception(this, "TxId is invalid");
 
-        const out = await this._scope.mainChain.data.getTransactionByHash( hash );
+        const tx = await this._scope.mainChain.data.getTransactionByHash( hash );
 
-        if (out) return out.tx.toType(type);
+        if (tx) return tx.toType(type);
         else return null;
 
     }
@@ -82,7 +82,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
         };
 
         //included in blockchain
-        const out = await chainData.getTransactionByHash( hash );
+        const out = await chainData.getTransactionWithInfoByHash( hash );
 
         if (out) return {
             tx: (type === "json") ? out.tx.toJSONRaw() : out.tx.toType(type),
