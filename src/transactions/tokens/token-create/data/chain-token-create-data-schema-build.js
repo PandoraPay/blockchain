@@ -95,12 +95,12 @@ class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
                     position: 1007,
                 },
 
-                verificationPublicKey:{
+                verificationPublicKeyHash:{
 
                     type: "buffer",
-                    fixedBytes: 33,
-                    minSize: 33,
-                    maxSize: 33,
+                    fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
 
                     position: 1008,
                 },

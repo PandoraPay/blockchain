@@ -54,11 +54,11 @@ module.exports = class WalletTransfer {
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
-        if (delegate && typeof delegate.delegatePublicKey === "string" && StringHelper.isHex(delegate.delegatePublicKey) )
-            delegate.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKey, "hex"), {
+        if (delegate && typeof delegate.delegatePublicKeyHash === "string" && StringHelper.isHex(delegate.delegatePublicKeyHash ) )
+            delegate.delegatePublicKeyHash = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKeyHash, "hex"), {
                 specifyLength: true,
-                fixedBytes: 33,
-            }, "delegatePublicKey", ()=>{}, "object", {}  );
+                fixedBytes: 20,
+            }, "delegatePublicKeyHash", ()=>{}, "object", {}  );
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");

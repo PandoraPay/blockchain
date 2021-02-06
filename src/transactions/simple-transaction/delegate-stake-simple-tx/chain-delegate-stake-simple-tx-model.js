@@ -36,7 +36,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegateNonce, this.delegate.delegatePublicKey, this.delegate.delegateFee );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegateNonce, this.delegate.delegatePublicKeyHash, this.delegate.delegateFee );
 
         return true;
     }
@@ -52,7 +52,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
             delegateNonce: delegate.delegateNonce,
-            delegatePublicKey: delegate.delegatePublicKey.toString('hex'),
+            delegatePublicKeyHash: delegate.delegatePublicKeyHash.toString('hex'),
             delegateFee: delegate.delegateFee,
         };
     }
@@ -62,7 +62,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
 
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - revertInfoData.delegateNonce, Buffer.from(revertInfoData.delegatePublicKey, 'hex'), revertInfoData.delegateFee );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - revertInfoData.delegateNonce, Buffer.from(revertInfoData.delegatePublicKeyHash, 'hex'), revertInfoData.delegateFee );
 
     }
 

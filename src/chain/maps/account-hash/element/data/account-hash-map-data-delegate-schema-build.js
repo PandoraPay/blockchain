@@ -14,14 +14,15 @@ class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
                     position: 100,
                 },
 
-                delegatePublicKey: {
+                delegatePublicKeyHash: {
                     type: "buffer",
-                    fixedBytes: 33,
+
                     minSize: 0,
-                    maxSize: 33,
+                    maxSize: 20,
+                    specifyLength: true,
 
                     validation(value){
-                        return value.length === 0 || value.length === 33;
+                        return value.length === 0 || value.length === 20;
                     },
 
                     position: 101,

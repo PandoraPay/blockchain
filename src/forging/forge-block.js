@@ -74,7 +74,7 @@ module.exports = class ForgeBlock {
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
-            const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeys();
+            const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeyHash();
 
             if (this._scope.forging.reset) return false;
 

@@ -40,22 +40,22 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         return this._challenge;
     }
 
-    async _importWalletStake({ publicKey, signature, delegatePublicKey, delegatePrivateKey }){
+    async _importWalletStake({ publicKey, signature, delegatePublicKeyHash, delegatePrivateKey }){
 
         if (!this._scope.argv.walletStakes.allowDelegating)
             throw new Exception(this, "Delegating Stakes is not allowed");
 
         if (typeof publicKey === "string" && StringHelper.isHex(publicKey)) publicKey = Buffer.from(publicKey, "hex");
         if (typeof signature === "string" && StringHelper.isHex(signature)) signature = Buffer.from(signature, "hex");
-        if (typeof delegatePublicKey === "string" && StringHelper.isHex(delegatePublicKey)) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
+        if (typeof delegatePublicKeyHash === "string" && StringHelper.isHex(delegatePublicKeyHash)) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
 
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== 33) throw new Exception(this, "public key is invalid", publicKey);
         if (!Buffer.isBuffer(signature) || signature.length !== 65) throw new Exception(this, "signature is invalid", signature);
-        if (!Buffer.isBuffer(delegatePublicKey) || delegatePublicKey.length !== 33) throw new Exception(this, "delegatePublicKey is invalid", delegatePublicKey);
+        if (!Buffer.isBuffer(delegatePublicKeyHash) || delegatePublicKeyHash.length !== 20) throw new Exception(this, "delegatePublicKeyHash is invalid", delegatePublicKeyHash);
         if ( delegatePrivateKey && (!Buffer.isBuffer(delegatePrivateKey) || delegatePrivateKey.length !== 32) ) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
 
-        if (delegatePublicKey.equals(Buffer.alloc(33))){
+        if ( !delegatePublicKeyHash.length ){
 
             if (this._scope.argv.walletStakes.allowDelegatingPrivateKey) throw new Exception(this, "You need to delegate first. Your stake is not delegated");
             else {
@@ -71,7 +71,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         const concat = Buffer.concat([
             this._challenge,
             publicKey,
-            delegatePublicKey,
+            delegatePublicKeyHash,
             delegatePrivateKey ? delegatePrivateKey : Buffer.alloc(0),
         ]);
 
@@ -93,7 +93,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
 
         }
 
-        const out = await this._scope.walletStakes.addWalletStake({publicKey, delegatePublicKey, delegatePrivateKey});
+        const out = await this._scope.walletStakes.addWalletStake({publicKey, delegatePublicKeyHash, delegatePrivateKey});
 
         return out;
 
@@ -107,7 +107,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         for (let i=0; i < delegatedStakesList.length; i++){
             out.push({
                 publicKeyHash: delegatedStakesList[i].publicKeyHash,
-                delegatePublicKey: delegatedStakesList[i].delegatePublicKey,
+                delegatePublicKeyHash: delegatedStakesList[i].delegatePublicKeyHash,
             });
         }
 

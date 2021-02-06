@@ -29,7 +29,7 @@ var createToken = async (name, description, ticker, maxSupply, decimalSeparator)
             ticker,
             maxSupply,
             decimalSeparator,
-            verificationPublicKey: mainAddress.publicKey,
+            verificationPublicKey: mainAddress.publicKeyHash,
             supply: 0, //it needs to be 0
 
         },

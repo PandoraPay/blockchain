@@ -23,8 +23,8 @@ module.exports = class ChainTokenUpdateSupplySimpleTxModel extends ChainSimpleTx
         const token = await chainData.tokenHashMap.getTokenNode( this.tokenUpdateData.tokenPublicKeyHash );
         if (!token) throw new Exception(this, `Token doesn't exist`);
 
-        if (!token.verificationPublicKey.equals(this.vin[0].publicKey)) //validate the printer public key hash
-            throw new Exception(this, 'verificationPublicKey is not matching');
+        if (!token.verificationPublicKeyHash.equals(this.vin[0].publicKeyHash)) //validate the printer public key hash
+            throw new Exception(this, 'verificationPublicKeyHash is not matching');
 
         const newSupply = token.supply + this.supplySignValue * this.tokenUpdateData.supplyValue;
         if ( newSupply > token.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });

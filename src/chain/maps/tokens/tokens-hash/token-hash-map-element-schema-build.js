@@ -91,12 +91,12 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     position: 10005,
                 },
 
-                verificationPublicKey:{
+                verificationPublicKeyHash:{
 
                     type: "buffer",
-                    fixedBytes: 33,
-                    minSize: 33,
-                    maxSize: 33,
+                    fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
 
                     position: 10006,
                 },

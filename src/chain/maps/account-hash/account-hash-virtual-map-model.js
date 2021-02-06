@@ -207,9 +207,9 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
         }
     }
 
-    async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKey, delegateFee ){
+    async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKeyHash, delegateFee ){
 
-        if (!Buffer.isBuffer(delegatePublicKey) && StringHelper.isHex(delegatePublicKey) ) delegatePublicKey = Buffer.from(delegatePublicKey, "hex");
+        if (!Buffer.isBuffer(delegatePublicKeyHash) && StringHelper.isHex(delegatePublicKeyHash) ) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
 
         if (delegateNonceUpdate > 1 || delegateNonceUpdate < -1) throw new Exception(this, "Value is bigger than 1 or less than -1");
         if (delegateFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateFee is larger than percentage fee ", {delegateFee});
@@ -223,7 +223,7 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
         if (prevDelegate !== undefined ){
 
             node.delegate.delegateNonce = prevDelegate.delegateNonce + delegateNonceUpdate;
-            node.delegate.delegatePublicKey = delegatePublicKey;
+            node.delegate.delegatePublicKeyHash = delegatePublicKeyHash;
             node.delegate.delegateFee = delegateFee;
 
             if ( node.isDataEmpty() ){
@@ -237,7 +237,7 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
         } else {
 
-            throw new Exception(this, "updateDelegate error - account doesn't exist", {publicKeyHash: publicKeyHash, delegateNonce, delegatePublicKey, delegateFee });
+            throw new Exception(this, "updateDelegate error - account doesn't exist", {publicKeyHash: publicKeyHash, delegateNonceUpdate, delegatePublicKeyHash, delegateFee });
 
         }
     }
