@@ -34,6 +34,8 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                     publicKey: {
                         type: "buffer",
                         fixedBytes: 33,
+                        minSize: 33,
+                        maxSize: 33,
 
                         position: 101,
                     },
@@ -41,6 +43,8 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                     publicKeyHash: { //same as id
                         type: "buffer",
                         fixedBytes: 20,
+                        minSize: 20,
+                        maxSize: 20,
 
                         position: 102,
                     },
@@ -48,6 +52,8 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                     delegatePublicKey: {
                         type: "buffer",
                         fixedBytes: 33,
+                        minSize: 33,
+                        maxSize: 33,
 
                         position: 103,
                     },
@@ -55,6 +61,8 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                     delegatePrivateKey: {
                         type: "buffer",
                         fixedBytes: 32,
+                        minSize: 32,
+                        axSize: 32,
 
                         position: 104,
                     },

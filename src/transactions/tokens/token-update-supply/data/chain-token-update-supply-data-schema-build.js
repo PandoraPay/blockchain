@@ -21,6 +21,8 @@ class ChainTokenUpdateSupplyDataSchemaBuild extends SchemaBuild {
                 tokenPublicKeyHash: {
                     type: "buffer",
                     fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
 
                     position: 1001,
                 },

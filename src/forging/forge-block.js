@@ -11,10 +11,10 @@ module.exports = class ForgeBlock {
 
     async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
 
-        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer);
 
         //showing the number of coins
-        //this._scope.logger.log(this, "I have money: ", this.stakeForgerPublicKeyHash.toString("hex"), out);
+        //this._scope.logger.log(this, "I have money: ", block.pos.stakeForgerPublicKeyHash.toString("hex"), funds);
 
         if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: block.stakeForgerPublicKeyHash,  stakeForgerPublicKey: block.stakeForgerPublicKey });
 

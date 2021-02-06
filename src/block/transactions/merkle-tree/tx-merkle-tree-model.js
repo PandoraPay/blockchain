@@ -15,11 +15,13 @@ module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
 
         if (!transactions ) return;
         if (!Array.isArray(transactions)) transactions = [transactions];
-        if (transactions.length === 0) return;
+        if (!transactions.length) return;
 
         for (let i=0; i < transactions.length; i++)
             if (transactions[i] instanceof BaseTxModel)
                 transactions[i] = transactions[i].toBuffer();
+            else
+                throw new Exception(this, "Transaction input is not ")
 
         this.fillMerkleTree(transactions);
 

@@ -57,6 +57,8 @@ class WalletSchemaBuild extends DBSchemaBuild {
                 mnemonicChecksum: {
                     type: "buffer",
                     fixedBytes: 32,
+                    minSize: 32,
+                    maxSize: 32,
 
                     position: 103,
                 },

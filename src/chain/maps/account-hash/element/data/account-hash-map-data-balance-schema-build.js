@@ -25,8 +25,9 @@ class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
 
                 tokenCurrency:{
                     type: "buffer",
-                    minSize: 1,
                     maxSize: 20,
+                    minSize: 0,
+                    specifyLength: true,
 
                     default: TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer,
 

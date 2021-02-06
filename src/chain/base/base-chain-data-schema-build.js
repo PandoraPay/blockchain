@@ -95,6 +95,8 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
 
                     type: "buffer",
                     fixedBytes: 32,
+                    minSize: 32,
+                    maxSize: 32,
 
                     position: 107,
                 },
@@ -106,6 +108,8 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
 
                     type: "buffer",
                     fixedBytes: 32,
+                    minSize: 32,
+                    maxSize: 32,
 
                     position: 108,
                 },
@@ -117,6 +121,8 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
 
                     type: "buffer",
                     fixedBytes: 32,
+                    maxSize: 32,
+                    minSize: 32,
 
                     removeLeadingZeros: true,
 
@@ -130,6 +136,8 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
 
                     type: "buffer",
                     fixedBytes: 32,
+                    minSize: 32,
+                    maxSize: 32,
 
                     removeLeadingZeros: true,
 

@@ -55,9 +55,9 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
         //otherwise return undefined
     }
 
-    async getBalance( publicKeyHash, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
+    async getBalance( publicKeyHash, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ){
 
-        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        if (typeof tokenCurrency === "string" && ( StringHelper.isHex(tokenCurrency) || !tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
@@ -94,9 +94,9 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
     }
 
-    async updateBalance( publicKeyHash, value, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ){
+    async updateBalance( publicKeyHash, value, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ){
 
-        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        if (typeof tokenCurrency === "string" && ( StringHelper.isHex(tokenCurrency) || !tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         await this._scope.chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         if (value === 0) throw new Exception(this, "Value is be different than 0");

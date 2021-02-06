@@ -32,8 +32,10 @@ class TokenNameMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 data: null,
 
                 hash: {
-                    type: "string",
-                    fixedBytes: 40,
+                    type: "buffer",
+                    fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
                     position: 10001,
                 },
 

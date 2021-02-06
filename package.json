@@ -17,9 +17,10 @@
     "start": "npm run build && npm run open",
     "debug": "npm run build -- --debug --mode development && node start-node.js --inspect=0.0.0.0:9229",
     "test": "npm run build -- --tests && npm run open -- --tests:enabled",
-    "build-browser": "node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es6 true",
-    "build-browser-wallet": "node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es6 true  && mv ./build/output/build-browser.js ./../wallet/dist/Blockchain-Browser-Bundle.js",
-    "build-browser-release": "node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --es5 --uglify",
+    "build-browser": "node ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es6 true",
+    "build-browser-release": "node ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es5 --uglify",
+    "build-browser-wallet": "node ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es6 true  && mv ./build/output/build-browser.js ./../wallet/dist/dev/Blockchain-Browser-Bundle.js",
+    "build-browser-wallet-release": "node ./node_modules/webpack/bin/webpack.js --config bin/webpack/webpack-config-browser.js --es6 true  && mv ./build/output/build-browser.js ./../wallet/dist/dev/Blockchain-Browser-Bundle.js",
     "test-browser": "npm run build-browser -- --tests",
     "prepublishOnly": "npm run build",
     "ssl-generator": "node scripts/SSL/generate-ssl-node.js"

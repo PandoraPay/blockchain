@@ -26,7 +26,7 @@ module.exports = class WalletTransfer {
 
     }
 
-    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
 
         if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
         if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
@@ -56,7 +56,7 @@ module.exports = class WalletTransfer {
 
         if (delegate && typeof delegate.delegatePublicKey === "string" && StringHelper.isHex(delegate.delegatePublicKey) )
             delegate.delegatePublicKey = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKey, "hex"), {
-                removeLeadingZeros: true,
+                specifyLength: true,
                 fixedBytes: 33,
             }, "delegatePublicKey", ()=>{}, "object", {}  );
 

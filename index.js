@@ -5,13 +5,14 @@ const networking = require('networking');
 const App = require('./src/app');
 const BlockModel = require('./src/block/block-model');
 const BlockVersionEnum = require('./src/block/block-version-enum');
-const TransactionsMerkleTree = require('./src/block/transactions/merkle-tree/tx-merkle-tree-model');
+const TxMerkleTreeModel = require('./src/block/transactions/merkle-tree/tx-merkle-tree-model');
 const TxMerkleTreeNodeModel = require('./src/block/transactions/merkle-tree/tx-merkle-tree-node-model');
 const TxMerkleTreeRootModel = require('./src/block/transactions/merkle-tree/tx-merkle-tree-root-model');
 const AccountHashVirtualMapModel = require("./src/chain/maps/account-hash/account-hash-virtual-map-model");
 const AccountHashMapElementSchemaBuild = require("./src/chain/maps/account-hash/element/account-hash-map-element-schema-build");
 const AccountHashMapDataDelegateSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-delegate-schema-build");
 const AccountHashMapDataBalanceSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-balance-schema-build");
+
 const TokenHashVirtualMapModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map-model");
 const TokenHashMapElementSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build");
 
@@ -50,7 +51,7 @@ const library = Helper.merge(merged, {
             GenesisModel,
             BlockVersionEnum,
             merkleTree:{
-                TransactionsMerkleTree,
+                TxMerkleTreeModel,
                 TxMerkleTreeNodeModel,
                 TxMerkleTreeRootModel,
             },
@@ -79,6 +80,7 @@ const library = Helper.merge(merged, {
 
             token: {
                 TokenHashVirtualMapModel,
+                TokenHashMapElementSchemaBuild
             },
 
         },

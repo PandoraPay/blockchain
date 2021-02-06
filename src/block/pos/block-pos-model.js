@@ -78,7 +78,7 @@ module.exports = class BlockPoSModel extends DBModel {
         if (this.stakingAmount < minimumStake)
             throw new Exception(this, "for staking it requires a minimum threshold", {minimumStake, availableStake: this.stakingAmount});
 
-        let funds = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id);
+        let funds = await chainData.accountHashMap.getBalance( this.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer );
 
         if (funds === undefined) throw new Exception(this, "Account not found", { forgerPublicKeyHash: this.stakeForgerPublicKeyHash,  stakeForgerPublicKey: this.stakeForgerPublicKey});
 

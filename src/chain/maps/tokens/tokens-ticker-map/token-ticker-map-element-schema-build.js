@@ -33,7 +33,9 @@ class TokenTickerMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 hash: {
                     type: "string",
-                    fixedBytes: 40,
+                    fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
                     position: 10001,
                 },
 

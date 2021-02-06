@@ -172,13 +172,11 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
         if (this.blocksHashesMap[hash]) return this.blocksHashesMap[hash];
 
-        const element = await this.blockHashMap.getMap( hash );
+        const blockInfo = await this.blockHashMap.getMap( hash );
 
-        if (!element) throw new Exception(this, "Block not found", {hash});
+        if (!blockInfo) throw new Exception(this, "Block not found", {hash});
 
-        const blockHeight = element.data;
-
-        return this.getBlock(blockHeight);
+        return this.getBlock(blockInfo.height);
 
     }
 
@@ -192,8 +190,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         const hashExistence = await this.txInfoHashMap.getMap( hash, );
         if (!hashExistence) return undefined;
 
-        const blockHeight = hashExistence.data.blockHeight;
-        const merkleHeight = hashExistence.data.merkleHeight;
+        const blockHeight = hashExistence.blockHeight;
+        const merkleHeight = hashExistence.merkleHeight;
 
         const txMerkleNode  = new TxMerkleTreeNodeModel( {
             ...this._scope,
@@ -212,8 +210,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         return {
             tx: txMerkleNode.transaction,
             block: blockHeight,
-            blockTimestamp: hashExistence.data.blockTimestamp,
-            merkleLeafHeight: hashExistence.data.merkleLeafHeight,
+            blockTimestamp: hashExistence.blockTimestamp,
+            merkleLeafHeight: hashExistence.merkleLeafHeight,
         };
     }
 

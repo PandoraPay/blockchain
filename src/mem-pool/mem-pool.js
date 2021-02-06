@@ -120,7 +120,7 @@ module.exports =  class MemPool {
     getMemPoolPendingBalance(publicKeyHash, tokenCurrency ){
 
         if (tokenCurrency)
-            if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency)) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+            if (typeof tokenCurrency === "string" && ( StringHelper.isHex(tokenCurrency) || !tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
 
         const out = {};
 

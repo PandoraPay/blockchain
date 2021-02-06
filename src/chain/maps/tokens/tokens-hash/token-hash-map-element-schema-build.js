@@ -40,6 +40,8 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     /**
                      * only lowercase ascii and one space between words is allowed.
                      */
+
+
                     validation(name){
                         return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name);
                     },
@@ -92,7 +94,9 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 verificationPublicKey:{
 
                     type: "buffer",
-                    fixedBytes: 32,
+                    fixedBytes: 33,
+                    minSize: 33,
+                    maxSize: 33,
 
                     position: 10006,
                 },

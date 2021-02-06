@@ -22,6 +22,8 @@ class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
                 tokenPublicKeyHash:{
                     type: "buffer",
                     fixedBytes: 20,
+                    minSize: 20,
+                    maxSize: 20,
 
                     position: 1001,
                 },
@@ -96,7 +98,9 @@ class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
                 verificationPublicKey:{
 
                     type: "buffer",
-                    fixedBytes: 32,
+                    fixedBytes: 33,
+                    minSize: 33,
+                    maxSize: 33,
 
                     position: 1008,
                 },

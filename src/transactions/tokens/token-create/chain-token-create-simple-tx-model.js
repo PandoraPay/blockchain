@@ -22,7 +22,7 @@ module.exports = class ChainTokenCreateSimpleTxModel extends ChainSimpleTxModel 
         if (!this._scope.argv.transactions.tokens.validateCreateTokenFee( this.vout[0].amount, block.height ))
             throw new Exception(this, 'Fee too small for creating a new token to avoid spamming with useless tokens');
 
-        if (!this.vout[0].tokenCurrency.equals(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id) )
+        if (!this.vout[0].tokenCurrency.equals(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer) )
             throw new Exception(this, 'TokenCurrency for creating a new token to avoid spamming with useless tokens is invalid');
 
         const balance = await chainData.accountHashMap.getBalance( this.vin[0].publicKeyHash  ) || 0;
@@ -50,8 +50,8 @@ module.exports = class ChainTokenCreateSimpleTxModel extends ChainSimpleTxModel 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
         await chainData.tokenHashMap.addMap(this.tokenData.tokenPublicKeyHash, this.tokenData.toJSON() );
-        await chainData.tokenNameHashMap.addMap(this.tokenData.name.toLowerCase(), this.tokenPublicKeyHash.toString('hex') );
-        await chainData.tokenTickerHashMap.addMap(this.tokenData.ticker.toLowerCase(), this.tokenPublicKeyHash.toString('hex') );
+        await chainData.tokenNameHashMap.addMap(this.tokenData.name.toLowerCase(), this.tokenPublicKeyHash );
+        await chainData.tokenTickerHashMap.addMap(this.tokenData.ticker.toLowerCase(), this.tokenPublicKeyHash );
 
         return true;
     }

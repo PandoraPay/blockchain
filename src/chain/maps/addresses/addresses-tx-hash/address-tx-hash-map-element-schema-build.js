@@ -36,6 +36,8 @@ class AddressTxHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 hash: {
                     type: "buffer",
                     fixedBytes: 32,
+                    minSize: 32,
+                    maxSize: 32,
                     position: 10001,
                 },
 

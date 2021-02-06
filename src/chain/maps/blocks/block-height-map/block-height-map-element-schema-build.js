@@ -37,8 +37,8 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                     type: "buffer",
                     fixedBytes: 32,
-                    minSize: undefined,
-                    maxSize: undefined,
+                    minSize: 32,
+                    maxSize: 32,
                     position: 10001,
                 },
 

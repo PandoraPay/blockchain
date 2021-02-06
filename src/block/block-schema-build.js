@@ -71,9 +71,9 @@ class BlockSchemaBuild extends DBSchemaBuild {
                 prevHash: {
 
                     type: "buffer",
-                    fixedBytes(){
-                        return this._scope.argv.block.hashSize;
-                    },
+                    fixedBytes: 32,
+                    maxSize: 32,
+                    minSize: 32,
 
                     position: 103,
                 },
@@ -85,9 +85,9 @@ class BlockSchemaBuild extends DBSchemaBuild {
                 prevKernelHash: {
 
                     type: "buffer",
-                    fixedBytes(){
-                        return this._scope.argv.block.hashSize;
-                    },
+                    minSize: 32,
+                    maxSize: 32,
+                    fixedBytes: 32,
 
                     removeLeadingZeros: true,
 
@@ -114,6 +114,8 @@ class BlockSchemaBuild extends DBSchemaBuild {
                 target: {
 
                     type: "buffer",
+                    minSize: 32,
+                    maxSize: 32,
                     fixedBytes: 32,
 
                     removeLeadingZeros: true,

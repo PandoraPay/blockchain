@@ -12,6 +12,7 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
                 stakeForgerPublicKey: {
                     type: "buffer",
                     fixedBytes: 33,
+                    maxSize: 33,
 
                     preprocessor(publicKey) {
                         delete this._stakeForgerPublicKeyHash;
@@ -34,12 +35,16 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
                 stakeDelegateRewardPublicKeyHash: {
                     type: "buffer",
                     fixedBytes: 20,
-
-                    removeLeadingZeros: true,
+                    maxSize: 20,
+                    minSize: 0,
 
                     preprocessor(stakeDelegateRewardPublicKeyHash) {
                         delete this._stakeDelegateRewardAddress;
                         return stakeDelegateRewardPublicKeyHash;
+                    },
+
+                    validation(value){
+                        return value.length === 0 || value.length === 20;
                     },
 
                     position: 103
@@ -51,6 +56,8 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
                 stakeForgerSignature: {
                     type: "buffer",
                     fixedBytes: 65,
+                    maxSize: 65,
+                    minSize: 65,
 
                     position: 104,
                 },

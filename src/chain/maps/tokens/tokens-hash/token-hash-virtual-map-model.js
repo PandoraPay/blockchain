@@ -41,9 +41,7 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
     async getTokenNode( tokenPublicKeyHash ){
 
         tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
-        const out = await this.getMap(tokenPublicKeyHash);
-
-        return out;
+        return this.getMap(tokenPublicKeyHash);
     }
 
     async updateTokenSupply(tokenPublicKeyHash, value){

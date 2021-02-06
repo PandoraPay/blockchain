@@ -17,8 +17,12 @@ class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
                 delegatePublicKey: {
                     type: "buffer",
                     fixedBytes: 33,
+                    minSize: 0,
+                    maxSize: 33,
 
-                    removeLeadingZeros: true,
+                    validation(value){
+                        return value.length === 0 || value.length === 33;
+                    },
 
                     position: 101,
                 },

@@ -151,14 +151,14 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
 
     }
 
-    async _getBalanceIncludingMemPool({account, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id}){
+    async _getBalanceIncludingMemPool({account, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
         if (!address) throw "Transparent Account is invalid";
 
         const chainData = this._scope.mainChain.data;
 
-        if (!Buffer.isBuffer(tokenCurrency) && StringHelper.isHex(tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
+        if (typeof tokenCurrency === "string" && ( StringHelper.isHex(tokenCurrency) || !tokenCurrency) ) tokenCurrency = Buffer.from(tokenCurrency, "hex");
         await chainData.tokenHashMap.currencyExists(tokenCurrency);
 
         const publicKeyHash = address.publicKeyHash;
