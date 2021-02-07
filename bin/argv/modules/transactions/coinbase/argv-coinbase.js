@@ -2,33 +2,15 @@ module.exports = {
 
     tokenTicker: "pand",
 
-    getSupplyBefore(blockHeight){
+
+    getBlockRewardAt(blockHeight, circulatingSupply){
 
         if (typeof blockHeight !== "number") throw "blockHeight is invalid";
+        if (typeof circulatingSupply !== "number" ) throw "circulatingSupply is invalid";
+        if ( circulatingSupply < 0 ) throw "circulatingSupply is negative"
+        if ( circulatingSupply === 0 && blockHeight > 0) throw "circulatingSupply was not set"
 
-        let sum = 0;
-
-        if ( blockHeight === 0) sum = 1;
-        else {
-
-            const  blocksPerCycle = this.blocksPerCycle();
-            const  cycle = Math.trunc( blockHeight / blocksPerCycle );
-
-            for (let i=0 ; i < cycle; i++)
-                sum += blocksPerCycle * this.getBlockRewardAt( blocksPerCycle * i);
-
-            sum += ( blockHeight % blocksPerCycle ) * this.getBlockRewardAt(blockHeight);
-
-        }
-
-        return sum * this.coinDenomination;
-
-    },
-
-    getBlockRewardAt(blockHeight){
-
-        if (typeof blockHeight !== "number") throw "blockHeight is invalid";
-
+        if (circulatingSupply >= this._fixedMaxSupply ) return 0; //making sure the coin supply is fixed
 
         let reward;
         if (blockHeight === 0)
@@ -44,17 +26,20 @@ module.exports = {
 
         }
 
-        return reward * this.coinDenomination;
+        return reward * this._coinDenomination;
     },
 
     blocksPerCycle(){
-        return 4*365.25*24*60*60 / this._argvBlock.difficulty.blockTime;
+        return 4*365.25*24*60*60 / this._argvBlock.difficulty._blockTime;
     },
 
     _initArgv( parents ){
+        this.blockTime =
         this._argvBlock = parents[0].block;
+
         if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
-        this.coinDenomination = parents[0].transactions.coins.coinDenomination;
+        this._coinDenomination = parents[0].transactions.coins.coinDenomination;
+        this._fixedMaxSupply = parents[0].transactions.coins.fixedMaxSupply;
     }
 
 }

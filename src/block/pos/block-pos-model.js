@@ -103,7 +103,7 @@ module.exports = class BlockPoSModel extends DBModel {
     async _getRewardDistribution(chain = this._scope.chain, chainData = chain.data){
 
         const fees = await this.block.sumFees();
-        const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height );
+        const coinbase = this._scope.argv.transactions.coinbase.getBlockRewardAt( this.block.height, chainData.circulatingSupply );
 
         const sum = fees;
         sum[ TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ] =  (sum[TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0) + coinbase; //reward

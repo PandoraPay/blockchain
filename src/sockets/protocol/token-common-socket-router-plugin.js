@@ -61,6 +61,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
                 tokenPublicKeyHash: token,
                 decimalSeparator: 5,
                 supply: this._scope.mainChain.data.circulatingSupply,
+                maxSupply: this._scope.mainChain.data.circulatingSupply,
             };
 
         const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token);

@@ -8,14 +8,14 @@ module.exports = {
 
     getMinimumStakeRequiredForForging(blockHeight){
 
-        if (blockHeight < this.stakingMinimumStakeEffectBlockHeight) return 1 * this.coinDenomination;
-        return 1000 * this.coinDenomination;
+        if (blockHeight < this.stakingMinimumStakeEffectBlockHeight) return 1 * this._coinDenomination;
+        return 1000 * this._coinDenomination;
 
     },
 
     _initArgv(parents){
         if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
-        this.coinDenomination = parents[0].transactions.coins.coinDenomination;
+        this._coinDenomination = parents[0].transactions.coins.coinDenomination;
     }
 
 }

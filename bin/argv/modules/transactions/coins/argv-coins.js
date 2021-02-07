@@ -1,6 +1,9 @@
+const coinDenomination = 10000;
+
 module.exports = {
 
-    coinDenomination: 10000,
+    coinDenomination: coinDenomination,
+    fixedMaxSupply: coinDenomination * 42000000000,
 
     validateCoins(number){
 

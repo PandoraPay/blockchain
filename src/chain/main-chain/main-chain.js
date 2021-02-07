@@ -117,7 +117,7 @@ module.exports = class MainChain extends BaseChain {
 
         this._scope.logger.info(this, `Balance updated for Genesis ${this._scope.genesis.settings.stakes.publicKeyHash.toString('hex')}`)
         if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
-            const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0 );
+            const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0, 0 );
             await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
             this.data.circulatingSupply = reward;
         }
