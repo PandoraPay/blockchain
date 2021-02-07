@@ -15,6 +15,11 @@ class AddressHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     maxSize: 7,
                 },
 
+                id: {
+                    minSize: 40,
+                    maxSize: 40,
+                },
+
                 version: {
                     type: "number",
                     default: 0,

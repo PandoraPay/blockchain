@@ -9,7 +9,7 @@ module.exports = class AccountHashMapDataBalanceModel extends HashVirtualMapMode
     }
 
     isDataEmpty(){
-        if (this.delegateNonce === 0 && !this.delegatePublicKeyHash.length && this.delegateFee === 0 ) return true;
+        if ( !this.delegateNonce && !this.delegatePublicKeyHash.length && !this.delegateFee ) return true;
         return false;
     }
 }

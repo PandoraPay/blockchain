@@ -10,8 +10,7 @@ module.exports = class AccountHashMapElementModel extends HashVirtualMapModel {
 
     isDataEmpty(){
 
-        if (this.balances.length === 0 && this.nonce === 0 && this.delegate.isDataEmpty() ) return true;
-
+        if ( !this.balances.length && !this.nonce && this.delegate.isDataEmpty() ) return true;
         return false;
     }
 

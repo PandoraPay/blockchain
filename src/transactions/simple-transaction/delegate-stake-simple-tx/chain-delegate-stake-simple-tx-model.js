@@ -42,9 +42,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
     }
 
     async transactionRemoved(chain = this._scope.chain, chainData = chain.data , block, merkleHeight, merkleLeafHeight){
-
         return super.transactionRemoved(chain, chainData);
-
     }
 
     async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
@@ -52,7 +50,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
             delegateNonce: delegate.delegateNonce,
-            delegatePublicKeyHash: delegate.delegatePublicKeyHash,
+            delegatePublicKeyHash: delegate.delegatePublicKeyHash.toString('hex'),
             delegateFee: delegate.delegateFee,
         };
     }

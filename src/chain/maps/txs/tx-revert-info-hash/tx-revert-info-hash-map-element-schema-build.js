@@ -30,28 +30,9 @@ class TxRevertInfoHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     position: 10000,
                 },
 
-                data: null,
-
-                delegateNonce: {
-                    type: "number",
-                    position: 10001,
-                },
-
-                delegatePublicKeyHash: {
-                    type: "buffer",
-                    minSize: 20,
-                    maxSize: 20,
-                    specifyLength: true,
-
-                    position: 10002,
-                },
-
-                delegateFee: {
-                    type: "number",
-                    validation(delegateFee){
-                        return delegateFee <= this._scope.argv.transactions.staking.delegateStakingFeePercentage;
-                    },
-                    position: 10003,
+                data: {
+                    type: "string",
+                    maxSize: 1000,
                 },
 
             },
