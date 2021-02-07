@@ -13,8 +13,9 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
             fields: {
 
                 table: {
-                    default: "Tmerkle",
-                    fixedBytes: 7,
+                    default: "TxMerkle",
+                    minSize: 8,
+                    maxSize: 8,
                 },
 
                 id: {

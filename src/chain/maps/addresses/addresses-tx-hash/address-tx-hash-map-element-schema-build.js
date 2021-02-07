@@ -12,14 +12,14 @@ class AddressTxHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 //format: `address_0`, `address_1`
                 id: {
-                    fixedBytes: null,
                     minSize: 42,
                     maxSize: 55,
                 },
 
                 table: {
                     default: "addrTxMap",
-                    fixedBytes: 9,
+                    minSize: 9,
+                    maxSize: 9,
                 },
 
                 version: {
@@ -35,7 +35,6 @@ class AddressTxHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 hash: {
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
                     position: 10001,

@@ -83,7 +83,7 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
          */
         const revertInfoPreviousState = await this.getTransactionRevertInfoPreviousState( chain, chainData, block, merkleHeight, merkleLeafHeight );
         if (revertInfoPreviousState)
-            await chainData.txRevertInfoHashMap.updateMap( this.hash().toString("hex"), JSON.stringify( revertInfoPreviousState ) );
+            await chainData.txRevertInfoHashMap.updateMap( this.hash().toString("hex"), revertInfoPreviousState);
 
         /**
          * Store TxId into AddressTxMap
@@ -155,7 +155,7 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
          */
         const revertInfoPreviousState = await chainData.txRevertInfoHashMap.getMap( this.hash().toString("hex") );
         if (revertInfoPreviousState){
-            await this.processTransactionRevertInfoPreviousState( JSON.parse(revertInfoPreviousState.data), chain, chainData, block, merkleHeight, merkleLeafHeight );
+            await this.processTransactionRevertInfoPreviousState( revertInfoPreviousState, chain, chainData, block, merkleHeight, merkleLeafHeight );
             await chainData.txRevertInfoHashMap.deleteMap( this.hash().toString("hex")  );
         }
 

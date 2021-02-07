@@ -11,11 +11,11 @@ class TokenTickerMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "tokenTickerMap",
-                    fixedBytes: 14,
+                    minSize: 14,
+                    maxSize: 14,
                 },
 
                 id:{
-                    fixedBytes: null,
                     minSize: 2,
                     maxSize: 6,
                 },
@@ -32,8 +32,7 @@ class TokenTickerMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 data: null,
 
                 hash: {
-                    type: "string",
-                    fixedBytes: 20,
+                    type: "buffer",
                     minSize: 20,
                     maxSize: 20,
                     position: 10001,

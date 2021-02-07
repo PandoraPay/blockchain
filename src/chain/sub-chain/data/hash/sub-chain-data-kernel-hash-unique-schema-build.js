@@ -11,7 +11,8 @@ class SubChainDataKernelHashUniqueSchemaBuild extends BufferUniqueSchemaBuild {
 
                     table: {
                         default: "kernel",
-                        fixedBytes: 6,
+                        minSize: 6,
+                        maxSize: 6,
                     },
 
                 },

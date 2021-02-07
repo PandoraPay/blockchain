@@ -11,12 +11,14 @@ class TxRevertInfoHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "txRevertInfoHashMap",
-                    fixedBytes: 19,
+                    minSize: 19,
+                    maxSize: 19,
                 },
 
                 //hash
                 id:{
-                    fixedBytes: 64,
+                    minSize: 64,
+                    maxSize: 64,
                 },
 
                 version: {
@@ -28,13 +30,28 @@ class TxRevertInfoHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     position: 10000,
                 },
 
-                //it will store json, it will be easier
-                data: {
-                    type: "buffer",
-                    maxSize: 100000,
-                    minSize: 0,
+                data: null,
 
+                delegateNonce: {
+                    type: "number",
                     position: 10001,
+                },
+
+                delegatePublicKeyHash: {
+                    type: "buffer",
+                    minSize: 20,
+                    maxSize: 20,
+                    specifyLength: true,
+
+                    position: 10002,
+                },
+
+                delegateFee: {
+                    type: "number",
+                    validation(delegateFee){
+                        return delegateFee <= this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+                    },
+                    position: 10003,
                 },
 
             },

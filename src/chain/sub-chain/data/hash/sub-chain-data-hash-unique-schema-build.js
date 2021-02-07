@@ -11,7 +11,8 @@ class SubChainDataHashUniqueSchemaBuild extends BufferUniqueSchemaBuild {
 
                     table: {
                         default: "hash",
-                        fixedBytes: 4,
+                        minSize: 4,
+                        maxSize: 4,
                     },
 
                 },

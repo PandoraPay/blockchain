@@ -203,7 +203,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             parentFieldName: "children",
         }, undefined, { } );
 
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:Tmerkle:m_${txInfo.merkleHeight}`);
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkl:m_${txInfo.merkleHeight}`);
         return txMerkleNode.transaction;
     }
 
@@ -238,7 +238,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             parentFieldName: "children",
         }, undefined, { } );
 
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:Tmerkle:m_${txInfo.merkleHeight}`);
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkl:m_${txInfo.merkleHeight}`);
         out.tx = txMerkleNode.transaction;
 
         return out;

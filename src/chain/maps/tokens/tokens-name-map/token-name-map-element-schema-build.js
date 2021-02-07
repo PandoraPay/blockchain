@@ -11,11 +11,11 @@ class TokenNameMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "tokenNameMap",
-                    fixedBytes: 12,
+                    minSize: 12,
+                    maxSize: 12,
                 },
 
                 id:{
-                    fixedBytes: null,
                     minSize: 2,
                     maxSize: 15,
                 },
@@ -33,7 +33,6 @@ class TokenNameMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 hash: {
                     type: "buffer",
-                    fixedBytes: 20,
                     minSize: 20,
                     maxSize: 20,
                     position: 10001,

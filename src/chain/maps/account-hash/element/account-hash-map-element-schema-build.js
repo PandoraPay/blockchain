@@ -15,7 +15,13 @@ class AccountHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "accountMap",
-                    fixedBytes: 10,
+                    minSize: 10,
+                    maxSize: 10,
+                },
+
+                id: {
+                    minSize: 40,
+                    maxSize: 40,
                 },
 
                 data: null,

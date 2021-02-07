@@ -11,12 +11,14 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "tokenMap",
-                    fixedBytes: 8,
+                    minSize: 8,
+                    maxSize: 8,
                 },
 
                 //hash
                 id:{
-                    fixedBytes: 40,
+                    minSize: 40,
+                    maxSize: 40,
                 },
 
                 data: null,
@@ -94,7 +96,6 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 verificationPublicKeyHash:{
 
                     type: "buffer",
-                    fixedBytes: 20,
                     minSize: 20,
                     maxSize: 20,
 

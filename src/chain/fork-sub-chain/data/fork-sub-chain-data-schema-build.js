@@ -11,7 +11,8 @@ class ForkSubChainDataSchemaBuild extends SubChainDataSchemaBuild {
 
                 table: {
                     default: "fork",
-                    fixedBytes: 4,
+                    minSize: 4,
+                    maxSize: 4,
                 },
 
                 ready: {

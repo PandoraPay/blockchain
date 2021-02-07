@@ -52,7 +52,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
             delegateNonce: delegate.delegateNonce,
-            delegatePublicKeyHash: delegate.delegatePublicKeyHash.toString('hex'),
+            delegatePublicKeyHash: delegate.delegatePublicKeyHash,
             delegateFee: delegate.delegateFee,
         };
     }

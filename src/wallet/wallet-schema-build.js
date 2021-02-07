@@ -18,12 +18,14 @@ class WalletSchemaBuild extends DBSchemaBuild {
 
                 table: {
                     default: "wallet",
-                    fixedBytes: 6,
+                    minSize: 6,
+                    maxSize: 6,
                 },
 
                 id: {
                     default: "main",
-                    fixedBytes: 4,
+                    minSize: 4,
+                    maxSize: 4,
                 },
 
                 version: {
@@ -56,7 +58,6 @@ class WalletSchemaBuild extends DBSchemaBuild {
 
                 mnemonicChecksum: {
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
 

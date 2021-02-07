@@ -17,7 +17,8 @@ class BlockSchemaBuild extends DBSchemaBuild {
 
                 table: {
                     default: "block",
-                    fixedBytes: 5,
+                    minSize: 5,
+                    maxSize: 5,
                 },
 
 
@@ -71,7 +72,6 @@ class BlockSchemaBuild extends DBSchemaBuild {
                 prevHash: {
 
                     type: "buffer",
-                    fixedBytes: 32,
                     maxSize: 32,
                     minSize: 32,
 
@@ -87,7 +87,6 @@ class BlockSchemaBuild extends DBSchemaBuild {
                     type: "buffer",
                     minSize: 32,
                     maxSize: 32,
-                    fixedBytes: 32,
 
                     removeLeadingZeros: true,
 
@@ -116,7 +115,6 @@ class BlockSchemaBuild extends DBSchemaBuild {
                     type: "buffer",
                     minSize: 32,
                     maxSize: 32,
-                    fixedBytes: 32,
 
                     removeLeadingZeros: true,
 

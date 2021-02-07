@@ -11,12 +11,14 @@ class BlockHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "blkHashMap",
-                    fixedBytes: 10,
+                    minSize: 10,
+                    maxSize: 10,
                 },
 
                 //hash
                 id:{
-                    fixedBytes: 64,
+                    minSize: 64,
+                    maxSize: 64,
                 },
 
                 version: {

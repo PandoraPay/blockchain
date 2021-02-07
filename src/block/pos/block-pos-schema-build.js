@@ -11,7 +11,6 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
 
                 stakeForgerPublicKey: {
                     type: "buffer",
-                    fixedBytes: 33,
                     maxSize: 33,
                     minSize: 33,
 
@@ -57,7 +56,6 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
                  */
                 stakeForgerSignature: {
                     type: "buffer",
-                    fixedBytes: 65,
                     maxSize: 65,
                     minSize: 65,
 

@@ -57,7 +57,8 @@ module.exports = class WalletTransfer {
         if (delegate && typeof delegate.delegatePublicKeyHash === "string" && StringHelper.isHex(delegate.delegatePublicKeyHash ) )
             delegate.delegatePublicKeyHash = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKeyHash, "hex"), {
                 specifyLength: true,
-                fixedBytes: 20,
+                minSize: 20,
+                maxSize: 20,
             }, "delegatePublicKeyHash", ()=>{}, "object", {}  );
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );

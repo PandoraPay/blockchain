@@ -24,14 +24,12 @@ class ChainDelegateStakeSimpleTxSchemaBuild extends ChainSimpleTxSchemaBuild {
                 vin:{
                     minSize: 1,
                     maxSize: 1,
-                    fixedBytes: 1,
                     specifyLength: false,
                 },
 
                 vout:{
                     minSize: 0,
                     maxSize: 0,
-                    fixedBytes: 0,
                     specifyLength: false,
                     emptyAllowed: true,
                 },

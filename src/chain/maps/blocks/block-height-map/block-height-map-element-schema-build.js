@@ -11,14 +11,14 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "blkHeightMap",
-                    fixedBytes: 6,
+                    minSize: 12,
+                    maxSize: 12,
                 },
 
                 //height
                 id:{
                     minSize: 1,
                     maxSize: 10,
-                    fixedBytes: undefined,
                 },
 
                 version: {
@@ -36,7 +36,6 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 hash: {
 
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
                     position: 10001,

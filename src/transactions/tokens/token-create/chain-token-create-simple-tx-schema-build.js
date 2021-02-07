@@ -24,14 +24,12 @@ class ChainTokenCreateSimpleTxSchemaBuild extends ChainSimpleTxSchemaBuild {
                 vin:{
                     minSize: 1,
                     maxSize: 1,
-                    fixedBytes: 1,
                     specifyLength: false,
                 },
 
                 vout:{
                     minSize: 1,
                     maxSize: 1,
-                    fixedBytes: 1,
                     specifyLength: false,
                 },
 

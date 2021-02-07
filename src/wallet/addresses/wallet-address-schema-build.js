@@ -19,12 +19,12 @@ class WalletAddressSchemaBuild extends DBSchemaBuild {
 
                 table: {
                     default: "address",
-                    fixedBytes: 6,
+                    minSize: 6,
+                    maxSize: 6,
                 },
 
                 version: {
                     type: "number",
-                    fixedBytes: 1,
 
                     default: 0,
 
@@ -38,7 +38,6 @@ class WalletAddressSchemaBuild extends DBSchemaBuild {
 
                 type: {
                     type: "number",
-                    fixedBytes: 1,
 
                     default: 0,
 

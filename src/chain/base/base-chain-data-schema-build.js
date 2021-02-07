@@ -12,7 +12,8 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
 
                 table: {
                     default: "basechain",
-                    fixedBytes: 9,
+                    minSize: 9,
+                    maxSize: 9,
                 },
 
                 version: {
@@ -94,7 +95,6 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
                 hash:{
 
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
 
@@ -107,7 +107,6 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
                 prevHash:{
 
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
 
@@ -120,7 +119,6 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
                 kernelHash:{
 
                     type: "buffer",
-                    fixedBytes: 32,
                     maxSize: 32,
                     minSize: 32,
 
@@ -135,7 +133,6 @@ class BaseChainDataSchemaBuild extends DBSchemaBuild {
                 prevKernelHash:{
 
                     type: "buffer",
-                    fixedBytes: 32,
                     minSize: 32,
                     maxSize: 32,
 

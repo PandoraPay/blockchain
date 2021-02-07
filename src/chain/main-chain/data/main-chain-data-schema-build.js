@@ -11,12 +11,14 @@ class MainChainDataSchemaBuild extends BaseChainDataSchemaBuild {
 
                     table: {
                         default: "mainchain",
-                        fixedBytes: 9,
+                        minSize: 9,
+                        maxSize: 9,
                     },
 
                     id: {
                         default: "main",
-                        fixedBytes: 4,
+                        minSize: 4,
+                        maxSize: 4,
                     },
 
                     version: {

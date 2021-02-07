@@ -16,7 +16,8 @@ class SubChainDataSchemaBuild extends BaseChainDataSchemaBuild {
 
                 table: {
                     default: "chain",
-                    fixedBytes: 5,
+                    minSize: 5,
+                    maxSize: 5,
                 },
 
                 version: {

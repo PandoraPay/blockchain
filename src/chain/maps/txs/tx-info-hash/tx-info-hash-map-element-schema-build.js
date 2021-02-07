@@ -11,12 +11,14 @@ class TxInfoHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 table: {
                     default: "txInfoHashMap",
-                    fixedBytes: 13,
+                    minSize: 13,
+                    maxSize: 13,
                 },
 
                 //hash
                 id:{
-                    fixedBytes: 64,
+                    minSize: 64,
+                    maxSize: 64,
                 },
 
                 version: {

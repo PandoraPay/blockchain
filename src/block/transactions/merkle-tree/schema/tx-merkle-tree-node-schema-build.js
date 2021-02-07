@@ -11,8 +11,9 @@ class TxMerkleTreeNodeSchemaBuild extends MerkleTreeNodeSchemaBuild {
             fields: {
 
                 table: {
-                    default: "TNode",
-                    fixedBytes: 6,
+                    default: "TxMerkleNode",
+                    minSize: 12,
+                    maxSize: 12,
                 },
 
             },
