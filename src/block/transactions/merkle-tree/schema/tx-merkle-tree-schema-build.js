@@ -13,20 +13,16 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
             fields: {
 
                 table: {
-                    default: "TxMerkle",
-                    minSize: 8,
-                    maxSize: 8,
+                    default: "Merkle",
+                    minSize: 6,
+                    maxSize: 6,
                 },
 
                 id: {
-
-                    default(){
-                        return "m_"+this.block.height.toString();
-                    },
+                    default: "TxMerkleTree",
 
                     maxSize: 12,
-                    minSize: 3,
-
+                    minSize: 12,
                 },
 
                 root:{

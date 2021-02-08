@@ -11,7 +11,7 @@ module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
         super(scope, schema, data, type, creationOptions);
     }
 
-    async fillTransactions(transactions, chain = this._scope.chain){
+    fillTransactions(transactions, chain = this._scope.chain){
 
         if (!transactions ) return;
         if (!Array.isArray(transactions)) transactions = [transactions];
@@ -23,7 +23,7 @@ module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
             else
                 throw new Exception(this, "Transaction input is not ")
 
-        this.fillMerkleTree(transactions);
+        return this.fillMerkleTree(transactions);
 
     }
 

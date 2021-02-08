@@ -1,10 +1,13 @@
 const {Helper, Exception} = require('kernel').helpers;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const ForgeBlockMemPool = require('./forge-block-mem-pool')
 
 module.exports = class ForgeBlock {
 
     constructor(scope) {
+
         this._scope = scope;
+        this.forgeBlockMemPool = new ForgeBlockMemPool(scope);
 
         this._hashrate = 0
     }
@@ -41,7 +44,7 @@ module.exports = class ForgeBlock {
 
     }
 
-    async forgeBlockWithPrivateKey(block, createTransactionsCallback, stakeForgerPublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
+    async forgeBlockWithPrivateKey(block, stakeForgerPublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
 
 
         block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
@@ -85,7 +88,7 @@ module.exports = class ForgeBlock {
             //create a local chainData
             let chainData = block._scope.chain.cloneData();
 
-            await this._scope.memPool.includeTransactions( block, createTransactionsCallback, block._scope.chain, chainData  );
+            await this.forgeBlockMemPool.includeTransactions( block, block._scope.chain, chainData  );
 
             block.newTokens = await block.transactionsMerkleTree.newTokensCount();
             block.totalDifficulty = await block.computeTotalDifficulty( block._scope.chain, chainData);
@@ -104,7 +107,7 @@ module.exports = class ForgeBlock {
 
     }
 
-    async forgeBlockWithWallet(block, createTransactionsCallback){
+    async forgeBlockWithWallet(block){
 
         const networkTimestampDrift = this._scope.genesis.settings.getDateNow() + this._scope.argv.block.timestamp.timestampDriftMaximum;
 
@@ -117,7 +120,7 @@ module.exports = class ForgeBlock {
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, availableStakeAddress.keys.decryptPublicKey(), availableStakeAddress.keys.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, availableStakeAddress.keys.decryptPublicKey(), availableStakeAddress.keys.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
@@ -135,7 +138,7 @@ module.exports = class ForgeBlock {
 
                 if ( !delegatedStake.checkStake(block.height) ) break; //they are all sorted
 
-                const out = await this.forgeBlockWithPrivateKey(block, createTransactionsCallback, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
@@ -152,6 +155,7 @@ module.exports = class ForgeBlock {
         }
 
 
+        return {result: false}
     }
 
 

@@ -199,11 +199,12 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
                     levels: 0,
                 },
                 level: -1,
+                _propagateChanges: a => a,
             },
             parentFieldName: "children",
-        }, undefined, { } );
+        }, undefined, {  }, "object", {loading: true} );
 
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkl:m_${txInfo.merkleHeight}`);
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkleTree:TxMerkleNode:${txInfo.merkleHeight}`);
         return txMerkleNode.transaction;
     }
 
@@ -234,11 +235,12 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
                     levels: 0,
                 },
                 level: -1,
+                _propagateChanges: a => a,
             },
             parentFieldName: "children",
-        }, undefined, { } );
+        }, undefined, {  }, "object", {loading: true} );
 
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkl:m_${txInfo.merkleHeight}`);
+        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkleTree:TxMerkleNode:${txInfo.merkleHeight}`);
         out.tx = txMerkleNode.transaction;
 
         return out;

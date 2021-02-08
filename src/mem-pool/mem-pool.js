@@ -158,101 +158,6 @@ module.exports =  class MemPool {
 
     }
 
-    async _includeTransaction(chain = this._scope.mainChain, chainData = chain.data, transactions, block, tx){
-
-        try{
-
-            const out1 = await tx.validateTransaction( chain, chainData, block);
-            if (!out1) throw new Exception(this, "validateTransaction failed");
-
-        }catch(err){
-
-            if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, "Including Tx raised an error", err);
-
-            return false;
-        }
-
-        try{
-
-            const out2 = await tx.transactionAdded( chain, chainData, block, transactions.length );
-            if (!out2) throw new Exception(this, "transactionAdded failed");
-
-
-        }catch(err){
-
-            this._scope.logger.error(this, "Including Tx 2 raised a strange error", err);
-
-            return false
-        }
-
-        transactions.push(tx);
-        return true;
-    }
-
-    //block.ChainData is being locked already
-    async includeTransactions( block, createTransactionsCallback, chain = block._scope.chain, chainData = chain.data ){
-
-        /**
-         * TODO order the transactions to be sorted
-         */
-
-        const transactions = [  ];
-
-        for (const vin0PublicKeyHash in this.transactionsOrderedByVin0Nonce){
-
-            const array = this.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
-
-            let nonce =  ( await chainData.accountHashMap.getNonce( vin0PublicKeyHash ) ) || 0;
-
-            const nonces = [];
-            for (const tx of array)
-                nonces.push(tx.nonce  );
-            this._scope.logger.log(this, "nonces", { nonces, nonce} );
-
-            for (let i=0; i < array.length; i++) {
-
-                const tx = array[i];
-
-                if (tx.nonce < nonce){
-                    console.log("delete tx.nonce", tx.nonce, nonce);
-                    await this._removeTransactionFromMemPool( tx.hash(), true );
-                    if (array[i] !== tx) i--;
-                }
-                else if (tx.nonce === nonce) { //real tx and not only reserved nonce
-                    const out = await this._includeTransaction(block._scope.chain, chainData, transactions, block, tx);
-                    if ( !out ){
-                        this._scope.logger.warn(this, "Include Transaction didn't match ", {nonce: nonce, txNonce: tx.nonce, out } );
-                        break;
-                    }
-                    nonce = nonce + 1;
-                }
-                else break;
-            }
-
-        }
-
-        if (createTransactionsCallback)
-            await createTransactionsCallback(block, async ( tx )=>{
-
-                await this._includeTransaction(block._scope.chain, chainData, transactions, block, tx);
-
-            });
-
-        //no need to remove the transactions as a temporary chainData was used
-
-        const queuedTxs = {};
-        transactions.map (tx => queuedTxs[tx.hash().toString("hex")] = tx );
-
-        this.queuedTxs = queuedTxs;
-        this.queuedTxsArray = transactions;
-
-        await block.transactionsMerkleTree.fillTransactions( transactions );
-
-        return transactions;
-
-    }
-
     async updateMemPoolWithMainChainChanges(blocksAdded, blocksRemoved){
 
         //removing txs from the mem pool
@@ -303,14 +208,14 @@ module.exports =  class MemPool {
         const txIdHex = txId.toString("hex");
 
         if (this.transactions[ txIdHex ]) return false;
-        if (this._transactionsInsertingPromises[txIdHex]) return this._transactionsInsertingPromises[txIdHex].promise;
+        if (this._transactionsInsertingPromises[txIdHex]) return this._transactionsInsertingPromises[txIdHex];
 
         let answer;
         const promise = new Promise( (resolve, reject)=>{
             answer = { resolve, reject }
         });
         answer.promise = promise;
-        this._transactionsInsertingPromises[txIdHex] = answer;
+        this._transactionsInsertingPromises[txIdHex] = answer.promise;
 
         try{
 

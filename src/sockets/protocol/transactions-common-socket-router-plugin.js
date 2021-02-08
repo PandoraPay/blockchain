@@ -74,23 +74,25 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
         //included in mem pool
         const memPoolTx = this._scope.memPool.transactions[hash];
 
-        if (memPoolTx) return {
-            tx: (type === "json") ? memPoolTx.toJSONRaw() : memPoolTx.toType(type),
-            memPool: true,
-            memPoolQueued: !!this._scope.memPool.queuedTxs[hash],
-            txId: memPoolTx.hash().toString("hex"),
-        };
+        if (memPoolTx)
+            return {
+                tx: (type === "json") ? memPoolTx.toJSONRaw() : memPoolTx.toType(type),
+                memPool: true,
+                memPoolQueued: !!this._scope.memPool.queuedTxs[hash],
+                txId: memPoolTx.hash().toString("hex"),
+            };
 
         //included in blockchain
         const out = await chainData.getTransactionWithInfoByHash( hash );
 
-        if (out) return {
-            tx: (type === "json") ? out.tx.toJSONRaw() : out.tx.toType(type),
-            block: out.block,
-            blockTimestamp: out.blockTimestamp,
-            confirmations: chainData.end - out.block,
-            txId: out.tx.hash().toString("hex"),
-        };
+        if (out)
+            return {
+                tx: (type === "json") ? out.tx.toJSONRaw() : out.tx.toType(type),
+                block: out.block,
+                blockTimestamp: out.blockTimestamp,
+                confirmations: chainData.end - out.block,
+                txId: out.tx.hash().toString("hex"),
+            };
 
 
         return null;
@@ -127,9 +129,9 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
         const publicKeyHash = address.publicKeyHash.toString("hex");
 
         const addressHashMapOut = await chainData.addressHashMap.getMap( publicKeyHash );
-        if (addressHashMapOut)
-            index = Math.min( index, addressHashMapOut.txsCount);
-        else return null;
+        if (!addressHashMapOut) return null;
+
+        index = Math.min( index, addressHashMapOut.txsCount);
 
         const startIndex = Math.max(0, index-limit );
 
@@ -141,7 +143,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
 
         const result = {};
         for (let i=0; i < out.length; i++)
-            result[startIndex+i] = out[i];
+            result[startIndex+i] = out[i].hash;
 
         return {
             out: result,
@@ -167,7 +169,7 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
             ids.out[key] = promise;
         }
 
-        const out = await Promise.all(promises);
+        await Promise.all(promises);
 
         for (const key in ids.out)
             ids.out[key] = await ids.out[key];

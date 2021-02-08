@@ -96,7 +96,7 @@ module.exports = class Forging  {
 
             const mined = await this.forgeBlock.forgeBlockWithWallet( this._work.block);
 
-            if (mined && !this.reset){
+            if (mined && mined.result && !this.reset){
 
                 this._scope.logger.info( this, "BLOCK FORGED", { block: this._work.block.height, timestamp: this._work.block.timestamp, totalDifficulty: this._work.block.totalDifficulty.toString(), target: this._work.block.target.toString("hex") } );
                 this._scope.logger.info( this, "target", { target: this._work.block.target.toString("hex") } );

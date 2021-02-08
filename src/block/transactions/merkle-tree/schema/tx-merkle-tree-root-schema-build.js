@@ -18,7 +18,7 @@ class TxMerkleTreeRootSchemaBuild extends MerkleTreeRootSchemaBuild {
 
             },
 
-        }, schema, true));
+        }, schema, true) );
 
     }
 
