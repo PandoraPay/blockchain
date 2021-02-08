@@ -5,6 +5,9 @@ const {StringHelper} = require('networking').sockets.protocol;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 const {SimpleTxModel} = require('cryptography').transactions.simpleTransaction;
 
+const BlockModel = require( "../../block/block-model");
+const TxMerkleTreeNodeModel = require( "../../block/transactions/merkle-tree/tx-merkle-tree-node-model")
+
 const TxInfoHashVirtualMapModel = require("../maps/txs/tx-info-hash/tx-info-hash-virtual-map-model");
 const TxRevertInfoHashVirtualMapModel = require("../maps/txs/tx-revert-info-hash/tx-revert-info-hash-virtual-map-model");
 
@@ -271,25 +274,50 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     }
 
-    async getTransactionByHash(hash){
-        throw new Exception(this, "Not implemented");
-    }
-
-    async getTransactionWithInfoByHash(hash){
-        throw new Exception(this, "Not implemented");
-    }
-
     async getBlock( height = this.end-1){
-        throw new Exception(this, "Not implemented");
+
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, end: this.end});
+
+        return this._getBlock(height);
     }
 
-    async getBlockByHash(hash){
-        throw new Exception(this, "Not implemented");
+    async _getBlock(height ){
+
+        const block  = new BlockModel( this._scope, undefined, {
+            height: height
+        } );
+        await block.load();
+
+        return block;
     }
 
-    async getBlockHash(height = this.end - 1){
-        const block = await this.getBlock(height);
-        return block.hash();
+    async deleteBlock(height){
+
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+
+        return this._deleteBlock(height);
+    }
+
+    async _deleteBlock(height, block){
+        if (!block) block = await this.getBlock(height);
+        await block.delete();
+        return true;
+    }
+
+    async getBlockByHash( hash ){
+
+        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
+        if (typeof hash !== "string" || hash.length !== 64) throw new Exception(this, 'Hash is invalid');
+
+        return this._getBlockByHash(hash);
+    }
+
+    async _getBlockByHash(hash){
+        const blockInfo = await this.blockHashMap.getMap( hash );
+        if (!blockInfo) throw new Exception(this, "Block not found", {hash});
+        return this.getBlock(blockInfo.height);
     }
 
     async getBlockKernelHash(height = this.end - 1 ){
@@ -315,6 +343,81 @@ module.exports = class BaseChainDataModel extends DBModel {
     async getBlockTimestamp(height = this.end - 1){
         const block = await this.getBlock(height);
         return block.timestamp;
+    }
+
+    async getBlockHash(height){
+
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+
+        return this._getBlockHash(height);
+    }
+
+    async _getBlockHash(height){
+
+        const element = await this.blockHeightMap.getMap( height.toString() );
+        if (!element) throw new Exception(this, "Block not found", {height});
+
+        return element.hash;
+    }
+
+    async getTransactionByHash(hash){
+
+        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
+        if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
+
+        return this._getTransactionByHash(hash);
+    }
+
+    async _getTransactionByHash(hash, txInfo){
+
+        if (!txInfo)
+            txInfo = await this.txInfoHashMap.getMap( hash, );
+
+        if (!txInfo) return;
+        return this._getTxMerkleLeaf( txInfo.merkleHeight, txInfo.blockHeight);
+    }
+
+    async _getTxMerkleLeaf(merkleHeight, blockHeight){
+
+        const txMerkleNode  = new TxMerkleTreeNodeModel( {
+            ...this._scope,
+            parent: {
+                tree: {
+                    levelsCounts: [txInfo.merkleHeight],
+                    levels: 0,
+                },
+                level: -1,
+                _propagateChanges: a => a,
+            },
+            parentFieldName: "children",
+        }, undefined, {  }, "object", {loading: true} );
+
+        await txMerkleNode.load( merkleHeight.toString(), `block:b_${blockHeight}:Merkle:TxMerkleTree` );
+        return txMerkleNode.transaction;
+    }
+
+    async getTransactionWithInfoByHash(hash){
+
+        if ( Buffer.isBuffer(hash) ) hash = hash.toString("hex");
+        if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
+
+        return this._getTransactionWithInfoByHash(hash);
+    }
+
+    async _getTransactionWithInfoByHash(hash){
+
+        const txInfo = await this.txInfoHashMap.getMap( hash );
+        if (!txInfo) return;
+
+        const out = {
+            block: txInfo.blockHeight,
+            blockTimestamp: txInfo.blockTimestamp,
+            merkleLeafHeight: txInfo.merkleLeafHeight,
+        }
+
+        out.tx = await this._getTransactionByHash( hash, txInfo);
+        return out;
     }
 
     async _computeGrindingLockedTransfersFundsHeight(height){
@@ -389,5 +492,6 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         return sum;
     }
+
 
 }

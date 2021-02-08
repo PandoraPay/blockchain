@@ -1,5 +1,3 @@
-const BlockModel = require( "../../../block/block-model");
-const TxMerkleTreeNodeModel = require( "../../../block/transactions/merkle-tree/tx-merkle-tree-node-model")
 
 const {Helper, Exception} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
@@ -16,9 +14,9 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
     }
 
     clearOnlyLocalBlocks(){
-        this.blocksMap = {};
-        this.blocksHashesMap = {};
-        this.transactionsHashesMap = {};
+        this.blocksMapByHeight = {};
+        this.blocksMapByHash = {};
+        this.transactionsMapByHash = {};
     }
 
     validateChainwork(subchainChainwork, subchainEnd){
@@ -79,11 +77,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
         this._scope.logger.info(this, "Deleting block");
         for (let i=0; i < this.end; i ++)
-            try{
                 blockPromises.push( this.deleteBlock(i) );
-            }catch(err){
-
-            }
 
         await Promise.all(blockPromises);
         this._scope.logger.info(this, "Deleting block finished");
@@ -120,120 +114,46 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     }
 
+    async _getBlock( height  = this.end - 1 ){
 
-
-
-    async getBlock( height  = this.end - 1 ){
-
-        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
-        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, end: this.end});
-
-        if (this.blocksMap[height]) return this.blocksMap[height];
-
-        const block  = new BlockModel( this._scope, undefined, {
-            height: height
-        } );
-        await block.load();
-
-        return block;
-
+        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height];
+        return super._getBlock(height);
     }
 
-    async deleteBlock(height){
+    async _deleteBlock(height){
 
-        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
-        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+        const block = await this._getBlock(height);
 
-        try{
-            const block = await this.getBlock(height);
-            await block.delete();
-            return true;
-        }catch(err){
+        delete this.blocksMapByHeight[height];
+        delete this.blocksMapByHash[block.hash().toString('hex')];
 
-        }
-
+        return super._deleteBlock(height, block);
     }
 
-    async getBlockHash(height){
-
-        if (this.blocksMap[height]) return this.blocksMap[height].hash();
-
-        const element = await this.blockHeightMap.getMap( height.toString() );
-
-        if (!element) throw new Exception(this, "Block not found", {height});
-
-        return element.hash;
-
+    async _getBlockByHash(hash){
+        if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash];
+        return super._getBlockByHash(hash);
     }
 
-    async getBlockByHash( hash ){
-
-        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
-
-        if (this.blocksHashesMap[hash]) return this.blocksHashesMap[hash];
-
-        const blockInfo = await this.blockHashMap.getMap( hash );
-
-        if (!blockInfo) throw new Exception(this, "Block not found", {hash});
-
-        return this.getBlock(blockInfo.height);
-
+    async _getBlockHash(height){
+        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height];
+        return super._getBlockHash(height);
     }
 
-    async getTransactionByHash(hash){
+    async _getTransactionByHash(hash){
 
-        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
-        if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
+        if (this.transactionsMapByHash[hash])
+            return this.transactionsMapByHash[hash].tx;
 
-        if (this.transactionsHashesMap[hash])
-            return this.transactionsHashesMap[hash];
-
-        const txInfo = await this.txInfoHashMap.getMap( hash, );
-        if (!txInfo) return undefined;
-
-        return this._getTxMerkleLeaf( txInfo.merkleHeight, txInfo.blockHeight);
+        return super._getTransactionByHash(hash);
     }
 
-    async getTransactionWithInfoByHash(hash){
+    async _getTransactionWithInfoByHash(hash){
 
-        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
-        if (!hash || hash.length !== 64) throw new Exception(this, "Hash is invalid");
+        if (this.transactionsMapByHash[hash])
+            return this.transactionsMapByHash[hash];
 
-        const txInfo = await this.txInfoHashMap.getMap( hash, );
-        if (!txInfo) return undefined;
-
-        const out = {
-            block: txInfo.blockHeight,
-            blockTimestamp: txInfo.blockTimestamp,
-            merkleLeafHeight: txInfo.merkleLeafHeight,
-        }
-
-        if (this.transactionsHashesMap[hash]){
-            out.tx = this.transactionsHashesMap[hash].toBuffer();
-            return out;
-        }
-
-        out.tx = this._getTxMerkleLeaf( txInfo.merkleHeight, txInfo.blockHeight);
-        return out;
+        return super._getTransactionWithInfoByHash(hash);
     }
-
-    async _getTxMerkleLeaf(merkleHeight, blockHeight){
-        const txMerkleNode  = new TxMerkleTreeNodeModel( {
-            ...this._scope,
-            parent: {
-                tree: {
-                    levelsCounts: [txInfo.merkleHeight],
-                    levels: 0,
-                },
-                level: -1,
-                _propagateChanges: a => a,
-            },
-            parentFieldName: "children",
-        }, undefined, {  }, "object", {loading: true} );
-
-        await txMerkleNode.load( merkleHeight.toString(), `block:b_${blockHeight}:Merkle:TxMerkleTree` );
-        return txMerkleNode.transaction;
-    }
-
 
 }

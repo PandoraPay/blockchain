@@ -205,12 +205,19 @@ module.exports = class MainChain extends BaseChain {
                 }
 
                 //saving temporary blocks
-                newData.blocksMap[block.height] = block;
-                newData.blocksHashesMap[block.hash().toString("hex")] = block;
+                newData.blocksMapByHeight[block.height] = block;
+                newData.blocksMapByHash[block.hash().toString("hex")] = block;
 
                 const txs = await block.getTransactions();
-                for (const tx of txs)
-                    newData.transactionsHashesMap[txs[i].hash().toString("hex")] = tx;
+                for (let i=0; i < txs.length; i++) {
+                    const tx = txs[i];
+                    newData.transactionsMapByHash[ tx.hash().toString("hex") ] = {
+                        block: block.height,
+                        blockTimestamp: block.timestamp,
+                        merkleLeafHeight: i,
+                        tx,
+                    };
+                }
 
                 newData.end = newData.end + 1;
                 newData.transactionsIndex = newData.transactionsIndex + block.txCount();
@@ -234,11 +241,18 @@ module.exports = class MainChain extends BaseChain {
             //saving the blocks which will be removed from oldData
             for (let i=0; i < blocksRemoved.length; i++){
                 const block = blocksRemoved[i];
-                oldData.blocksHashesMap[block.hash().toString("hex")] = block;
-                oldData.blocksMap[block.height] = block ;
+                oldData.blocksMapByHash[block.hash().toString("hex")] = block;
+                oldData.blocksMapByHeight[block.height] = block ;
                 const txs = await block.getTransactions();
-                for (const tx of txs)
-                    oldData.transactionsHashesMap[tx.hash().toString("hex")] = tx;
+                for (let i=0; i < txs.length; i++) {
+                    const tx = txs[i];
+                    oldData.transactionsMapByHash[ tx.hash().toString("hex") ] = {
+                        block: block.height,
+                        blockTimestamp: block.timestamp,
+                        merkleLeafHeight: i,
+                        tx,
+                    };
+                }
             }
 
             //mark it is being saved

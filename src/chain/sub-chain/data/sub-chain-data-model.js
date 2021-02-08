@@ -31,32 +31,29 @@ module.exports = class SubChainDataModel extends BaseChainDataModel {
 
     }
 
-    async getBlock( height  = this.end - 1){
+    async _getBlock( height  = this.end - 1){
 
         if (this.blocks[height])
             return this.blocks[height];
 
-        return this._fallback.getBlock(height);
-
+        return this._fallback._getBlock(height);
     }
 
-    async getBlockByHash(hash){
-
-        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
+    async _getBlockByHash(hash){
 
         if (this.hashes[hash])
             return this.hashes[hash];
 
-        return this._fallback.getBlockByHash(hash);
+        return this._fallback._getBlockByHash(hash);
     }
 
 
-    async getBlockHash(height){
+    async _getBlockHash(height){
 
         if (this.blocks[height])
             return this.blocks[height].hash();
 
-        return this._fallback.getBlockHash(height);
+        return this._fallback._getBlockHash(height);
 
     }
     
