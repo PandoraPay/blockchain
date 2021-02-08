@@ -191,21 +191,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         const txInfo = await this.txInfoHashMap.getMap( hash, );
         if (!txInfo) return undefined;
 
-        const txMerkleNode  = new TxMerkleTreeNodeModel( {
-            ...this._scope,
-            parent: {
-                tree: {
-                    levelsCounts: [txInfo.merkleHeight],
-                    levels: 0,
-                },
-                level: -1,
-                _propagateChanges: a => a,
-            },
-            parentFieldName: "children",
-        }, undefined, {  }, "object", {loading: true} );
-
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkleTree:TxMerkleNode:${txInfo.merkleHeight}`);
-        return txMerkleNode.transaction;
+        return this._getTxMerkleLeaf( txInfo.merkleHeight, txInfo.blockHeight);
     }
 
     async getTransactionWithInfoByHash(hash){
@@ -227,6 +213,11 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             return out;
         }
 
+        out.tx = this._getTxMerkleLeaf( txInfo.merkleHeight, txInfo.blockHeight);
+        return out;
+    }
+
+    async _getTxMerkleLeaf(merkleHeight, blockHeight){
         const txMerkleNode  = new TxMerkleTreeNodeModel( {
             ...this._scope,
             parent: {
@@ -240,10 +231,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             parentFieldName: "children",
         }, undefined, {  }, "object", {loading: true} );
 
-        await txMerkleNode.load(undefined, `block:b_${txInfo.blockHeight}:TxMerkleTree:TxMerkleNode:${txInfo.merkleHeight}`);
-        out.tx = txMerkleNode.transaction;
-
-        return out;
+        await txMerkleNode.load( merkleHeight.toString(), `block:b_${blockHeight}:Merkle:TxMerkleTree` );
+        return txMerkleNode.transaction;
     }
 
 

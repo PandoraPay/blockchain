@@ -165,7 +165,7 @@ module.exports = class BlockModel extends DBModel {
     }
 
     reward(){
-        return this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height )
+        return this._scope.argv.transactions.coinbase.getBlockRewardAt( this.height, 1 )
     }
 
     async sumFees(){
