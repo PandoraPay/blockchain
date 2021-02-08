@@ -114,7 +114,6 @@ module.exports = class BlockPoSModel extends DBModel {
 
         //not delegated or reward address not specified
         if ( !delegated || this.stakeDelegateRewardPublicKeyHash.length ){ //me
-
             for (const tokenCurrency in sum){
                 distributions[tokenCurrency] = {
                     owner: sum[tokenCurrency],  //owner

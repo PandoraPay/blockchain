@@ -15,7 +15,7 @@ class TxMerkleTreeNodeModel extends MerkleTreeNodeModel {
         if (this.type === MerkleTreeNodeTypeEnum.MERKLE_TREE_NODE || this.__data.pruned) return;
 
         if (!this._transaction)
-            this._transaction = this._scope.chain.transactionsValidator.validateTx( this.data );
+            this._transaction = this._scope.chain.transactionsValidator.cloneTx( this.data );
 
 
         return this._transaction;

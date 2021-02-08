@@ -9,8 +9,7 @@ module.exports = class AccountHashMapDataBalanceModel extends HashVirtualMapMode
     }
 
     isBalanceEmpty(){
-        if (this.amount === 0 ) return true;
-        return false;
+        return this.amount === 0;
     }
 
 }

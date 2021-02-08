@@ -1,8 +1,9 @@
 
 const {TxTypeEnum, TxScriptTypeEnum} = require('cryptography').transactions;
 const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
+const {MarshalData} = require('kernel').marshal;
 
-const {Exception, EnumHelper, StringHelper, BufferHelper} = require('kernel').helpers;
+const {BufferReader, Exception, EnumHelper, StringHelper, BufferHelper} = require('kernel').helpers;
 
 const ChainSimpleTxModel = require( "../simple-transaction/chain-simple-tx-model")
 const ChainDelegateStakeSimpleTxModel = require( "../simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model")
@@ -16,38 +17,27 @@ module.exports = class TransactionsValidator{
     }
     
     validateTxVersion(version){
-        
-        if (EnumHelper.validateEnum( version , TxTypeEnum) ) return true;
-
+        return EnumHelper.validateEnum( version , TxTypeEnum);
     }
     
     validateTxScript(scriptVersion){
-        if (EnumHelper.validateEnum( scriptVersion , TxScriptTypeEnum) ) return true;
+        return EnumHelper.validateEnum( scriptVersion , TxScriptTypeEnum);
     }
 
     isReallyATx(tx){
-
-        if (tx && tx instanceof ChainSimpleTxModel) return true;
-
-        return false;
+        return (tx && tx instanceof ChainSimpleTxModel);
     }
 
     getTxClass(input){
 
-        if (typeof input === "string") {
-
-            if (StringHelper.isHex(input))
-                input = Buffer.from(input, "hex");
-            else
-                input = JSON.parse(input);
-
-        }
+        if (typeof input === "string" && StringHelper.isHex(input)) input = Buffer.from(input, "hex");
 
         let scriptVersion;
 
-        if (Buffer.isBuffer(input )) scriptVersion = input[1];
+        if (Buffer.isBuffer(input )) scriptVersion = MarshalData.unmarshalNumber( BufferReader.create(input) );
         else if ( input instanceof BaseTxModel) scriptVersion = input.scriptVersion;
         else if ( typeof input === "object" ) scriptVersion = input.scriptVersion;
+        else throw "invalid data type";
 
         if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return ChainSimpleTxModel;
         if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return ChainDelegateStakeSimpleTxModel;
@@ -58,17 +48,9 @@ module.exports = class TransactionsValidator{
             
     }
 
-    validateTx(input){
-
-        const transactionClass = this.getTxClass( input );
-
-        if (input instanceof transactionClass) return input;
-        else return new transactionClass( this._scope, undefined, input  );
-
-    }
-
     cloneTx(input){
-        return this.validateTx(input);
+        const transactionClass = this.getTxClass( input );
+        return new transactionClass( this._scope, undefined, input  );
     }
     
 }
