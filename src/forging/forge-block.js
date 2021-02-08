@@ -34,7 +34,11 @@ module.exports = class ForgeBlock {
 
         try{
 
+            const hash = chain.data.hash;
+
             const block = await chain.createBlock();
+
+            if ( !hash.equals(chain.data.hash) ) return undefined; //meanwhile the main chain changed
 
             return block;
 
@@ -64,7 +68,7 @@ module.exports = class ForgeBlock {
             return false;
         }
 
-        if (this._scope.forging.reset) return false;
+        if (this._scope.forging.reset) return;
 
         const kernelHash = block.kernelHash();
         this._hashrate++;
@@ -79,7 +83,7 @@ module.exports = class ForgeBlock {
 
             const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeyHash();
 
-            if (this._scope.forging.reset) return false;
+            if (this._scope.forging.reset) return;
 
             if ( delegated && delegateFee )
                 block.pos.stakeDelegateRewardPublicKeyHash = walletStakeDelegateRewardPublicKeyHash;
@@ -113,10 +117,14 @@ module.exports = class ForgeBlock {
 
         const walletStakeDelegateRewardPublicKeyHash = this._scope.wallet.addresses[0].keys.decryptPublicKeyHash();
 
-        while (block.timestamp < networkTimestampDrift && !this._scope.forging.reset){
+        while (block.timestamp < networkTimestampDrift){
+
+            if (this._scope.forging.reset) return;
 
             //my own addresses
-            for (let i=0; i < this._scope.wallet.addresses.length && !this._scope.forging.reset; i++){
+            for (let i=0; i < this._scope.wallet.addresses.length; i++){
+
+                if (this._scope.forging.reset) return;
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
@@ -132,7 +140,9 @@ module.exports = class ForgeBlock {
             }
 
             //delegatedStakesList to coldStaking
-            for (let i=0; i < this._scope.walletStakes.delegatedStakesList.length && !this._scope.forging.reset; i++){
+            for (let i=0; i < this._scope.walletStakes.delegatedStakesList.length; i++){
+
+                if (this._scope.forging.reset) return;
 
                 const delegatedStake = this._scope.walletStakes.delegatedStakesList[i];
 
@@ -154,8 +164,6 @@ module.exports = class ForgeBlock {
 
         }
 
-
-        return {result: false}
     }
 
 

@@ -37,11 +37,6 @@ module.exports = class Forging  {
     }
 
     initializeForging(){
-
-        this._scope.mainChain.on("blocks/included", ()=>{
-            this.reset = true;
-        });
-
         return true;
     }
 
@@ -88,7 +83,7 @@ module.exports = class Forging  {
 
             //create a new block
             if ( this.reset || !this._work.block ){
-                this._work.block = await this.forgeBlock. createBlockForging(  );
+                this._work.block = await this.forgeBlock.createBlockForging(  );
                 if (!this._work.block) return;
                 this._work.timestamp = this._work.block.timestamp;
                 this.reset = false;

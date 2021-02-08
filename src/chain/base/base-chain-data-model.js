@@ -384,7 +384,7 @@ module.exports = class BaseChainDataModel extends DBModel {
             ...this._scope,
             parent: {
                 tree: {
-                    levelsCounts: [txInfo.merkleHeight],
+                    levelsCounts: [merkleHeight],
                     levels: 0,
                 },
                 level: -1,
@@ -439,7 +439,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
             }
 
-        this._grindingLockedTransfersFunds[height] = {
+        this._grindingLockedTransfersFunds[height] = { //it is mandatory to be immutable
             hash: block.hash().toString('hex'),
             transfers
         };
@@ -485,7 +485,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         let sum = 0;
         for (let height = startHeight; height < this.end; height++){
-            const transfers = this._grindingLockedTransfersFunds[height].transfers;
+            const transfers = this._grindingLockedTransfersFunds[height].transfers; // it is mandatory to be immutable
             if (transfers[publicKeyHashHex])
                 sum += transfers[publicKeyHashHex];
         }

@@ -49,7 +49,8 @@ module.exports = class ForgeBlockMemPool {
 
         for (const vin0PublicKeyHash in this._scope.memPool.transactionsOrderedByVin0Nonce){
 
-            const array = this._scope.memPool.transactionsOrderedByVin0Nonce[vin0PublicKeyHash];
+            if (this._scope.forging.reset) return;
+            const array = [ ...this._scope.memPool.transactionsOrderedByVin0Nonce[vin0PublicKeyHash] ];
 
             let nonce =  ( await chainData.accountHashMap.getNonce( vin0PublicKeyHash ) ) || 0;
 
@@ -59,14 +60,16 @@ module.exports = class ForgeBlockMemPool {
 
             this._scope.logger.log(this, "nonces", { nonces, nonce} );
 
-            for (let i=0; i < array.length && !this._scope.forging.reset ; i++) {
+            for (let i=0; i < array.length ; i++) {
+
+                if (this._scope.forging.reset) return;
 
                 const tx = array[i];
 
                 if (tx.nonce < nonce){
                     console.log("delete tx.nonce", tx.nonce, nonce);
-                    await this._scope.memPool._removeTransactionFromMemPool( tx.hash(), true );
-                    if (array[i] !== tx) i--;
+                    //await is not necessary to avoid waiting for useless operations in forging
+                    this._scope.memPool._removeTransactionFromMemPool( tx.hash(), true );
                 }
                 else if (tx.nonce === nonce) { //real tx and not only reserved nonce
 

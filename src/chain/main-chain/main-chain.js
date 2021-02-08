@@ -93,6 +93,8 @@ module.exports = class MainChain extends BaseChain {
 
                         await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock(data.senderSockets);
 
+                    } else if (data.message === "main-chain/forging-reset"){
+                        this._scope.forging.reset = true;
                     }
 
                 }catch(err){
@@ -315,6 +317,8 @@ module.exports = class MainChain extends BaseChain {
 
             oldData.beingSaved = false; //oldData is no longer used, so it will not have any effect
 
+            this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
+
             if (this._scope.db.isSynchronized )
                 await this._scope.masterCluster.sendMessage("main-chain", {
                     message: "main-chain/update-main-chain",
@@ -328,12 +332,17 @@ module.exports = class MainChain extends BaseChain {
                     prevHash: newData.prevHash,
                     kernelHash: newData.kernelHash,
                     prevKernelHash: newData.prevKernelHash,
-                    grindingLockedTransfersFunds: Helper.merge( {}, newData._grindingLockedTransfersFunds, false ), //not necessary to be cloned as it is immutable
+                    grindingLockedTransfersFunds: { ...newData._grindingLockedTransfersFunds }, //not necessary to be cloned as it is immutable
                 }, true, false);
 
-            this._scope.logger.log(this, "emitting new block",  newData.chainwork.toString() );
+            this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
 
-            await this._scope.memPool.updateMemPoolWithMainChainChanges( blocks, blocksRemoved );
+            lock();
+            lock = undefined;
+
+            this._scope.forging.reset = true;
+
+            await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/forging-reset" }, true, false );
 
             await this.emit("blocks/included", {
                 blocks: blocks,
@@ -341,6 +350,8 @@ module.exports = class MainChain extends BaseChain {
                 end: newData.end,
                 senderSockets,
             });
+
+            await this._scope.memPool.updateMemPoolWithMainChainChanges( blocks, blocksRemoved );
 
             if (this._scope.db.isSynchronized )
                 await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/propagate-new-block", data: { start: newData.start, end: newData.end } }, true, false );
@@ -377,8 +388,10 @@ module.exports = class MainChain extends BaseChain {
                 }
 
         }finally{
-            this._scope.logger.warn(this, 'Lock removed', blocks.map( it => it.height ));
-            if (typeof lock === "function") await lock();
+            if (typeof lock === "function"){
+                this._scope.logger.warn(this, 'Lock.finally removed', blocks.map( it => it.height ));
+                await lock();
+            }
         }
 
         return result;
@@ -405,7 +418,7 @@ module.exports = class MainChain extends BaseChain {
         forkSubChain.data.tokensIndex = this.data.tokensIndex;
         forkSubChain.data.chainwork = this.data.chainwork;
         forkSubChain.data.circulatingSupply = this.data.circulatingSupply;
-        forkSubChain.data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, false ); //not necessary to be cloned as it is immutable
+        forkSubChain.data._grindingLockedTransfersFunds = { ...this.data._grindingLockedTransfersFunds }; //not necessary to be cloned as it is immutable
         forkSubChain.data._fallback = this.data;
 
         forkSubChain.data.setFallbacks(this.data);

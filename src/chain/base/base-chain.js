@@ -33,8 +33,8 @@ module.exports = class BaseChain extends AsyncEvents{
 
     cloneData(){
         const data = this.createData();
-        data.fromObject( this.data.toJSON() );
-        data._grindingLockedTransfersFunds = Helper.merge( {}, this.data._grindingLockedTransfersFunds, false ); //not necessary to be cloned as it is immutable
+        data.fromObject( this.data.toObject() );
+        data._grindingLockedTransfersFunds = {...this.data._grindingLockedTransfersFunds}; //not necessary to be cloned as it is immutable
         data.setFallbacks(this.data);
         return data;
     }

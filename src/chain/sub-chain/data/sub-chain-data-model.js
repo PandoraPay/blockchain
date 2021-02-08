@@ -31,30 +31,4 @@ module.exports = class SubChainDataModel extends BaseChainDataModel {
 
     }
 
-    async _getBlock( height  = this.end - 1){
-
-        if (this.blocks[height])
-            return this.blocks[height];
-
-        return this._fallback._getBlock(height);
-    }
-
-    async _getBlockByHash(hash){
-
-        if (this.hashes[hash])
-            return this.hashes[hash];
-
-        return this._fallback._getBlockByHash(hash);
-    }
-
-
-    async _getBlockHash(height){
-
-        if (this.blocks[height])
-            return this.blocks[height].hash();
-
-        return this._fallback._getBlockHash(height);
-
-    }
-    
-} 
+}
