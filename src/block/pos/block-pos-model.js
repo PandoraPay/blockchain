@@ -86,7 +86,11 @@ module.exports = class BlockPoSModel extends DBModel {
 
         this._scope.logger.info(this, 'validatePOS locked funds', {forger: this.stakeForgerPublicKeyHash.toString('hex'), lockedFunds } );
 
-        if (funds !== this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: funds, stakingAmount: this.stakingAmount });
+        /**
+         * Funds can be higher than stakingAmount for one single reason. Maybe the forger received
+         * some funds, but he didn't update his stakingBalance to remove the deadlock.
+         */
+        if (funds < this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: funds, stakingAmount: this.stakingAmount });
 
         //verify signature
         const { delegateStakeForgerPublicKeyHash } = await this._getStakeDelegateForgerPublicKeyHash(chain, chainData);
