@@ -8,7 +8,6 @@ const {BN, BigNumber} = require('kernel').utils;
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list
  */
 
-const BlockModel = require("../../block/block-model");
 
 module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends SocketRouterPlugin {
 
@@ -315,7 +314,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             this._scope.logger.log(this, "Download height", height);
 
             //requesting block
-            const blockBuffer = await socket.emitAsync( 'blockchain/get-block-by-height', {index: height}, 2 * this._scope.argv.networkSettings.networkTimeout );
+            const blockBuffer = await socket.emitAsync( 'blockchain/get-block-by-height', {index: height}, Math.floor(1.5*this._scope.argv.networkSettings.networkTimeout) );
 
             if (!blockBuffer || !Buffer.isBuffer(blockBuffer)) throw new Exception(this, "block received is invalid", {index: height});
 

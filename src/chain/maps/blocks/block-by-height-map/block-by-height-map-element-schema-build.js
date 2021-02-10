@@ -1,7 +1,7 @@
 const {HashMapElementSchemaBuild} = require('kernel').dataStructures.hashMap.schema.HashMapElementSchemaBuild;
 const {Helper, Exception} = require('kernel').helpers;
 
-class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
+class BlockByHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
     constructor(schema) {
 
@@ -10,9 +10,9 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
             fields: {
 
                 table: {
-                    default: "blkHeightMap",
-                    minSize: 12,
-                    maxSize: 12,
+                    default: "blkByHeightMap",
+                    minSize: 14,
+                    maxSize: 14,
                 },
 
                 //height
@@ -33,8 +33,7 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                 data: null,
 
                 //hash
-                hash: {
-
+                blockHash: {
                     type: "buffer",
                     minSize: 32,
                     maxSize: 32,
@@ -50,6 +49,6 @@ class BlockHeightHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 }
 
 module.exports = {
-    BlockHeightHashMapElementSchemaBuild,
-    BlockHeightHashMapElementSchemaBuilt: new BlockHeightHashMapElementSchemaBuild()
+    BlockByHeightHashMapElementSchemaBuild,
+    BlockByHeightHashMapElementSchemaBuilt: new BlockByHeightHashMapElementSchemaBuild()
 }

@@ -13,9 +13,9 @@ class WalletAddressTransparentKeySchemaBuild extends DBSchemaBuild {
             fields:{
 
                 table: {
-                    default: "address",
-                    minSize: 6,
-                    maxSize: 6,
+                    default: "keys",
+                    minSize: 4,
+                    maxSize: 4,
                 },
 
                 version: {

@@ -128,17 +128,32 @@ module.exports = class BlockModel extends DBModel {
         /**
          * Store hash into HashMap
          */
-        await chainData.blockHeightMap.updateMap( this.height.toString(), {
-            hash: this.hash()
+        await chainData.blockByHeightMap.updateMap( this.height.toString(), {
+            blockHash: this.hash()
         } );
 
         /**
-         * Store block height into BlockHashMap
+         * Store block height into blockByHashMap
          */
-        await chainData.blockHashMap.updateMap( this.hash().toString("hex"), {
-            height: Number.parseInt(this.height)
+        await chainData.blockByHashMap.updateMap( this.hash().toString("hex"), {
+            height: this.height
         } );
 
+        /**
+         * Store block extra information into blockInfo
+         */
+        await chainData.blockInfoByHashMap.updateMap( this.hash().toString("hex"), {
+            blockHash: this.hash(),
+            kernelHash: this.kernelHash(),
+            prevHash: this.prevHash,
+            prevKernelHash: this.prevKernelHash,
+            height: this.height,
+            timestamp: this.timestamp,
+            size: this.size(),
+            txs: this.txCount(),
+            stakeForgerPublicKey: this.pos.stakeForgerPublicKey,
+            totalDifficulty: this.totalDifficulty,
+        }, "object", {skipProcessingConstructionValues: true});
 
         if (!chain.isForkSubChain)
             await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
@@ -153,13 +168,18 @@ module.exports = class BlockModel extends DBModel {
         /**
          * Remove hash from HashMap
          */
-        await chainData.blockHeightMap.deleteMap( this.height.toString() );
+        await chainData.blockByHeightMap.deleteMap( this.height.toString() );
 
         /**
-         * Remove block height from BlockHashMap
+         * Remove block height from blockByHashMap
          */
 
-        await chainData.blockHashMap.deleteMap( this.hash().toString("hex") );
+        await chainData.blockByHashMap.deleteMap( this.hash().toString("hex") );
+
+        /**
+         * Remove block info from blockInfoByHashMap
+         */
+        await chainData.blockInfoByHashMap.deleteMap( this.hash().toString("hex") );
 
 
     }

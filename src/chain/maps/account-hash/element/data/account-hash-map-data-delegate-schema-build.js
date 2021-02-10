@@ -43,12 +43,9 @@ class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
 
             options: {
                 hashing: {
-
                     enabled: true,
                     parentHashingPropagation: true,
-
                     fct: b => b,
-
                 },
             },
 

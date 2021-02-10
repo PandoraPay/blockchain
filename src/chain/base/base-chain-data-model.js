@@ -14,8 +14,9 @@ const TxRevertInfoHashVirtualMapModel = require("../maps/txs/tx-revert-info-hash
 const AddressHashVirtualMapModel = require("../maps/addresses/addresses-hash/address-hash-virtual-map-model");
 const AddressTxHashVirtualMapModel = require("../maps/addresses/addresses-tx-hash/address-tx-hash-virtual-map-model");
 
-const BlockHashVirtualMapModel = require("../maps/blocks/block-hash-map/block-hash-virtual-map-model");
-const BlockHeightVirtualMapModel = require("../maps/blocks/block-height-map/block-height-virtual-map-model");
+const BlockByHashVirtualMapModel = require("../maps/blocks/block-by-hash-map/block-by-hash-virtual-map-model");
+const BlockByHeightVirtualMapModel = require("../maps/blocks/block-by-height-map/block-by-height-virtual-map-model");
+const BlockInfoByHashMapVirtualMapModel = require("../maps/blocks/block-info-by-hash-map/block-info-by-hash-virtual-map-model");
 const AccountHashVirtualMapModel = require("../maps/account-hash/account-hash-virtual-map-model");
 const TokenHashVirtualMapModel = require("../maps/tokens/tokens-hash/token-hash-virtual-map-model");
 const TokenNameVirtualMapModel = require("../maps/tokens/tokens-name-map/token-name-virtual-map-model");
@@ -37,55 +38,21 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     resetCompleteData(){
 
-        this.addressHashMap = new this._addressHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
+        this.accountHashMap = new this._accountHashMapClass({ ...this._scope,  chainData: this, });
 
-        this.tokenHashMap = new this._tokenHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
+        this.addressHashMap = new this._addressHashMapClass({ ...this._scope,  chainData: this, });
+        this.addressTxHashMap = new this._addressTxHashMapClass({ ...this._scope,  chainData: this, });
 
-        this.tokenNameHashMap = new this._tokenNameMapClass({
-            ...this._scope,
-            chainData: this,
-        });
+        this.tokenHashMap = new this._tokenHashMapClass({ ...this._scope,  chainData: this, });
+        this.tokenNameHashMap = new this._tokenNameMapClass({ ...this._scope,  chainData: this, });
+        this.tokenTickerHashMap = new this._tokenTickerHashMapClass({ ...this._scope,  chainData: this, });
 
-        this.tokenTickerHashMap = new this._tokenTickerHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
+        this.txInfoHashMap = new this._txInfoHashMapClass({ ...this._scope,  chainData: this, });
+        this.txRevertInfoHashMap = new this._txRevertInfoHashMapClass({ ...this._scope,  chainData: this, });
 
-        this.addressTxHashMap = new this._addressTxHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.txInfoHashMap = new this._txInfoHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.txRevertInfoHashMap = new this._txRevertInfoHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.blockHashMap = new this._blockHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.blockHeightMap = new this._blockHeightMapClass({
-            ...this._scope,
-            chainData: this,
-        });
-
-        this.accountHashMap = new this._accountHashMapClass({
-            ...this._scope,
-            chainData: this,
-        });
+        this.blockByHashMap = new this._blockByHashMapClass({ ...this._scope,  chainData: this, });
+        this.blockByHeightMap = new this._blockByHeightMapClass({ ...this._scope,  chainData: this, });
+        this.blockInfoByHashMap = new this._blockInfoByHashMapClass({ ...this._scope,  chainData: this, });
 
         this.start = 0;
         this.end = 0;
@@ -130,12 +97,16 @@ module.exports = class BaseChainDataModel extends DBModel {
         return TxRevertInfoHashVirtualMapModel;
     }
 
-    get _blockHashMapClass(){
-        return BlockHashVirtualMapModel;
+    get _blockByHashMapClass(){
+        return BlockByHashVirtualMapModel;
     }
 
-    get _blockHeightMapClass(){
-        return BlockHeightVirtualMapModel;
+    get _blockByHeightMapClass(){
+        return BlockByHeightVirtualMapModel;
+    }
+
+    get _blockInfoByHashMapClass(){
+        return BlockInfoByHashMapVirtualMapModel;
     }
 
     get _accountHashMapClass(){
@@ -168,8 +139,9 @@ module.exports = class BaseChainDataModel extends DBModel {
         this.txRevertInfoHashMap.resetHashMap();
         this.addressHashMap.resetHashMap();
         this.addressTxHashMap.resetHashMap();
-        this.blockHashMap.resetHashMap();
-        this.blockHeightMap.resetHashMap();
+        this.blockByHashMap.resetHashMap();
+        this.blockByHeightMap.resetHashMap();
+        this.blockInfoByHashMap.resetHashMap();
         this.accountHashMap.resetHashMap();
         this.tokenHashMap.resetHashMap();
         this.tokenTickerHashMap.resetHashMap();
@@ -216,11 +188,11 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     }
 
-    async nextTarget( height = this.data.end ){
+    async nextTarget( height = this.data.end, lastBlockInfo ){
 
         const blockWindow = height >= this._scope.argv.block.difficulty.blockWindow ? this._scope.argv.block.difficulty.blockWindow : Math.max( height, 1) ;
         const first = Math.max( 0, height - this._scope.argv.block.difficulty.blockWindow ) ;
-        const last = Math.max( 0, height  );
+        const last = height ;
 
         const firstTotalDifficulty = height ? await this.getBlockTotalDifficulty(first) : 0;
         const lastTotalDifficulty = await this.getBlockTotalDifficulty(last);
@@ -255,8 +227,9 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     setFallbacks(mainChainData){
 
-        this.blockHashMap._fallback = mainChainData.blockHashMap;
-        this.blockHeightMap._fallback = mainChainData.blockHeightMap;
+        this.blockByHashMap._fallback = mainChainData.blockByHashMap;
+        this.blockByHeightMap._fallback = mainChainData.blockByHeightMap;
+        this.blockInfoByHashMap._fallback = mainChainData.blockInfoByHashMap;
 
         this.txInfoHashMap._fallback = mainChainData.txInfoHashMap;
         this.txRevertInfoHashMap._fallback = mainChainData.txRevertInfoHashMap;
@@ -315,34 +288,32 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _getBlockByHash(hash){
-        const blockInfo = await this.blockHashMap.getMap( hash );
-        if (!blockInfo) throw new Exception(this, "Block not found", {hash});
-        return this.getBlock(blockInfo.height);
+        const blockHeightInfo = await this.blockByHashMap.getMap( hash );
+        if (!blockHeightInfo) throw new Exception(this, "Block not found", {hash});
+        return this.getBlock(blockHeightInfo.height);
     }
 
-    async getBlockKernelHash(height = this.end - 1 ){
-        const block = await this.getBlock(height);
-        return block.kernelHash();
+    async getBlockInfoByHash(hash){
+        if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
+        if (typeof hash !== "string" || hash.length !== 64) throw new Exception(this, 'Hash is invalid');
+
+        return this.blockInfoByHashMap.getMap(hash);
     }
 
-    async getBlockTarget(height = this.end - 1){
-        const block = await this.getBlock(height);
-        return block.target;
+    async getBlockInfoByHeight(height){
+        const blockHeightInfo = await this.blockByHeightMap.getMap( height.toString() );
+        if (!blockHeightInfo) throw new Exception(this, "Block not found", {height});
+        return this.getBlockInfoByHash(blockHeightInfo.blockHash);
     }
 
     async getBlockTotalDifficulty(height = this.end - 1){
-        const block = await this.getBlock(height);
-        return block.totalDifficulty;
-    }
-
-    async getBlockDifficulty(height = this.end - 1){
-        const block = await this.getBlock(height);
-        return block.difficulty;
+        const blockInfo = await this.getBlockInfoByHeight(height);
+        return blockInfo.totalDifficulty;
     }
 
     async getBlockTimestamp(height = this.end - 1){
-        const block = await this.getBlock(height);
-        return block.timestamp;
+        const blockInfo = await this.getBlockInfoByHeight(height);
+        return blockInfo.timestamp;
     }
 
     async getBlockHash(height){
@@ -355,10 +326,23 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     async _getBlockHash(height){
 
-        const element = await this.blockHeightMap.getMap( height.toString() );
+        const element = await this.blockByHeightMap.getMap( height.toString() );
         if (!element) throw new Exception(this, "Block not found", {height});
 
-        return element.hash;
+        return element.blockHash;
+    }
+
+    async getBlockKernelHash(height){
+
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+
+        return this._getBlockKernelHash(height);
+    }
+
+    async _getBlockKernelHash(height){
+        const blockInfo = await this.getBlockInfoByHeight(height);
+        return blockInfo.kernelHash;
     }
 
     async getTransactionByHash(hash){

@@ -53,8 +53,9 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         //delete maps
         const promises = [
 
-            this.blockHashMap.clearHashMap(),
-            this.blockHeightMap.clearHashMap(),
+            this.blockByHashMap.clearHashMap(),
+            this.blockByHeightMap.clearHashMap(),
+            this.blockInfoByHashMap.clearHashMap(),
 
             this.txInfoHashMap.clearHashMap(),
             this.txRevertInfoHashMap.clearHashMap(),
@@ -94,8 +95,9 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
          */
 
         const promises = [
-            this.blockHashMap.saveVirtualMap(),
-            this.blockHeightMap.saveVirtualMap(),
+            this.blockByHashMap.saveVirtualMap(),
+            this.blockByHeightMap.saveVirtualMap(),
+            this.blockInfoByHashMap.saveVirtualMap(),
 
             this.txInfoHashMap.saveVirtualMap(),
             this.txRevertInfoHashMap.saveVirtualMap(),

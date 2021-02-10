@@ -19,8 +19,8 @@ class WalletAddressSchemaBuild extends DBSchemaBuild {
 
                 table: {
                     default: "address",
-                    minSize: 6,
-                    maxSize: 6,
+                    minSize: 7,
+                    maxSize: 7,
                 },
 
                 version: {

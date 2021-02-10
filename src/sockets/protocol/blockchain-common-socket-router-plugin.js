@@ -58,7 +58,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             },
 
             "blockchain/get-block-hash": {
-                handle:  this._getBlockHash,
+                handle:  this._getBlockHashByHeight,
                 maxCallsPerSecond:  50,
                 descr: "Returns hash of block in best-block-chain at <index>; index 0 is the genesis block"
             },
@@ -120,17 +120,19 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
 
     async _getBlockInfo({index = 0}){
 
-        const block = await this._scope.mainChain.data.getBlock( index );
+        const chainData = this._scope.mainChain.data;
+
+        const blockInfo = await chainData.getBlockInfo( index );
 
         return{
 
-            height: block.height,
-            timestamp: block.timestamp,
-            size: block.size(),
-            txCount: block.txCount(),
-            forgedBy:  block.pos.stakeForgerAddress,
-            hash: await this._scope.mainChain.data.getBlockHash( index ),
-            kernelHash: await this._scope.mainChain.data.getBlockKernelHash( index ),
+            height: blockInfo.height,
+            timestamp: blockInfo.timestamp,
+            size: blockInfo.size,
+            txCount: blockInfo.txCount,
+            forgedBy:  blockInfo.stakeForgerAddress,
+            hash: blockInfo.blockHash,
+            kernelHash: blockInfo.kernelHash,
 
         };
 
@@ -160,7 +162,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
         return this._scope.mainChain.data.end;
     }
 
-    async _getBlockHash( {index = 0}, ){
+    async _getBlockHashByHeight( {index = 0}, ){
         return this._scope.mainChain.data.getBlockHash( index );
     }
 
@@ -170,9 +172,11 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
 
     async _getBlockHashes({index = 0}){
 
+        const blockInfo = await this._scope.mainChain.data.getBlockInfoByHeight(index);
+
         return {
-            hash: await this._scope.mainChain.data.getBlockHash( index ),
-            kernelHash: await this._scope.mainChain.data.getBlockKernelHash( index ),
+            hash: blockInfo.blockHash,
+            kernelHash: blockInfo.kernelHash,
         };
 
     }
@@ -207,6 +211,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             prevKernelHash : this._scope.genesis.prevKernelHash,
             timestamp : this._scope.genesis.timestamp,
             timestampGenesis: this._scope.genesisSettings.timestamp,
+            reward: this._scope.argv.transactions.coinbase.getBlockRewardAt( 0, 0 ),
         }
 
     }

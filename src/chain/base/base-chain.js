@@ -76,7 +76,7 @@ module.exports = class BaseChain extends AsyncEvents{
             if ( height ) {
 
                 data.prevHash =  prevBlock.hash();
-                data.target = await chainData.nextTarget( prevBlock.height );
+                data.target = await chainData.nextTarget(  prevBlock.height, );
                 data.timestamp = await chainData.getBlockTimestamp(height -1 ) + 1;
                 data.prevKernelHash = prevBlock.kernelHash();
 
