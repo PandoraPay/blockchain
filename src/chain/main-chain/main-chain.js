@@ -164,7 +164,7 @@ module.exports = class MainChain extends BaseChain {
 
         try{
 
-            lock = await this.data.lock( 10*60*1000, -1 );
+            lock = await this.data.lock( -1, 2, 100, 'main-chain' );
             if (!lock){
                 this._scope.logger.warn(this, 'Locked failed', blocks.map( it => it.height ));
                 return false;
@@ -407,23 +407,23 @@ module.exports = class MainChain extends BaseChain {
 
     createForkSubChain(){
 
-        const forkSubChain = new ForkSubChain({
+        const forkSubchain = new ForkSubChain({
             ...this._scope,
             mainChain: this,
         });
 
-        forkSubChain.data.start = this.data.start;
-        forkSubChain.data.end = this.data.end;
-        forkSubChain.data.transactionsIndex = this.data.transactionsIndex;
-        forkSubChain.data.tokensIndex = this.data.tokensIndex;
-        forkSubChain.data.chainwork = this.data.chainwork;
-        forkSubChain.data.circulatingSupply = this.data.circulatingSupply;
-        forkSubChain.data._grindingLockedTransfersFunds = { ...this.data._grindingLockedTransfersFunds }; //not necessary to be cloned as it is immutable
-        forkSubChain.data._fallback = this.data;
+        forkSubchain.data.start = this.data.start;
+        forkSubchain.data.end = this.data.end;
+        forkSubchain.data.transactionsIndex = this.data.transactionsIndex;
+        forkSubchain.data.tokensIndex = this.data.tokensIndex;
+        forkSubchain.data.chainwork = this.data.chainwork;
+        forkSubchain.data.circulatingSupply = this.data.circulatingSupply;
+        forkSubchain.data._grindingLockedTransfersFunds = { ...this.data._grindingLockedTransfersFunds }; //not necessary to be cloned as it is immutable
+        forkSubchain.data._fallback = this.data;
 
-        forkSubChain.data.setFallbacks(this.data);
+        forkSubchain.data.setFallbacks(this.data);
 
-        return forkSubChain;
+        return forkSubchain;
 
     }
 

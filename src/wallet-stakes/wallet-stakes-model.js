@@ -93,7 +93,7 @@ module.exports = class WalletStakesModel extends DBModel{
         if (!delegate || !delegate.delegatePublicKeyHash.equals( delegatePublicKeyHash ))
             throw new Exception(this, "You need to delegate your stake to the following public key", delegatePublicKeyHash );
 
-        const lock = await this.lock(-1, publicKeyHash.toString("hex") );
+        const lock = await this.lock(-1, -1, 50, publicKeyHash.toString("hex") );
 
         let result = false;
 

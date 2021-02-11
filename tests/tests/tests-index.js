@@ -21,9 +21,9 @@ module.exports = {
 
         //await TestRedis();
 
-        await TestCouchDB();
+        // await TestCouchDB();
 
-        //await TestPouchDB();
+        await TestPouchDB();
 
 
     }

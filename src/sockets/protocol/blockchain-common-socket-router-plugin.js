@@ -118,7 +118,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
         };
     }
 
-    async _getBlockInfoByHeight({index = 0 }){
+    async _getBlockInfoByHeight({index = this._scope.mainChain.data.end-1 }){
 
         const blockInfo = await this._scope.mainChain.data.getBlockInfoByHeight( index );
 
