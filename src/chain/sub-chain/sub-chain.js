@@ -75,21 +75,20 @@ module.exports = class SubChain extends BaseChain{
         if (this.data.blocks[block.height])
             throw new Exception(this, 'block already found', block.height );
 
-        let insertPosition;
-        for (let j=0; j < this.data.listBlocks.length-1; j++)
-            if (this.data.listBlocks[j].height < block.height && ( j+1 < this.data.listBlocks.length && this.data.listBlocks[j+1].height > block.height ) ){
-                insertPosition = j;
-                break;
-            }
-
-        this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
+        if (!this.data.blocks[block.height]) {
+            let insertPosition;
+            for (let j = 0; j < this.data.listBlocks.length - 1; j++)
+                if (this.data.listBlocks[j].height < block.height && (j + 1 < this.data.listBlocks.length && this.data.listBlocks[j + 1].height > block.height)) {
+                    insertPosition = j;
+                    break;
+                }
+            this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
+            this.data.pushArray( "listHashes", block.hash(), undefined, undefined, insertPosition );
+            this.data.pushArray( "listKernelHashes", block.kernelHash(), undefined, undefined, insertPosition );
+        }
         this.data.blocks[block.height] = block;
-
-        this.data.pushArray( "listHashes", block.hash(), undefined, undefined, insertPosition );
         this.data.hashes[block.hash().toString('hex')] = block;
-
-        this.data.pushArray( "listKernelHashes", block.kernelHash(), undefined, undefined, insertPosition );
-        this.data.hashes[block.kernelHash().toString('hex')] = block;
+        this.data.kernelHashes[block.kernelHash().toString('hex')] = block;
 
     }
 

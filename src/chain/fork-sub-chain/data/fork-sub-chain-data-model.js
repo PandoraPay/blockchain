@@ -10,14 +10,13 @@ module.exports = class ForkSubChainDataModel extends SubChainDataModel {
         super(scope, schema, data, type, creationOptions);
         this.errorDownload = 0;
 
-        this.underlineFork = undefined;
         this.sockets = {};
         this.socketsList = [];
 
     }
 
     isReady(){
-        return this.ready && !this.processing && !this.underlineFork;
+        return this.ready && !this.processing;
     }
 
     score(){
