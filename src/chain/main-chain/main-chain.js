@@ -437,6 +437,7 @@ module.exports = class MainChain extends BaseChain {
         subChain.data.start = this.data.start;
         subChain.data.end = this.data.end;
         subChain.data.chainwork = this.data.chainwork;
+        subChain.data.circulatingSupply = this.data.circulatingSupply;
 
         subChain.data.setFallbacks(this.data);
 

@@ -75,8 +75,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         //let's delete blocks
         const blockPromises = [];
 
-
-        this._scope.logger.info(this, "Deleting block");
+        this._scope.logger.info(this, "Deleting block", {end: this.end});
         for (let i=0; i < this.end; i ++)
                 blockPromises.push( this.deleteBlockByHeight(i) );
 
@@ -124,10 +123,11 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     async _deleteBlockByHeight(height){
 
-        const hash = await this._getBlockHashByHeight(height);
-
-        delete this.blocksMapByHeight[height];
-        delete this.blocksMapByHash[hash.toString('hex')];
+        if (this.blocksMapByHeight[height]){
+            const block = this.blocksMapByHeight[height];
+            delete this.blocksMapByHeight[height];
+            delete this.blocksMapByHash[block.hash().toString('hex')];
+        }
 
         return super._deleteBlockByHeight(height);
     }
@@ -144,7 +144,7 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     async _getBlockInfoByHash(hash){
         if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash].getBlockInfo();
-        return super._getBlockByHash(hash);
+        return super._getBlockInfoByHash(hash);
     }
 
     async _getTransactionByHash(hash){

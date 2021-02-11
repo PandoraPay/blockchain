@@ -322,17 +322,21 @@ module.exports = class BaseChainDataModel extends DBModel {
     async getBlockInfoByHeight(height){
         if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
         if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+        return this._getBlockInfoByHeight(height);
+    }
+
+    async _getBlockInfoByHeight(height){
         const hash = await this._getBlockHashByHeight(height);
         return this._getBlockInfoByHash(hash.toString('hex'));
     }
 
     async getBlockTotalDifficultyByHeight(height = this.end - 1){
-        const blockInfo = await this.getBlockInfoByHeight(height);
+        const blockInfo = await this._getBlockInfoByHeight(height);
         return blockInfo.totalDifficulty;
     }
 
     async getBlockTimestampByHeight(height = this.end - 1){
-        const blockInfo = await this.getBlockInfoByHeight(height);
+        const blockInfo = await this._getBlockInfoByHeight(height);
         return blockInfo.timestamp;
     }
 
@@ -346,7 +350,7 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _getBlockKernelHash(height){
-        const blockInfo = await this.getBlockInfoByHeight(height);
+        const blockInfo = await this._getBlockInfoByHeight(height);
         return blockInfo.kernelHash;
     }
 
