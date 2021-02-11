@@ -159,7 +159,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
             for (let i = this.end - 1; i >= start; i--) {
 
-                const block = await this.getBlock( i );
+                const block = await this.getBlockByHeight( i );
 
                 this.end = this.end - 1;
                 this.chainwork = this.chainwork.sub(  block.work );
@@ -188,18 +188,18 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     }
 
-    async nextTarget( height = this.data.end, lastBlockInfo ){
+    async nextTarget( height = this.data.end, ){
 
         const blockWindow = height >= this._scope.argv.block.difficulty.blockWindow ? this._scope.argv.block.difficulty.blockWindow : Math.max( height, 1) ;
         const first = Math.max( 0, height - this._scope.argv.block.difficulty.blockWindow ) ;
         const last = height ;
 
-        const firstTotalDifficulty = height ? await this.getBlockTotalDifficulty(first) : 0;
-        const lastTotalDifficulty = await this.getBlockTotalDifficulty(last);
+        const firstTotalDifficulty = height ? await this.getBlockTotalDifficultyByHeight(first) : 0;
+        const lastTotalDifficulty = await this.getBlockTotalDifficultyByHeight(last);
 
         let totalDifficulty = new BigNumber( lastTotalDifficulty.toString(16), 16).minus( new BigNumber(firstTotalDifficulty.toString(16), 16 ) );
 
-        let actualTime = await this.getBlockTimestamp(last) - await this.getBlockTimestamp(first);
+        let actualTime = await this.getBlockTimestampByHeight(last) - await this.getBlockTimestampByHeight(first);
 
         if ( last <= this._scope.argv.block.difficulty.blockWindow )
             actualTime += ( this._scope.argv.block.difficulty.blockWindow - last ) * this._scope.argv.block.difficulty.blockTime;
@@ -247,15 +247,15 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     }
 
-    async getBlock( height = this.end-1){
+    async getBlockByHeight( height = this.end-1){
 
         if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
         if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, end: this.end});
 
-        return this._getBlock(height);
+        return this._getBlockByHeight(height);
     }
 
-    async _getBlock(height ){
+    async _getBlockByHeight(height ){
 
         const block  = new BlockModel( this._scope, undefined, {
             height: height
@@ -265,18 +265,34 @@ module.exports = class BaseChainDataModel extends DBModel {
         return block;
     }
 
-    async deleteBlock(height){
+    async deleteBlockByHeight(height){
 
         if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
         if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
 
-        return this._deleteBlock(height);
+        return this._deleteBlockByHeight(height);
     }
 
-    async _deleteBlock(height, block){
-        if (!block) block = await this.getBlock(height);
+    async _deleteBlockByHeight(height){
+        const block = await this._getBlockByHeight(height);
         await block.delete();
         return true;
+    }
+
+    async getBlockHashByHeight(height){
+
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+
+        return this._getBlockHashByHeight(height);
+    }
+
+    async _getBlockHashByHeight(height){
+
+        const element = await this.blockByHeightMap.getMap( height.toString() );
+        if (!element) throw new Exception(this, "Block not found", {height});
+
+        return element.blockHash;
     }
 
     async getBlockByHash( hash ){
@@ -290,47 +306,36 @@ module.exports = class BaseChainDataModel extends DBModel {
     async _getBlockByHash(hash){
         const blockHeightInfo = await this.blockByHashMap.getMap( hash );
         if (!blockHeightInfo) throw new Exception(this, "Block not found", {hash});
-        return this.getBlock(blockHeightInfo.height);
+        return this.getBlockByHeight(blockHeightInfo.height);
     }
 
     async getBlockInfoByHash(hash){
         if (Buffer.isBuffer(hash)) hash = hash.toString("hex");
         if (typeof hash !== "string" || hash.length !== 64) throw new Exception(this, 'Hash is invalid');
+        return this._getBlockInfoByHash(hash);
+    }
 
+    async _getBlockInfoByHash(hash){
         return this.blockInfoByHashMap.getMap(hash);
     }
 
     async getBlockInfoByHeight(height){
-        const blockHeightInfo = await this.blockByHeightMap.getMap( height.toString() );
-        if (!blockHeightInfo) throw new Exception(this, "Block not found", {height});
-        return this.getBlockInfoByHash(blockHeightInfo.blockHash);
+        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
+        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
+        const hash = await this._getBlockHashByHeight(height);
+        return this._getBlockInfoByHash(hash.toString('hex'));
     }
 
-    async getBlockTotalDifficulty(height = this.end - 1){
+    async getBlockTotalDifficultyByHeight(height = this.end - 1){
         const blockInfo = await this.getBlockInfoByHeight(height);
         return blockInfo.totalDifficulty;
     }
 
-    async getBlockTimestamp(height = this.end - 1){
+    async getBlockTimestampByHeight(height = this.end - 1){
         const blockInfo = await this.getBlockInfoByHeight(height);
         return blockInfo.timestamp;
     }
 
-    async getBlockHash(height){
-
-        if ( height < this.start ) throw new Exception(this, "Height is less than start", {height, start: this.start});
-        if ( height >= this.end ) throw new Exception(this, "Height is higher than  length", {height, length: this.length});
-
-        return this._getBlockHash(height);
-    }
-
-    async _getBlockHash(height){
-
-        const element = await this.blockByHeightMap.getMap( height.toString() );
-        if (!element) throw new Exception(this, "Block not found", {height});
-
-        return element.blockHash;
-    }
 
     async getBlockKernelHash(height){
 
@@ -408,7 +413,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer; //native id;
 
-        const block = await this.getBlock(height);
+        const block = await this.getBlockByHeight(height);
         if (!block) throw new Exception(this, `Block couldn't get retrieved`, {height } );
 
         const transfers = {};
@@ -445,7 +450,7 @@ module.exports = class BaseChainDataModel extends DBModel {
         //clear old ones
         let height = startHeight-1;
         while (height >= 0 && this._grindingLockedTransfersFunds[height] ){
-            const blockHash = await this.getBlockHash(height);
+            const blockHash = await this.getBlockHashByHeight(height);
             if (!blockHash || blockHash.toString('hex') !== this._grindingLockedTransfersFunds[height].hash )
                 throw new Exception(this, 'BlockHash is not matching Grinding', {height});
             delete this._grindingLockedTransfersFunds[height];

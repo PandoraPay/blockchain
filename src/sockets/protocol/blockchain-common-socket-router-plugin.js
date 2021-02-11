@@ -34,13 +34,13 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             },
 
             "blockchain/get-block": {
-                handle:  this._getBlock,
+                handle:  this._getBlockByHash,
                 maxCallsPerSecond:  50,
                 descr: "Returns information about the block with the given hash."
             },
 
             "blockchain/get-block-by-height": {
-                handle:  this._getBlockByIndex,
+                handle:  this._getBlockByHeight,
                 maxCallsPerSecond:  50,
                 descr: "Returns the block with the given index."
             },
@@ -52,7 +52,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             },
 
             "blockchain/get-block-info": {
-                handle:  this._getBlockInfo,
+                handle:  this._getBlockInfoByHeight,
                 maxCallsPerSecond:  50,
                 descr: "Returns little information in best-block-chain at <index>; index 0 is the genesis block"
             },
@@ -70,7 +70,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             },
 
             "blockchain/get-block-hashes": {
-                handle:  this._getBlockHashes,
+                handle:  this._getBlockHashesByHeight,
                 maxCallsPerSecond:  50,
                 descr: "Returns hash and kernelHash of block in best-block-chain at <index>; index 0 is the genesis block"
             },
@@ -118,19 +118,17 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
         };
     }
 
-    async _getBlockInfo({index = 0}){
+    async _getBlockInfoByHeight({index = 0 }){
 
-        const chainData = this._scope.mainChain.data;
-
-        const blockInfo = await chainData.getBlockInfo( index );
+        const blockInfo = await this._scope.mainChain.data.getBlockInfoByHeight( index );
 
         return{
 
             height: blockInfo.height,
             timestamp: blockInfo.timestamp,
             size: blockInfo.size,
-            txCount: blockInfo.txCount,
-            forgedBy:  blockInfo.stakeForgerAddress,
+            txCount: blockInfo.txs,
+            forgedBy:  blockInfo.stakeForgerPublicKey,
             hash: blockInfo.blockHash,
             kernelHash: blockInfo.kernelHash,
 
@@ -138,9 +136,9 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
 
     }
     
-    async _getBlockByIndex({index = 0, type = "buffer"}){
+    async _getBlockByHeight({index = this._scope.mainChain.data.end-1, type = "buffer"}){
         
-        const block = await this._scope.mainChain.data.getBlock( index );
+        const block = await this._scope.mainChain.data.getBlockByHeight( index );
 
         if (!block) throw Exception(this, "Block was not found", {index: index} );
 
@@ -148,7 +146,7 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
         
     }
 
-    async _getBlock({hash, type = "buffer"}){
+    async _getBlockByHash({hash, type = "buffer"}){
 
         const block = await this._scope.mainChain.data.getBlockByHash( hash );
 
@@ -162,15 +160,15 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
         return this._scope.mainChain.data.end;
     }
 
-    async _getBlockHashByHeight( {index = 0}, ){
-        return this._scope.mainChain.data.getBlockHash( index );
+    async _getBlockHashByHeight( {index =  this._scope.mainChain.data.end-1 }, ){
+        return this._scope.mainChain.data.getBlockHashByHeight( index );
     }
 
-    async _getBlockKernelHash({index = 0}){
+    async _getBlockKernelHash({index = this._scope.mainChain.data.end-1 }){
         return this._scope.mainChain.data.getBlockKernelHash( index );
     }
 
-    async _getBlockHashes({index = 0}){
+    async _getBlockHashesByHeight({index = this._scope.mainChain.data.end-1 }){
 
         const blockInfo = await this._scope.mainChain.data.getBlockInfoByHeight(index);
 

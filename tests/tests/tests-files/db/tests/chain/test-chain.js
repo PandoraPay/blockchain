@@ -46,7 +46,7 @@ module.exports = function run () {
             this.expect(chain.data.end, 10);
 
             for (let i=0; i < chain.data.end; i++){
-                const block = await chain.data.getBlock(i);
+                const block = await chain.data.getBlockByHeight(i);
                 this.expect(hashes[i], block.hash() );
                 this.expect(kernelHashes[i], block.kernelHash() );
             }
@@ -109,7 +109,7 @@ module.exports = function run () {
             this.expect(this._scope.mainChain.data.end, 20);
 
             for (let i=0; i < this._scope.mainChain.data.end; i++){
-                const block = await this._scope.mainChain.data.getBlock(i);
+                const block = await this._scope.mainChain.data.getBlockByHeight(i);
                 this.expect(hashes[i], block.hash() );
                 this.expect(kernelHashes[i], block.kernelHash() );
             }

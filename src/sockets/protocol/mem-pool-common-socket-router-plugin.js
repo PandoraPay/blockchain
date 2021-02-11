@@ -13,11 +13,9 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
 
         });
 
-        this._scope.events.on("master-cluster/started", ()=> this.initializePluginMasterCluster() );
+        this._scope.events.on("master-cluster/started", ()=> {
 
-    }
-
-    async initializePluginMasterCluster(){
+        } );
 
     }
 

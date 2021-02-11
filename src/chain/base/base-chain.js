@@ -65,7 +65,7 @@ module.exports = class BaseChain extends AsyncEvents{
         let block;
         try{
 
-            const prevBlock = height ? await chainData.getBlock(height-1) : this._scope.genesis;
+            const prevBlock = height ? await chainData.getBlockByHeight(height-1) : this._scope.genesis;
 
             const data = {
                 height: height,
@@ -77,7 +77,7 @@ module.exports = class BaseChain extends AsyncEvents{
 
                 data.prevHash =  prevBlock.hash();
                 data.target = await chainData.nextTarget(  prevBlock.height, );
-                data.timestamp = await chainData.getBlockTimestamp(height -1 ) + 1;
+                data.timestamp = await chainData.getBlockTimestampByHeight(height -1 ) + 1;
                 data.prevKernelHash = prevBlock.kernelHash();
 
                 BlockModelClass = BlockModel;
@@ -100,7 +100,7 @@ module.exports = class BaseChain extends AsyncEvents{
 
             block.height = height;
 
-            const prevTotalDifficulty = block.height ? await chainData.getBlockTotalDifficulty( block.height -1 ) : new BN(0);
+            const prevTotalDifficulty = block.height ? await chainData.getBlockTotalDifficultyByHeight( block.height -1 ) : new BN(0);
             block.totalDifficulty = prevTotalDifficulty.add( block.difficulty );
 
 
@@ -115,7 +115,7 @@ module.exports = class BaseChain extends AsyncEvents{
 
         for (let i=this.data.start; i < this.data.end; i++){
 
-            const block = await this.getBlock(i);
+            const block = await this.getBlockByHeight(i);
             if ( await block.validateBlock(this) !== true )
                 return false;
 
@@ -130,7 +130,7 @@ module.exports = class BaseChain extends AsyncEvents{
         //Identify which blocks are matching so we can skip them right now.
         let index = 0;
         while (index < blocks.length && blocks[index].height < this.data.end ){
-            const hash = await this.data.getBlockHash( blocks[index].height );
+            const hash = await this.data.getBlockHashByHeight( blocks[index].height );
             if (hash.equals( blocks[index].hash() ))
                 index++;
             else

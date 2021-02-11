@@ -24,14 +24,14 @@ module.exports = class BlockModel extends DBModel {
         if ( this.timestamp >  networkTimestampDrift )
             throw new Exception(this, "timestamp drift is to big", {timestamp:this.timestamp, networkTimestampDrift: networkTimestampDrift });
 
-        const timestamp = await chainData.getBlockTimestamp( this.height - 1 );
+        const timestamp = await chainData.getBlockTimestampByHeight( this.height - 1 );
         if ( this.timestamp < timestamp )
             throw new Exception( this, "Timestamp is less than last median blocks", { timestamp: this.timestamp, medianTimestamp: timestamp } );
 
         /**
          * validate prevHash
          */
-        const prevBlockHash = await chainData.getBlockHash(this.height-1);
+        const prevBlockHash = await chainData.getBlockHashByHeight(this.height-1);
         if (!this.prevHash.equals(  prevBlockHash ))
             throw new Exception(this, "prevHash doesn't match", {prevHash: this.prevHash, prevBlockHash });
 
@@ -92,7 +92,7 @@ module.exports = class BlockModel extends DBModel {
 
     async computeTotalDifficulty(chain = this._scope.chain, chainData = chain.data){
 
-        const prevTotalDifficulty = this.height ? await chainData.getBlockTotalDifficulty( this.height -1 ) : new BN(0);
+        const prevTotalDifficulty = this.height ? await chainData.getBlockTotalDifficultyByHeight( this.height -1 ) : new BN(0);
         const totalDifficulty = prevTotalDifficulty.add( this.difficulty );
         return totalDifficulty;
 
@@ -142,7 +142,15 @@ module.exports = class BlockModel extends DBModel {
         /**
          * Store block extra information into blockInfo
          */
-        await chainData.blockInfoByHashMap.updateMap( this.hash().toString("hex"), {
+        await chainData.blockInfoByHashMap.updateMap( this.hash().toString("hex"), this.getBlockInfo(), "object", {skipProcessingConstructionValues: true});
+
+        if (!chain.isForkSubChain)
+            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
+        
+    }
+
+    getBlockInfo(){
+        return {
             blockHash: this.hash(),
             kernelHash: this.kernelHash(),
             prevHash: this.prevHash,
@@ -153,11 +161,7 @@ module.exports = class BlockModel extends DBModel {
             txs: this.txCount(),
             stakeForgerPublicKey: this.pos.stakeForgerPublicKey,
             totalDifficulty: this.totalDifficulty,
-        }, "object", {skipProcessingConstructionValues: true});
-
-        if (!chain.isForkSubChain)
-            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
-        
+        }
     }
 
     async successfullyRemoved(chain = this._scope.chain, chainData = chain.data){

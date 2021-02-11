@@ -6,11 +6,9 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
 
         super(scope);
 
-        this._scope.events.on("master-cluster/started", ()=> this.initializePluginMasterCluster() );
-    }
+        this._scope.events.on("master-cluster/started", ()=> {
 
-    async initializePluginMasterCluster(){
-
+        } );
     }
 
     getOneWayRoutes(){

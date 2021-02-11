@@ -6,12 +6,9 @@ const {Helper, Exception} = require('kernel').helpers;
 module.exports = class ForkSubChain extends SubChain{
 
     constructor(scope) {
-
         super(scope);
-
-        this.sockets = {};
-        this.socketsList = [];
     }
+
 
 
     get _chainDataClassModel(){
