@@ -9,8 +9,9 @@ const {AddressTxHashMapElementSchemaBuilt} = require( "./address-tx-hash-map-ele
 
 module.exports = class AddressTxHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = AddressTxHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema , data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = AddressTxHashMapElementSchemaBuilt;
     }
 
 }

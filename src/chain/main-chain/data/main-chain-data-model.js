@@ -59,8 +59,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             this.accountHashMap.clearHashMap(),
             this.tokenHashMap.clearHashMap(),
 
-            this.tokenNameHashMap.clearHashMap(),
-            this.tokenTickerHashMap.clearHashMap(),
+            this.tokenNameMap.clearHashMap(),
+            this.tokenTickerMap.clearHashMap(),
 
         ];
 
@@ -99,9 +99,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
             this.accountHashMap.saveVirtualMap(),
             this.tokenHashMap.saveVirtualMap(),
 
-            this.tokenNameHashMap.saveVirtualMap(),
-            this.tokenTickerHashMap.saveVirtualMap(),
-
+            this.tokenNameMap.saveVirtualMap(),
+            this.tokenTickerMap.saveVirtualMap(),
         ];
 
         await Promise.all(promises);

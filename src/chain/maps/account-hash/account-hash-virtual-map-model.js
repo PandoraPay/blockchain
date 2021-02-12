@@ -12,9 +12,10 @@ const AccountHashMapElementModel = require('./element/account-hash-map-element-m
 
 module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = AccountHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
         this._childHashMapModel = AccountHashMapElementModel;
+        this._childHashMapSchemaBuilt = AccountHashMapElementSchemaBuilt;
     }
 
     processLeafLabel(label){

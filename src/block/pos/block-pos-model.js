@@ -1,6 +1,5 @@
 const {DBModel} = require('kernel').db;
 const {Helper, EnumHelper, Exception} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
 const {BN, bn128} = require('kernel').utils;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
@@ -157,6 +156,7 @@ module.exports = class BlockPoSModel extends DBModel {
             const {distributions, coinbase} = await this._getRewardDistribution(chain, chainData);
 
             chainData.circulatingSupply = chainData.circulatingSupply + coinbase;
+            await chainData.tokenHashMap.updateNativeCoinSupply(coinbase);
 
             for (const tokenCurrency in distributions){
 
@@ -199,6 +199,7 @@ module.exports = class BlockPoSModel extends DBModel {
             }
 
             chainData.circulatingSupply = chainData.circulatingSupply - coinbase;
+            await chainData.tokenHashMap.updateNativeCoinSupply(-coinbase);
 
         }catch(err){
 

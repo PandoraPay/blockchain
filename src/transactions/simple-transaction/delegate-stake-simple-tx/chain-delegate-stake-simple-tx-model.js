@@ -1,5 +1,4 @@
 const {Helper, Exception} = require('kernel').helpers;
-const {TxTypeEnum, TxScriptTypeEnum, TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 const ChainSimpleTxModel = require( "../chain-simple-tx-model")
 

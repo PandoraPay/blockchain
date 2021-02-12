@@ -1,6 +1,6 @@
 const {Helper, Exception, EnumHelper} = require('kernel').helpers;
 
-const AccountHashMapDataDelegate = require( "../../../chain/maps/account-hash/element/data/account-hash-map-data-delegate-schema-build");
+const AccountHashMapDataDelegate = require( "../../../chain/maps/account-hash/element/data/account-data-delegate-schema-build");
 const {ChainSimpleTxSchemaBuild} = require('../chain-simple-tx-schema-build')
 const { TxScriptTypeEnum } = require('cryptography').transactions;
 

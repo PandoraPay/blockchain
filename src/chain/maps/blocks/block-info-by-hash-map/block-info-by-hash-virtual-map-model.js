@@ -9,8 +9,9 @@ const {BlockInfoByHashMapElementSchemaBuilt} = require( "./block-info-by-hash-ma
 
 module.exports = class BlockInfoByHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = BlockInfoByHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = BlockInfoByHashMapElementSchemaBuilt;
     }
 
 }

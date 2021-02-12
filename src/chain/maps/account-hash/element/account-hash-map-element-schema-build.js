@@ -1,9 +1,8 @@
 const {HashMapElementSchemaBuild} = require('kernel').dataStructures.hashMap.schema.HashMapElementSchemaBuild;
 const {Helper, Exception} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
 
-const AccountHashMapDataBalanceModel = require( "./data/account-hash-map-data-balance-model")
-const AccountHashMapDataDelegateModel = require( "./data/account-hash-map-data-delegate-model")
+const AccountDataBalanceModel = require( "./data/account-data-balance-model")
+const AccountDataDelegateModel = require( "./data/account-data-delegate-model")
 
 class AccountHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
@@ -45,7 +44,7 @@ class AccountHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 balances: {
                     type: "array",
-                    modelClass: AccountHashMapDataBalanceModel,
+                    modelClass: AccountDataBalanceModel,
 
                     minSize: 0,
                     maxSize: 65535,
@@ -55,22 +54,11 @@ class AccountHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
                 delegate: {
                     type: "object",
-                    modelClass: AccountHashMapDataDelegateModel,
+                    modelClass: AccountDataDelegateModel,
 
                     position: 10003,
                 },
 
-            },
-
-            options: {
-                hashing: {
-
-                    enabled: true,
-                    parentHashingPropagation: true,
-
-                    fct: CryptoHelper.dkeccak256
-
-                },
             },
 
         }, schema, true) );

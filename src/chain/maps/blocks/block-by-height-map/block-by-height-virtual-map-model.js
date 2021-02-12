@@ -10,8 +10,9 @@ const {BlockByHeightHashMapElementSchemaBuilt} = require( "./block-by-height-map
 
 module.exports = class BlockByHeightVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = BlockByHeightHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema , data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = BlockByHeightHashMapElementSchemaBuilt;
     }
 
 }

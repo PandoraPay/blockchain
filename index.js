@@ -10,8 +10,8 @@ const TxMerkleTreeNodeModel = require('./src/block/transactions/merkle-tree/tx-m
 const TxMerkleTreeRootModel = require('./src/block/transactions/merkle-tree/tx-merkle-tree-root-model');
 const AccountHashVirtualMapModel = require("./src/chain/maps/account-hash/account-hash-virtual-map-model");
 const AccountHashMapElementSchemaBuild = require("./src/chain/maps/account-hash/element/account-hash-map-element-schema-build");
-const AccountHashMapDataDelegateSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-delegate-schema-build");
-const AccountHashMapDataBalanceSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-hash-map-data-balance-schema-build");
+const AccountHashMapDataDelegateSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-delegate-schema-build");
+const AccountHashMapDataBalanceSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-balance-schema-build");
 
 const TokenHashVirtualMapModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map-model");
 const TokenHashMapElementSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build");

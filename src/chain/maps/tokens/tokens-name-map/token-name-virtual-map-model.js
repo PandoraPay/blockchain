@@ -10,8 +10,9 @@ const {TokenNameMapElementSchemaBuilt} = require( "./token-name-map-element-sche
 
 module.exports = class TokenNameVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = TokenNameMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = TokenNameMapElementSchemaBuilt;
     }
 
 }

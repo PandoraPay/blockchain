@@ -2,14 +2,13 @@ const {DBSchemaBuild} = require('kernel').db;
 const {Helper, Exception, EnumHelper} = require('kernel').helpers;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
-class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
+class AccountDataBalanceSchemaBuild extends DBSchemaBuild {
 
     constructor(schema){
 
         super(Helper.merge({
 
             fields: {
-
 
                 version: {
                     type: "number",
@@ -48,8 +47,6 @@ class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
 
             options: {
                 hashing: {
-                    enabled: true,
-                    parentHashingPropagation: true,
                     fct: b => b,
                 },
             },
@@ -66,6 +63,6 @@ class AccountHashMapDataBalanceSchemaBuild extends DBSchemaBuild {
 
 
 module.exports = {
-    AccountHashMapDataBalanceSchemaBuild,
-    AccountHashMapDataBalanceSchemaBuilt: new AccountHashMapDataBalanceSchemaBuild(),
+    AccountDataBalanceSchemaBuild: AccountDataBalanceSchemaBuild,
+    AccountDataBalanceSchemaBuilt: new AccountDataBalanceSchemaBuild(),
 }

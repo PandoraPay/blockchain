@@ -46,5 +46,5 @@ class AddressHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
 module.exports = {
     AddressHashMapElementSchemaBuild,
-    AddressHashMapElementSchemaBuild: new AddressHashMapElementSchemaBuild()
+    AddressHashMapElementSchemaBuilt: new AddressHashMapElementSchemaBuild()
 }

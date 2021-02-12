@@ -13,8 +13,9 @@ const {TxInfoHashMapElementSchemaBuilt} = require('./tx-info-hash-map-element-sc
 
 module.exports = class TxInfoHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = TxInfoHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = TxInfoHashMapElementSchemaBuilt;
     }
 
 }

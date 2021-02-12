@@ -3,6 +3,7 @@ const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
 
 const {TokenHashMapElementSchemaBuilt} = require( "./token-hash-map-element-schema-build");
+const TokenHashMapElementModel = require( "./token-hash-map-element-model");
 
 /**
  * Required for consensus.
@@ -11,8 +12,10 @@ const {TokenHashMapElementSchemaBuilt} = require( "./token-hash-map-element-sche
 
 module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = TokenHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = TokenHashMapElementSchemaBuilt;
+        this._childHashMapModel = TokenHashMapElementModel;
     }
 
     processLeafLabel(label){
@@ -44,30 +47,45 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
         return this.getMap(tokenPublicKeyHash);
     }
 
-    async updateTokenSupply(tokenPublicKeyHash, value){
+    async updateNativeCoinSupply(value = 0){
+
+        if (value === 0) throw new Exception(this, "value needs to be different than zero");
+
+        const node = await this.getMap(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'));
+        if (!node) throw new Exception(this, "node was not found");
+
+        const supply = node.supply;
+
+        if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
+        node.supply = supply + value;
+
+        node.save();
+
+        return node.supply;
+    }
+
+    async updateTokenSupply(tokenPublicKeyHash, value = 0){
 
         if (value === 0) throw new Exception(this, "value needs to be different than zero");
 
         tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
 
         const node = await this.getMap(tokenPublicKeyHash);
+        if (!node) throw new Exception(this, "node was not found");
 
-        if (node){
+        if (value < 0 && !node.canBurn ) throw new Exception(this, "supply can not be burned");
+        if (value > 0 && node.canMint ) throw new Exception(this, "supply can not be minted");
 
-            const supply = node.supply;
+        const supply = node.supply;
 
-            if (supply + value < 0) throw new Exception(this, "supply would become negative", {supply, value});
-            if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
+        if (supply + value < 0) throw new Exception(this, "supply would become negative", {supply, value});
+        if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
 
-            node.supply = supply + value;
+        node.supply = supply + value;
 
-            node.save();
+        node.save();
 
-            return node.supply;
-
-        } else {
-            throw new Exception(this, "Token doesn't exist", {tokenPublicKeyHash});
-        }
+        return node.supply;
 
     }
 

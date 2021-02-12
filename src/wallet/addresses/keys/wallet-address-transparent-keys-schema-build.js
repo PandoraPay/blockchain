@@ -49,14 +49,6 @@ class WalletAddressTransparentKeySchemaBuild extends DBSchemaBuild {
 
             },
 
-            options: {
-                hashing: {
-                    enabled: true,
-                    parentHashingPropagation: true,
-                    fct: CryptoHelper.dkeccak256,
-                }
-            }
-
         }, schema, true) );
 
     }

@@ -44,8 +44,8 @@ module.exports = class BaseChainDataModel extends DBModel {
         this.addressTxHashMap = new this._addressTxHashMapClass({ ...this._scope,  chainData: this, });
 
         this.tokenHashMap = new this._tokenHashMapClass({ ...this._scope,  chainData: this, });
-        this.tokenNameHashMap = new this._tokenNameMapClass({ ...this._scope,  chainData: this, });
-        this.tokenTickerHashMap = new this._tokenTickerHashMapClass({ ...this._scope,  chainData: this, });
+        this.tokenNameMap = new this._tokenNameMapClass({ ...this._scope,  chainData: this, });
+        this.tokenTickerMap = new this._tokenTickerMapClass({ ...this._scope,  chainData: this, });
 
         this.txInfoHashMap = new this._txInfoHashMapClass({ ...this._scope,  chainData: this, });
         this.txRevertInfoHashMap = new this._txRevertInfoHashMapClass({ ...this._scope,  chainData: this, });
@@ -114,7 +114,7 @@ module.exports = class BaseChainDataModel extends DBModel {
         return TokenNameVirtualMapModel;
     }
 
-    get _tokenTickerHashMapClass(){
+    get _tokenTickerMapClass(){
         return TokenTickerVirtualMapModel;
     }
 
@@ -177,8 +177,8 @@ module.exports = class BaseChainDataModel extends DBModel {
         this.blockInfoByHashMap.resetHashMap();
         this.accountHashMap.resetHashMap();
         this.tokenHashMap.resetHashMap();
-        this.tokenTickerHashMap.resetHashMap();
-        this.tokenNameHashMap.resetHashMap();
+        this.tokenTickerMap.resetHashMap();
+        this.tokenNameMap.resetHashMap();
     }
 
     /**
@@ -273,8 +273,8 @@ module.exports = class BaseChainDataModel extends DBModel {
         this.accountHashMap._fallback = mainChainData.accountHashMap;
         this.tokenHashMap._fallback = mainChainData.tokenHashMap;
 
-        this.tokenNameHashMap._fallback = mainChainData.tokenNameHashMap;
-        this.tokenTickerHashMap._fallback = mainChainData.tokenTickerHashMap;
+        this.tokenNameMap._fallback = mainChainData.tokenNameMap;
+        this.tokenTickerMap._fallback = mainChainData.tokenTickerMap;
 
         this._fallback = mainChainData;
 

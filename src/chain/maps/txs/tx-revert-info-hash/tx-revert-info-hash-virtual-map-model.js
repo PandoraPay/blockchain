@@ -11,8 +11,9 @@ const {TxRevertInfoHashMapElementSchemaBuilt} = require( "./tx-revert-info-hash-
 
 module.exports = class TxRevertInfoHashVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = TxRevertInfoHashMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = TxRevertInfoHashMapElementSchemaBuilt;
     }
 
 }

@@ -10,8 +10,9 @@ const {TokenTickerMapElementSchemaBuilt} = require( "./token-ticker-map-element-
 
 module.exports = class TokenTickerVirtualMapModel extends HashVirtualMapModel {
 
-    constructor(scope, schema = TokenTickerMapElementSchemaBuilt, data, type, creationOptions) {
+    constructor(scope, schema, data, type, creationOptions) {
         super(scope, schema, data, type, creationOptions);
+        this._childHashMapSchemaBuilt = TokenTickerMapElementSchemaBuilt;
     }
 
 }

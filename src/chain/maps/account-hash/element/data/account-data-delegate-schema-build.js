@@ -1,7 +1,7 @@
 const {DBSchemaBuild} = require('kernel').db;
 const {Helper, Exception} = require('kernel').helpers;
 
-class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
+class AccountDataDelegateSchemaBuild extends DBSchemaBuild {
 
     constructor(schema = { }){
 
@@ -43,8 +43,6 @@ class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
 
             options: {
                 hashing: {
-                    enabled: true,
-                    parentHashingPropagation: true,
                     fct: b => b,
                 },
             },
@@ -60,6 +58,6 @@ class AccountHashMapDataDelegateSchemaBuild extends DBSchemaBuild {
 }
 
 module.exports = {
-    AccountHashMapDataDelegateSchemaBuild,
-    AccountHashMapDataDelegateSchemaBuilt: new AccountHashMapDataDelegateSchemaBuild()
+    AccountDataDelegateSchemaBuild,
+    AccountDataDelegateSchemaBuilt: new AccountDataDelegateSchemaBuild()
 }

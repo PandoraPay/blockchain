@@ -2,6 +2,7 @@ const ForkSubChain = require( "../fork-sub-chain/fork-sub-chain");
 
 const {Exception, Helper} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
+const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = require('cryptography').transactions.TxTokenCurrencyTypeEnum;
 
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")
@@ -119,6 +120,22 @@ module.exports = class MainChain extends BaseChain {
         if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
             const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0, 0 );
             await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
+            await this.data.tokenHashMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'), {
+                version: 0,
+                canUpgrade: false,
+                canMint: false,
+                canBurn: false,
+                canChangeVerificationPublicKeyHash: false,
+                canPause: false,
+                canFreeze: false,
+                name: TX_TOKEN_CURRENCY_NATIVE_TYPE.name,
+                ticker: TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker,
+                description: TX_TOKEN_CURRENCY_NATIVE_TYPE.description,
+                supply: reward,
+                maxSupply: this._scope.argv.transactions.coins.fixedMaxSupply,
+            });
+            await this.data.tokenNameMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.name.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );
+            await this.data.tokenTickerMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );
             this.data.circulatingSupply = reward;
         }
 
