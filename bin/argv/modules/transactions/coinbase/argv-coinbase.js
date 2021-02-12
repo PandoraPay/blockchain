@@ -1,7 +1,5 @@
 module.exports = {
 
-    tokenTicker: "pand",
-
 
     getBlockRewardAt(blockHeight, circulatingSupply){
 

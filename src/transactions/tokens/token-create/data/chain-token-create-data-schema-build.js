@@ -1,5 +1,6 @@
 const {DBSchemaBuild} = require('kernel').db;
 const {Helper, Exception} = require('kernel').helpers;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
 
@@ -47,7 +48,7 @@ class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
                      * only lowercase ascii and one space between words is allowed.
                      */
                     validation(name){
-                        return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name);
+                        return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name) && name !== TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.name;
                     },
 
                     position: 1003,
@@ -64,7 +65,7 @@ class ChainTokenCreateDataSchemaBuild extends DBSchemaBuild {
                      * only lowercase ascii is allowed. No space allowed
                      */
                     validation(ticker){
-                        return /^[A-Z0-9]+$/.exec(ticker) && ticker !== this._scope.argv.transactions.coinbase.tokenTicker;
+                        return /^[A-Z0-9]+$/.exec(ticker) && ticker !== TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker;
                     },
 
                     position: 1004,

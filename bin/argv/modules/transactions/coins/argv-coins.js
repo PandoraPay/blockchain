@@ -2,6 +2,7 @@ const coinDenomination = 10000;
 
 module.exports = {
 
+    decimalSeparator: 5,
     coinDenomination: coinDenomination,
     fixedMaxSupply: coinDenomination * 42000000000,
 

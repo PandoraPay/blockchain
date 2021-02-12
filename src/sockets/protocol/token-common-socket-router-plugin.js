@@ -1,6 +1,6 @@
 const {SocketRouterPlugin} = require('networking').sockets.protocol;
 const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = require('cryptography').transactions.TxTokenCurrencyTypeEnum;
 
 const TokenHashMapElementModel = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-model")
 
@@ -52,16 +52,16 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
 
         if (!Buffer.isBuffer(token) && ( StringHelper.isHex(token) || !token ) ) token = Buffer.from(token, "hex");
 
-        if (token.equals(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
+        if (token.equals(TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             return {
                 version:0,
-                name: "PANDORA",
-                ticker: "PAND",
-                description: "Native token",
+                name: TX_TOKEN_CURRENCY_NATIVE_TYPE.name,
+                ticker: TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker,
+                description: TX_TOKEN_CURRENCY_NATIVE_TYPE.description,
                 tokenPublicKeyHash: token,
-                decimalSeparator: 5,
-                supply: this._scope.mainChain.data.circulatingSupply,
-                maxSupply: this._scope.mainChain.data.circulatingSupply,
+                decimalSeparator: this._scope.argv.transactions.coins.decimalSeparator,
+                supply: this._scope.argv.transactions.coins.convertToUnits( this._scope.mainChain.data.circulatingSupply ),
+                maxSupply: this._scope.argv.transactions.coins.fixedMaxSupply,
             };
 
         const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token);
@@ -69,8 +69,8 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (out) {
 
             const json = out.toJSON();
-
             return json;
+
         }
 
 

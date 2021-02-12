@@ -1,5 +1,6 @@
 const {HashMapElementSchemaBuild} = require('kernel').dataStructures.hashMap.schema.HashMapElementSchemaBuild;
 const {Helper, Exception} = require('kernel').helpers;
+const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
 
 class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
@@ -45,7 +46,7 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
 
 
                     validation(name){
-                        return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name);
+                        return /^([a-zA-Z0-9]+ )+[a-zA-Z0-9]+$|^[a-zA-Z0-9]+$/.exec(name) && name !== TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.name;
                     },
 
                     position: 10001,
@@ -62,7 +63,7 @@ class TokenHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                      * only lowercase ascii is allowed. No space allowed
                      */
                     validation(ticker){
-                        return /^[A-Z0-9]+$/.exec(ticker) && ticker !== this._scope.argv.transactions.coinbase.tokenTicker;
+                        return /^[A-Z0-9]+$/.exec(ticker) && ticker !== TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker;
                     },
 
                     position: 10002,
