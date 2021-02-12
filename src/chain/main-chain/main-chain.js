@@ -121,18 +121,22 @@ module.exports = class MainChain extends BaseChain {
             const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0, 0 );
             await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
             await this.data.tokenHashMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'), {
-                version: 0,
-                canUpgrade: false,
-                canMint: false,
-                canBurn: false,
-                canChangeVerificationPublicKeyHash: false,
-                canPause: false,
-                canFreeze: false,
-                name: TX_TOKEN_CURRENCY_NATIVE_TYPE.name,
-                ticker: TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker,
-                description: TX_TOKEN_CURRENCY_NATIVE_TYPE.description,
-                supply: reward,
-                maxSupply: this._scope.argv.transactions.coins.fixedMaxSupply,
+                data: {
+                    version: 0,
+                    canUpgrade: false,
+                    canMint: false,
+                    canBurn: false,
+                    canChangeVerificationPublicKeyHash: false,
+                    canPause: false,
+                    canFreeze: false,
+                    name: TX_TOKEN_CURRENCY_NATIVE_TYPE.name,
+                    ticker: TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker,
+                    description: TX_TOKEN_CURRENCY_NATIVE_TYPE.description,
+                    supply: reward,
+                    decimalSeparator: this._scope.argv.transactions.coins.decimalSeparator,
+                    verificationPublicKeyHash: this._scope.argv.blockchain.genesis.BURN_PUBLIC_KEY_HASH,
+                    maxSupply: this._scope.argv.transactions.coins.fixedMaxSupply,
+                }
             });
             await this.data.tokenNameMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.name.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );
             await this.data.tokenTickerMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );

@@ -48,7 +48,9 @@ module.exports = class ChainTokenCreateSimpleTxModel extends ChainSimpleTxModel 
 
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
-        await chainData.tokenHashMap.addMap(this.tokenData.tokenPublicKeyHash, this.tokenData.toJSON() );
+        await chainData.tokenHashMap.addMap(this.tokenData.tokenPublicKeyHash, {
+            data: this.tokenData.toJSON()
+        } );
         await chainData.tokenNameMap.addMap(this.tokenData.name.toUpperCase(), this.tokenPublicKeyHash );
         await chainData.tokenTickerMap.addMap(this.tokenData.ticker.toUpperCase(), this.tokenPublicKeyHash );
 

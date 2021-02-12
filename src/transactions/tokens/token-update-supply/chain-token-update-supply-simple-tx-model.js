@@ -19,15 +19,20 @@ module.exports = class ChainTokenUpdateSupplySimpleTxModel extends ChainSimpleTx
 
         if (balance <= this.vin[0].amount ) throw new Exception(this, "resulting balance would be zero" );
 
-
         const token = await chainData.tokenHashMap.getTokenNode( this.tokenUpdateData.tokenPublicKeyHash );
         if (!token) throw new Exception(this, `Token doesn't exist`);
+
+        if (token.verificationPublicKeyHash.equals(this._scope.argv.blockchain.genesis.BURN_PUBLIC_KEY_HASH))
+            throw new Exception(this, 'verificationPublicKeyHash is invalid');
 
         if (!token.verificationPublicKeyHash.equals(this.vin[0].publicKeyHash)) //validate the printer public key hash
             throw new Exception(this, 'verificationPublicKeyHash is not matching');
 
-        const newSupply = token.supply + this.supplySignValue * this.tokenUpdateData.supplyValue;
-        if ( newSupply > token.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });
+        if (this.supplySignValue < 0 && !token.canBurn ) throw new Exception(this, "supply can not be burned");
+        if (this.supplySignValue > 0 && !token.canMint ) throw new Exception(this, "supply can not be minted");
+
+        const newSupply = token.data.supply + this.supplySignValue * this.tokenUpdateData.supplyValue;
+        if ( newSupply > token.data.maxSupply || newSupply < 0 ) throw new Exception(this, "New Supply exceeded max supply", {newSupply });
 
         return true;
     }

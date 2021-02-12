@@ -21,9 +21,7 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
     processLeafLabel(label){
 
         if (Buffer.isBuffer(label)) label = label.toString("hex");
-        if (typeof label !== "string" || label.length === 0) throw new Exception(this, "label length is invalid");
-
-        if (label.length !== 40) throw "label is not leaf";
+        if (typeof label !== "string" || label.length !== 40) throw new Exception(this, "label length is invalid");
 
         return label;
     }
@@ -44,7 +42,8 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
     async getTokenNode( tokenPublicKeyHash ){
 
         tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
-        return this.getMap(tokenPublicKeyHash);
+        const node = await this.getMap(tokenPublicKeyHash);
+        return node.data;
     }
 
     async updateNativeCoinSupply(value = 0){
@@ -54,14 +53,14 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
         const node = await this.getMap(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'));
         if (!node) throw new Exception(this, "node was not found");
 
-        const supply = node.supply;
+        const supply = node.data.supply;
 
         if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
-        node.supply = supply + value;
+        node.data.supply = supply + value;
 
-        node.save();
+        await node.save();
 
-        return node.supply;
+        return node.data.supply;
     }
 
     async updateTokenSupply(tokenPublicKeyHash, value = 0){
@@ -74,18 +73,18 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
         if (!node) throw new Exception(this, "node was not found");
 
         if (value < 0 && !node.canBurn ) throw new Exception(this, "supply can not be burned");
-        if (value > 0 && node.canMint ) throw new Exception(this, "supply can not be minted");
+        if (value > 0 && !node.canMint ) throw new Exception(this, "supply can not be minted");
 
-        const supply = node.supply;
+        const supply = node.data.supply;
 
         if (supply + value < 0) throw new Exception(this, "supply would become negative", {supply, value});
-        if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
+        if (supply + value > node.data.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
 
-        node.supply = supply + value;
+        node.data.supply = supply + value;
 
-        node.save();
+        await node.save();
 
-        return node.supply;
+        return node.data.supply;
 
     }
 

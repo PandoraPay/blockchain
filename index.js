@@ -10,12 +10,13 @@ const TxMerkleTreeNodeModel = require('./src/block/transactions/merkle-tree/tx-m
 const TxMerkleTreeRootModel = require('./src/block/transactions/merkle-tree/tx-merkle-tree-root-model');
 const AccountHashVirtualMapModel = require("./src/chain/maps/account-hash/account-hash-virtual-map-model");
 const AccountHashMapElementSchemaBuild = require("./src/chain/maps/account-hash/element/account-hash-map-element-schema-build");
-const AccountHashMapDataDelegateSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-delegate-schema-build");
-const AccountHashMapDataBalanceSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-balance-schema-build");
+const AccountDataDelegateSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-delegate-schema-build");
+const AccountDataBalanceSchemaBuild = require("./src/chain/maps/account-hash/element/data/account-data-balance-schema-build");
 
 const TokenHashVirtualMapModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-virtual-map-model");
 const TokenHashMapElementSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-schema-build");
-const TokenHashMapElementModel = require("./src/chain/maps/tokens/tokens-hash/token-hash-map-element-model");
+const TokenDataSchemaBuild = require("./src/chain/maps/tokens/tokens-hash/data/token-data-schema-build");
+const TokenDataModel = require("./src/chain/maps/tokens/tokens-hash/data/token-data-model");
 
 const ChainSimpleTxModel = require("./src/transactions/simple-transaction/chain-simple-tx-model");
 const ChainDelegateStakeSimpleTxModel = require("./src/transactions/simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model");
@@ -75,14 +76,15 @@ const library = Helper.merge(merged, {
             account:{
                 AccountHashVirtualMapModel,
                 AccountHashMapElementSchemaBuild,
-                AccountHashMapDataBalanceSchemaBuild,
-                AccountHashMapDataDelegateSchemaBuild,
+                AccountDataBalanceSchemaBuild,
+                AccountDataDelegateSchemaBuild,
             },
 
             token: {
                 TokenHashVirtualMapModel,
                 TokenHashMapElementSchemaBuild,
-                TokenHashMapElementModel,
+                TokenDataSchemaBuild,
+                TokenDataModel,
             },
 
         },

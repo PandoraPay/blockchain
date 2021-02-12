@@ -53,26 +53,12 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (!Buffer.isBuffer(token) && ( StringHelper.isHex(token) || !token ) ) token = Buffer.from(token, "hex");
 
         if (token.equals(TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
-            return {
-                version:0,
-                name: TX_TOKEN_CURRENCY_NATIVE_TYPE.name,
-                ticker: TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker,
-                description: TX_TOKEN_CURRENCY_NATIVE_TYPE.description,
-                tokenPublicKeyHash: token,
-                decimalSeparator: this._scope.argv.transactions.coins.decimalSeparator,
-                supply: this._scope.argv.transactions.coins.convertToUnits( this._scope.mainChain.data.circulatingSupply ),
-                maxSupply: this._scope.argv.transactions.coins.fixedMaxSupply,
-            };
+            token = TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong;
 
-        const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token);
+        const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token );
 
-        if (out) {
-
-            const json = out.toJSON();
-            return json;
-
-        }
-
+        if (out)
+            return out.toJSON();
 
     }
 
