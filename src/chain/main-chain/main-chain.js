@@ -145,7 +145,7 @@ module.exports = class MainChain extends BaseChain {
 
     /**
      * Add already validated blocks to blockchain
-     * Blocks must be validated already using a subchain
+     * Blocks must be validated already using a subChain
      *
      * A lock is used to avoid processing multiple chains in the same time
      *
@@ -407,23 +407,23 @@ module.exports = class MainChain extends BaseChain {
 
     createForkSubChain(){
 
-        const forkSubchain = new ForkSubChain({
+        const forkSubChain2 = new ForkSubChain({
             ...this._scope,
             mainChain: this,
         });
 
-        forkSubchain.data.start = this.data.start;
-        forkSubchain.data.end = this.data.end;
-        forkSubchain.data.transactionsIndex = this.data.transactionsIndex;
-        forkSubchain.data.tokensIndex = this.data.tokensIndex;
-        forkSubchain.data.chainwork = this.data.chainwork;
-        forkSubchain.data.circulatingSupply = this.data.circulatingSupply;
-        forkSubchain.data._grindingLockedTransfersFunds = { ...this.data._grindingLockedTransfersFunds }; //not necessary to be cloned as it is immutable
-        forkSubchain.data._fallback = this.data;
+        forkSubChain2.data.start = this.data.start;
+        forkSubChain2.data.end = this.data.end;
+        forkSubChain2.data.transactionsIndex = this.data.transactionsIndex;
+        forkSubChain2.data.tokensIndex = this.data.tokensIndex;
+        forkSubChain2.data.chainwork = this.data.chainwork;
+        forkSubChain2.data.circulatingSupply = this.data.circulatingSupply;
+        forkSubChain2.data._grindingLockedTransfersFunds = { ...this.data._grindingLockedTransfersFunds }; //not necessary to be cloned as it is immutable
+        forkSubChain2.data._fallback = this.data;
 
-        forkSubchain.data.setFallbacks(this.data);
+        forkSubChain2.data.setFallbacks(this.data);
 
-        return forkSubchain;
+        return forkSubChain2;
 
     }
 

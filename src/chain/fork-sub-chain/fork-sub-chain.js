@@ -7,19 +7,19 @@ module.exports = class ForkSubChain extends SubChain{
         super(scope);
     }
 
-    mergeForks(forkSubchain2){
+    mergeForks(forkSubChain2){
 
-        this.data.forkEnd = forkSubchain2.data.forkEnd;
-        for (let i=0; i < forkSubchain2.data.listHashes.length; i++){
+        this.data.forkEnd = forkSubChain2.data.forkEnd;
+        for (let i=0; i < forkSubChain2.data.listHashes.length; i++){
 
-            this.data.pushArray( "listHashes", forkSubchain2.data.listHashes[i].buffer, "object" );
-            this.data.pushArray( "listKernelHashes", forkSubchain2.data.listKernelHashes[i].buffer, "object" );
+            this.data.pushArray( "listHashes", forkSubChain2.data.listHashes[i].buffer, "object" );
+            this.data.pushArray( "listKernelHashes", forkSubChain2.data.listKernelHashes[i].buffer, "object" );
 
-            this.data.hashes[ forkSubchain2.data.listHashes[i].buffer.toString('hex')] = true;
-            this.data.kernelHashes[ forkSubchain2.data.listKernelHashes[i].buffer.toString('hex')] = true;
+            this.data.hashes[ forkSubChain2.data.listHashes[i].buffer.toString('hex')] = true;
+            this.data.kernelHashes[ forkSubChain2.data.listKernelHashes[i].buffer.toString('hex')] = true;
         }
 
-        for (const socket of forkSubchain2.data.socketsList)
+        for (const socket of forkSubChain2.data.socketsList)
             if (!this.data.sockets[socket.id]) {
                 this.data.sockets[socket.id] = true;
                 this.data.socketsList.push(socket);

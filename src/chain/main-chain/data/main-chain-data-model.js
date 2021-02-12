@@ -19,24 +19,24 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
         this.transactionsMapByHash = {};
     }
 
-    validateChainwork(subchainChainwork, subchainEnd){
+    validateChainwork(subChainChainwork, subChainEnd){
 
-        if ( Buffer.isBuffer(subchainChainwork) )
-            subchainChainwork = MarshalData.decompressBigNumber( subchainChainwork );
+        if ( Buffer.isBuffer(subChainChainwork) )
+            subChainChainwork = MarshalData.decompressBigNumber( subChainChainwork );
 
         /**
          * if chainwork is less than current chainwork then fails
          */
 
-        if ( this.chainwork.gt(subchainChainwork) ) return -1;
+        if ( this.chainwork.gt(subChainChainwork) ) return -1;
 
         /**
          * if chainwork is equal to the current chainwork and it has less blocks than fails
          */
 
-        if ( this.chainwork.eq(subchainChainwork) ){
+        if ( this.chainwork.eq(subChainChainwork) ){
 
-            if ( this.end > subchainEnd ) return -1;
+            if ( this.end > subChainEnd ) return -1;
             else return 0;
 
         }

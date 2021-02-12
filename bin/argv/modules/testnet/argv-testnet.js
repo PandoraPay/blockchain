@@ -40,7 +40,7 @@ module.exports = {
                 timestamp: Math.floor(new Date("05/13/2019 10:04 pm").getTime() / 1000),
 
                 stakes: {
-                    publicKeyHash: Buffer.from("e88feb421b6a3c2a7d1413ad612c6d9600e13d83", "hex"),
+                    publicKeyHash: Buffer.from("33b9436c507a8deef91dbf249684bded6d9c1182", "hex"),
                 },
 
                 /**

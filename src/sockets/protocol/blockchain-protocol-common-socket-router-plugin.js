@@ -23,16 +23,16 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
         //disconnected, remove socket because it got disconnected
         this._scope.events.on("sockets/disconnected", ({socket}) =>{
 
-            for (let i=this.forkSubchainsList.length-1; i>=0; i--){
+            for (let i=this.forkSubChainsList.length-1; i>=0; i--){
 
-                const forkSubchain = this.forkSubchainsList[i];
-                if ( forkSubchain.data.sockets[socket.id] ) {
+                const forkSubChain = this.forkSubChainsList[i];
+                if ( forkSubChain.data.sockets[socket.id] ) {
 
-                    delete forkSubchain.data.sockets[socket.id];
-                    forkSubchain.data.socketsList.splice(forkSubchain.data.socketsList.indexOf(socket), 1);
+                    delete forkSubChain.data.sockets[socket.id];
+                    forkSubChain.data.socketsList.splice(forkSubChain.data.socketsList.indexOf(socket), 1);
 
-                    if ( !forkSubchain.data.socketsList.length) //no more sockets
-                        this._deleteForkSubchain(forkSubchain);
+                    if ( !forkSubChain.data.socketsList.length) //no more sockets
+                        this._deleteForkSubChain(forkSubChain);
 
                 }
 
@@ -56,14 +56,14 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
          * socketsList = [];
          */
 
-        this.forkSubchains = { };
-        this.forkSubchainsList = [];
+        this.forkSubChains = { };
+        this.forkSubChainsList = [];
 
     }
 
     async _started(){
 
-        this._solveChainsInterval = setAsyncInterval( this._solveForkSubchains.bind(this), 100 );
+        this._solveChainsInterval = setAsyncInterval( this._solveForkSubChains.bind(this), 100 );
     }
 
     async _stopped(){
@@ -85,15 +85,15 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
     }
 
-    async processingFork(forkSubchain, { reqBlocks }){
+    async processingFork(forkSubChain, { reqBlocks }){
 
         //identify fork
         let forkHeight = reqBlocks-2;
         let trials = 0;
 
-        while ( forkHeight >= 0 &&  forkHeight > forkSubchain.data.end - this._scope.argv.blockchain.maxForkAllowed) {
+        while ( forkHeight >= 0 &&  forkHeight > forkSubChain.data.end - this._scope.argv.blockchain.maxForkAllowed) {
 
-            const socket = this._getForkSubchainSocket(forkSubchain);
+            const socket = this._getForkSubChainSocket(forkSubChain);
             if (!socket) throw new Exception(this, 'Socket is empty');
 
             //download hash & kernelHash
@@ -115,18 +115,18 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             if (!Buffer.isBuffer(kernelHash) || kernelHash.length !== 32) throw new Exception(this, 'kernelHash is invalid');
 
             //let's verify with all other forks, if they match, then we should merge them
-            const forkSubchain2 = this._getForkSubchainByBlockHash( hash );
-            if (forkSubchain2){
-                if (!forkSubchain2.data.processing) {
-                    forkSubchain2.mergeForks(forkSubchain);
+            const forkSubChain2 = this._getForkSubChainByBlockHash( hash );
+            if (forkSubChain2){
+                if (!forkSubChain2.data.processing) {
+                    forkSubChain2.mergeForks(forkSubChain);
                     return false;
                 }
                 return true;
             }
 
-            if (forkSubchain.data.end > forkHeight){
+            if (forkSubChain.data.end > forkHeight){
 
-                const mainChainHash = await forkSubchain.data.getBlockHashByHeight(forkHeight);
+                const mainChainHash = await forkSubChain.data.getBlockHashByHeight(forkHeight);
                 if ( hash.equals( mainChainHash ) ) {
                     this._scope.logger.log(this, "FORK IDENTIFIED", forkHeight + 1);
                     return true;
@@ -135,12 +135,12 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             }
 
             //to be sure i don't exceed the limit
-            forkSubchain.data.forkStart = forkHeight ;
-            forkSubchain.data.pushArray("listHashes", hash, "object", undefined, undefined, 0);
-            forkSubchain.data.hashes[ hash.toString("hex") ] = true;
+            forkSubChain.data.forkStart = forkHeight ;
+            forkSubChain.data.pushArray("listHashes", hash, "object", undefined, undefined, 0);
+            forkSubChain.data.hashes[ hash.toString("hex") ] = true;
 
-            forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, undefined, 0);
-            forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
+            forkSubChain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, undefined, 0);
+            forkSubChain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
 
             forkHeight--;
 
@@ -153,7 +153,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
     }
 
     /**
-     * Receiving a notification / tip that a new block was forged and it will create a subchain identify what to download.
+     * Receiving a notification / tip that a new block was forged and it will create a subChain identify what to download.
      */
     async _newBlock( req, res, socket){
 
@@ -179,21 +179,21 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
         if ( chainworkComparison < 0) return this._propagateNewBlock(socket);
 
         /**
-         * create a new subchain
+         * create a new subChain
          */
 
-        let forkSubchain;
+        let forkSubChain;
         try{
 
-            forkSubchain = this._getForkSubchainByBlockHash( reqHash );
-            const found = !!forkSubchain;
-            if (!forkSubchain) {
+            forkSubChain = this._getForkSubChainByBlockHash( reqHash );
+            const found = !!forkSubChain;
+            if (!forkSubChain) {
 
                 //TODO first asking other clusters if they already met this req.hash
 
-                forkSubchain = this._scope.mainChain.createForkSubChain();
+                forkSubChain = this._scope.mainChain.createForkSubChain();
 
-                forkSubchain.data.unmarshal({
+                forkSubChain.data.unmarshal({
                     forkStart: req.blocks-1,
                     forkEnd: req.blocks,
                     listHashes: [ reqHash ],
@@ -209,34 +209,34 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
                     },
                 });
 
-                this.forkSubchains[forkSubchain.data.id] = forkSubchain;
-                this.forkSubchainsList.push( forkSubchain );
+                this.forkSubChains[forkSubChain.data.id] = forkSubChain;
+                this.forkSubChainsList.push( forkSubChain );
 
-                forkSubchain.data.hashes[ reqHash.toString("hex") ] = true;
-                forkSubchain.data.kernelHashes[ reqKernelHash.toString("hex") ] = true;
+                forkSubChain.data.hashes[ reqHash.toString("hex") ] = true;
+                forkSubChain.data.kernelHashes[ reqKernelHash.toString("hex") ] = true;
             }
 
-            //this._scope.logger.log(this, "chainwork", { "initial value": chainwork.toString(), "data.chainwork": subchain.data.chainwork.toString() } );
-            this._fillSocketForkSubchain( forkSubchain, socket );
+            //this._scope.logger.log(this, "chainwork", { "initial value": chainwork.toString(), "data.chainwork": subChain.data.chainwork.toString() } );
+            this._fillSocketForkSubChain( forkSubChain, socket );
 
             if (found)
                 return true;
 
-            const ready = await this.processingFork(forkSubchain, { reqBlocks} );
+            const ready = await this.processingFork(forkSubChain, { reqBlocks} );
             if ( !ready )
-                this._deleteForkSubchain(forkSubchain);
+                this._deleteForkSubChain(forkSubChain);
             else
-                forkSubchain.data.ready = true;
+                forkSubChain.data.ready = true;
 
-            this._scope.logger.log(this, "fork found", forkSubchain.data.forkStart);
+            this._scope.logger.log(this, "fork found", forkSubChain.data.forkStart);
 
         }catch(err){
 
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, '_newBlock raised an error', err );
 
-            if (forkSubchain)
-                this._deleteForkSubchain(forkSubchain);
+            if (forkSubChain)
+                this._deleteForkSubChain(forkSubChain);
 
             throw err;
         }
@@ -244,55 +244,55 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
     }
 
-    async _solveForkSubchains(){
+    async _solveForkSubChains(){
 
-        if ( !this.forkSubchainsList.length ) return;
+        if ( !this.forkSubChainsList.length ) return;
 
         /**
          * Sort by chainwork
          */
 
 
-        let forkSubchain;
+        let forkSubChain;
         try{
 
-            //getting the best subchain
-            for (const fork of this.forkSubchainsList)
-                if ( fork.data.isReady() && ( !forkSubchain ||  forkSubchain.data.chainwork.lt( fork.data.chainwork ) ) )
-                    forkSubchain = fork;
+            //getting the best subChain
+            for (const fork of this.forkSubChainsList)
+                if ( fork.data.isReady() && ( !forkSubChain ||  forkSubChain.data.chainwork.lt( fork.data.chainwork ) ) )
+                    forkSubChain = fork;
 
-            if (!forkSubchain) return;
+            if (!forkSubChain) return;
 
-            this._scope.logger.log(this, "Subchains count", this.forkSubchainsList.length );
-            for (const fork of this.forkSubchainsList )
+            this._scope.logger.log(this, "SubChains count", this.forkSubChainsList.length );
+            for (const fork of this.forkSubChainsList )
                 this._scope.logger.log(this, 'Subchain ', {id: fork.data.id, forkEnd: fork.data.forkEnd, forkStart: fork.data.forkStart, isReady: fork.data.isReady(), ready: fork.data.ready, processing: fork.data.processing });
-            this._scope.logger.log(this, "subchain.data.chainwork", { "subchain.data.chainwork" :  forkSubchain.data.chainwork.toString(), "mainchain.data.chainwork": this._scope.mainChain.data.chainwork.toString() } );
+            this._scope.logger.log(this, "subChain.data.chainwork", { "subChain.data.chainwork" :  forkSubChain.data.chainwork.toString(), "mainchain.data.chainwork": this._scope.mainChain.data.chainwork.toString() } );
 
-            if (forkSubchain.data.listBlocks.length && forkSubchain.data.listBlocks[forkSubchain.data.listBlocks.length-1].height === forkSubchain.data.forkEnd - 1 ){
-
-                if (this._scope.argv.debug.enabled)
-                    this._scope.logger.log( this, "subchain downloaded successfully" );
-
-                for (let i=0; i < forkSubchain.data.listBlocks.length; i++)
-                    this._scope.logger.log( this, "listBlock", forkSubchain.data.listBlocks[i].height );
-
-                forkSubchain.data.processing = true;
-
-                await this._scope.mainChain.addBlocks( forkSubchain.data.listBlocks, forkSubchain.data.sockets );
+            if (forkSubChain.data.listBlocks.length && forkSubChain.data.listBlocks[forkSubChain.data.listBlocks.length-1].height === forkSubChain.data.forkEnd - 1 ){
 
                 if (this._scope.argv.debug.enabled)
-                    this._scope.logger.log( this, "subchain process successfully" );
+                    this._scope.logger.log( this, "subChain downloaded successfully" );
+
+                for (let i=0; i < forkSubChain.data.listBlocks.length; i++)
+                    this._scope.logger.log( this, "listBlock", forkSubChain.data.listBlocks[i].height );
+
+                forkSubChain.data.processing = true;
+
+                await this._scope.mainChain.addBlocks( forkSubChain.data.listBlocks, forkSubChain.data.sockets );
+
+                if (this._scope.argv.debug.enabled)
+                    this._scope.logger.log( this, "subChain process successfully" );
 
                 //success
-                this._deleteForkSubchain(forkSubchain);
+                this._deleteForkSubChain(forkSubChain);
 
                 return true;
             }
 
             //selecting a socket
-            const socket = this._getForkSubchainSocket( forkSubchain );
+            const socket = this._getForkSubChainSocket( forkSubChain );
 
-            const height = forkSubchain.data.forkStart;
+            const height = forkSubChain.data.forkStart;
 
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.log(this, "Downloading blk", {height});
@@ -305,31 +305,33 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
             if (!blockBuffer || !Buffer.isBuffer(blockBuffer) ){
 
-                forkSubchain.data.errorDownload += 1;
-                if (forkSubchain.data.errorDownload > 5)
-                    this._deleteForkSubchain(forkSubchain);
+                forkSubChain.data.errorDownload += 1;
+                if (forkSubChain.data.errorDownload > 5)
+                    this._deleteForkSubChain(forkSubChain);
 
                 return false;
 
             } else
-                forkSubchain.data.errorDownload = Math.max(0, forkSubchain.data.errorDownload - 0.1);
+                forkSubChain.data.errorDownload = Math.max(0, forkSubChain.data.errorDownload - 0.1);
 
-            const block = await forkSubchain.createBlock( height );
+            const block = await forkSubChain.createBlock( height );
             if (!block) throw new Exception(this, "block couldn't be created");
             block.fromBuffer(blockBuffer);
             block.height = height;
 
-            await forkSubchain.addBlocks(  [block] );
+            await forkSubChain.addBlocks(  [block] );
 
-            forkSubchain.data.forkStart = forkSubchain.data.forkStart + 1 ;
+            forkSubChain.data.forkStart = forkSubChain.data.forkStart + 1 ;
+            if (forkSubChain.data.end === block.height)
+                forkSubChain.data.end = block.height+1;
 
         } catch (err){
 
             if (this._scope.argv.debug.enabled)
-                this._scope.logger.error(this, 'solveForkSubchains raised an error', err );
+                this._scope.logger.error(this, 'solveForkSubChains raised an error', err );
 
-            if (forkSubchain)
-                this._deleteForkSubchain(forkSubchain);
+            if (forkSubChain)
+                this._deleteForkSubChain(forkSubChain);
 
         }
 
@@ -375,35 +377,35 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
     }
 
-    _fillSocketForkSubchain(forkSubchain, socket ){
+    _fillSocketForkSubChain(forkSubChain, socket ){
 
-        if (!forkSubchain.data.sockets[socket.id]){
-            forkSubchain.data.sockets[socket.id] = socket;
-            forkSubchain.data.socketsList.push( socket  );
+        if (!forkSubChain.data.sockets[socket.id]){
+            forkSubChain.data.sockets[socket.id] = socket;
+            forkSubChain.data.socketsList.push( socket  );
         }
 
     }
 
-    _deleteForkSubchain(forkSubchain){
+    _deleteForkSubChain(forkSubChain){
 
-        this.forkSubchainsList.splice( this.forkSubchainsList.indexOf(forkSubchain), 1);
-        delete this.forkSubchains[forkSubchain.data.id];
+        this.forkSubChainsList.splice( this.forkSubChainsList.indexOf(forkSubChain), 1);
+        delete this.forkSubChains[forkSubChain.data.id];
 
     }
 
-    _getForkSubchainSocket(forkSubchain){
+    _getForkSubChainSocket(forkSubChain){
 
-        const socketIndex = Math.floor( Math.random() * forkSubchain.data.socketsList.length );
-        return forkSubchain.data.socketsList[socketIndex];
+        const socketIndex = Math.floor( Math.random() * forkSubChain.data.socketsList.length );
+        return forkSubChain.data.socketsList[socketIndex];
     }
 
-    _getForkSubchainByBlockHash(blockHash){
+    _getForkSubChainByBlockHash(blockHash){
 
         if (Buffer.isBuffer(blockHash)) blockHash = blockHash.toString('hex');
 
-        for (const forkSubchain of this.forkSubchainsList)
-            if (forkSubchain.data.hashes[blockHash])
-                return forkSubchain;
+        for (const forkSubChain of this.forkSubChainsList)
+            if (forkSubChain.data.hashes[blockHash])
+                return forkSubChain;
 
     }
 
