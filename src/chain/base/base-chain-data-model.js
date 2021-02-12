@@ -438,7 +438,7 @@ module.exports = class BaseChainDataModel extends DBModel {
             parentFieldName: "children",
         }, undefined, {  }, "object", {loading: true} );
 
-        await txMerkleNode.load( merkleHeight.toString(), `block:b_${blockHeight}:Merkle:TxMerkleTree` );
+        await txMerkleNode.load( merkleHeight.toString(), `block:b_${blockHeight}:TxMerkleTree` );
         return txMerkleNode.transaction;
     }
 

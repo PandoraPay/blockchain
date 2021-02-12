@@ -1,10 +1,16 @@
-const coinDenomination = 10000;
+const decimalSeparator = 5;
+const coinDenomination = Math.pow(10,decimalSeparator);
+const maxSupplyCoins = 42000000000;
+
+if (maxSupplyCoins * coinDenomination >= Number.MAX_SAFE_INTEGER)
+    throw "invalid coin denomination";
 
 module.exports = {
 
-    decimalSeparator: 5,
     coinDenomination: coinDenomination,
-    fixedMaxSupply: coinDenomination * 42000000000,
+    decimalSeparator: decimalSeparator,
+    fixedMaxSupply_coins: maxSupplyCoins,
+    fixedMaxSupply: maxSupplyCoins * coinDenomination,
 
     validateCoins(number){
 
