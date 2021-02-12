@@ -137,10 +137,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             //to be sure i don't exceed the limit
             forkSubChain.data.forkStart = forkHeight ;
             forkSubChain.data.pushArray("listHashes", hash, "object", undefined, undefined, 0);
-            forkSubChain.data.hashes[ hash.toString("hex") ] = true;
-
-            forkSubChain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, undefined, 0);
-            forkSubChain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
+            forkSubChain.data.blocksMapByHash[ hash.toString("hex") ] = true;
 
             forkHeight--;
 
@@ -197,14 +194,12 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
                     forkStart: req.blocks-1,
                     forkEnd: req.blocks,
                     listHashes: [ reqHash ],
-                    listKernelHashes: [ reqKernelHash ],
                     chainwork,
                 }, "object", undefined, {
                     onlyFields: {
                         forkStart: true,
                         forkEnd: true,
                         listHashes: true,
-                        listKernelHashes: true,
                         chainwork: true,
                     },
                 });
@@ -212,8 +207,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
                 this.forkSubChains[forkSubChain.data.id] = forkSubChain;
                 this.forkSubChainsList.push( forkSubChain );
 
-                forkSubChain.data.hashes[ reqHash.toString("hex") ] = true;
-                forkSubChain.data.kernelHashes[ reqKernelHash.toString("hex") ] = true;
+                forkSubChain.data.blocksMapByHash[ reqHash.toString("hex") ] = true;
             }
 
             //this._scope.logger.log(this, "chainwork", { "initial value": chainwork.toString(), "data.chainwork": subChain.data.chainwork.toString() } );
@@ -404,7 +398,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
         if (Buffer.isBuffer(blockHash)) blockHash = blockHash.toString('hex');
 
         for (const forkSubChain of this.forkSubChainsList)
-            if (forkSubChain.data.hashes[blockHash])
+            if (forkSubChain.data.blocksMapByHash[blockHash])
                 return forkSubChain;
 
     }

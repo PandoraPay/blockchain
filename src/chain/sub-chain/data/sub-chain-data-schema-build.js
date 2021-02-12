@@ -44,16 +44,6 @@ class SubChainDataSchemaBuild extends BaseChainDataSchemaBuild {
                     position: 201,
                 },
 
-                listKernelHashes: {
-                    type: "array",
-                    maxSize(){
-                        return this._scope.argv.blockchain.maxForkAllowed;
-                    },
-                    schemaBuiltClass: SubChainDataKernelHashUniqueSchemaBuilt,
-
-                    position: 202,
-                },
-
             }
 
         }, schema, true));

@@ -66,7 +66,40 @@ module.exports = class BaseChainDataModel extends DBModel {
         this.prevKernelHash = Buffer.alloc(32);
 
         this._grindingLockedTransfersFunds = {};
+        this.clearOnlyLocalBlocks();
 
+    }
+
+    async importBlock(block){
+
+        this.blocksMapByHeight[block.height] = block;
+        this.blocksMapByHash[block.hash().toString("hex")] = block;
+
+        const txs = await block.getTransactions();
+        for (let i=0; i < txs.length; i++) {
+            const tx = txs[i];
+            this.transactionsMapByHash[ tx.hash().toString("hex") ] = {
+                block: block.height,
+                blockTimestamp: block.timestamp,
+                merkleLeafHeight: i,
+                tx,
+            };
+        }
+
+        this.end = this.end + 1;
+        this.transactionsIndex = this.transactionsIndex + block.txCount();
+        this.tokensIndex = this.tokensIndex + await block.newTokensCount();
+        this.chainwork = this.chainwork.add(  block.work );
+        this.hash = block.hash();
+        this.prevHash = block.prevHash;
+        this.kernelHash = block.kernelHash();
+        this.prevKernelHash = block.prevKernelHash;
+    }
+
+    clearOnlyLocalBlocks(){
+        this.blocksMapByHeight = {};
+        this.blocksMapByHash = {};
+        this.transactionsMapByHash = {};
     }
 
     get _addressHashMapClass(){
@@ -168,7 +201,7 @@ module.exports = class BaseChainDataModel extends DBModel {
                 this.transactionsIndex = this.transactionsIndex - block.txCount();
                 this.tokensIndex = this.tokensIndex - block.newTokensCount();
 
-                if (this._grindingLockedTransfersFunds[block.height].hash !== block.hash().toString('hex')  )
+                if (this._grindingLockedTransfersFunds[block.height] && !this._grindingLockedTransfersFunds[block.height].hash.equals( block.hash() ) )
                     throw new Exception(this, 'grinding hash is not matching');
 
                 delete this._grindingLockedTransfersFunds[block.height];
@@ -257,6 +290,8 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     async _getBlockByHeight(height ){
 
+        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height];
+
         const block  = new BlockModel( this._scope, undefined, {
             height: height
         } );
@@ -274,6 +309,14 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _deleteBlockByHeight(height){
+
+        if (this.blocksMapByHeight[height]){
+            const block = this.blocksMapByHeight[height];
+            delete this.blocksMapByHeight[height];
+            delete this.blocksMapByHash[block.hash().toString('hex')];
+            return true;
+        }
+
         const block = await this._getBlockByHeight(height);
         await block.delete();
         return true;
@@ -288,6 +331,8 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _getBlockHashByHeight(height){
+
+        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height].hash();
 
         const element = await this.blockByHeightMap.getMap( height.toString() );
         if (!element) throw new Exception(this, "Block not found", {height});
@@ -304,6 +349,9 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _getBlockByHash(hash){
+
+        if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash];
+
         const blockHeightInfo = await this.blockByHashMap.getMap( hash );
         if (!blockHeightInfo) throw new Exception(this, "Block not found", {hash});
         return this.getBlockByHeight(blockHeightInfo.height);
@@ -316,6 +364,7 @@ module.exports = class BaseChainDataModel extends DBModel {
     }
 
     async _getBlockInfoByHash(hash){
+        if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash].getBlockInfo();
         return this.blockInfoByHashMap.getMap(hash);
     }
 
@@ -364,6 +413,9 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     async _getTransactionByHash(hash, txInfo){
 
+        if (this.transactionsMapByHash[hash])
+            return this.transactionsMapByHash[hash].tx;
+
         if (!txInfo)
             txInfo = await this.txInfoHashMap.getMap( hash, );
 
@@ -400,6 +452,9 @@ module.exports = class BaseChainDataModel extends DBModel {
 
     async _getTransactionWithInfoByHash(hash){
 
+        if (this.transactionsMapByHash[hash])
+            return this.transactionsMapByHash[hash];
+
         const txInfo = await this.txInfoHashMap.getMap( hash );
         if (!txInfo) return;
 
@@ -433,7 +488,7 @@ module.exports = class BaseChainDataModel extends DBModel {
             }
 
         this._grindingLockedTransfersFunds[height] = { //it is mandatory to be immutable
-            hash: block.hash().toString('hex'),
+            hash: block.hash(),
             transfers
         };
 
@@ -455,7 +510,7 @@ module.exports = class BaseChainDataModel extends DBModel {
         let height = startHeight-1;
         while (height >= 0 && this._grindingLockedTransfersFunds[height] ){
             const blockHash = await this.getBlockHashByHeight(height);
-            if (!blockHash || blockHash.toString('hex') !== this._grindingLockedTransfersFunds[height].hash )
+            if (!blockHash || !blockHash.equals( this._grindingLockedTransfersFunds[height].hash) )
                 throw new Exception(this, 'BlockHash is not matching Grinding', {height});
             delete this._grindingLockedTransfersFunds[height];
             height--;

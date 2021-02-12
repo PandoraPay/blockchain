@@ -10,14 +10,8 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     constructor(scope, schema = MainChainDataSchemaBuilt, data, type , creationOptions){
         super(scope, schema, data, type, creationOptions);
-        this.clearOnlyLocalBlocks();
     }
 
-    clearOnlyLocalBlocks(){
-        this.blocksMapByHeight = {};
-        this.blocksMapByHash = {};
-        this.transactionsMapByHash = {};
-    }
 
     validateChainwork(subChainChainwork, subChainEnd){
 
@@ -88,7 +82,6 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
     async saveState(){
 
-
         /**
          * Maps and RadixTree are virtual
          */
@@ -113,54 +106,6 @@ module.exports = class MainChainDataModel extends BaseChainDataModel {
 
         await Promise.all(promises);
 
-    }
-
-    async _getBlockByHeight( height  = this.end - 1 ){
-
-        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height];
-        return super._getBlockByHeight(height);
-    }
-
-    async _deleteBlockByHeight(height){
-
-        if (this.blocksMapByHeight[height]){
-            const block = this.blocksMapByHeight[height];
-            delete this.blocksMapByHeight[height];
-            delete this.blocksMapByHash[block.hash().toString('hex')];
-        }
-
-        return super._deleteBlockByHeight(height);
-    }
-
-    async _getBlockByHash(hash){
-        if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash];
-        return super._getBlockByHash(hash);
-    }
-
-    async _getBlockHashByHeight(height){
-        if (this.blocksMapByHeight[height]) return this.blocksMapByHeight[height];
-        return super._getBlockHashByHeight(height);
-    }
-
-    async _getBlockInfoByHash(hash){
-        if (this.blocksMapByHash[hash]) return this.blocksMapByHash[hash].getBlockInfo();
-        return super._getBlockInfoByHash(hash);
-    }
-
-    async _getTransactionByHash(hash){
-
-        if (this.transactionsMapByHash[hash])
-            return this.transactionsMapByHash[hash].tx;
-
-        return super._getTransactionByHash(hash);
-    }
-
-    async _getTransactionWithInfoByHash(hash){
-
-        if (this.transactionsMapByHash[hash])
-            return this.transactionsMapByHash[hash];
-
-        return super._getTransactionWithInfoByHash(hash);
     }
 
 }

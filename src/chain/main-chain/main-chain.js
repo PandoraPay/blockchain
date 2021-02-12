@@ -2,9 +2,7 @@ const ForkSubChain = require( "../fork-sub-chain/fork-sub-chain");
 
 const {Exception, Helper} = require('kernel').helpers;
 const {MarshalData} = require('kernel').marshal;
-const {DBSchemaBuild} = require('kernel').db;
 
-const BlockModel = require( "../../block/block-model")
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")
 const MainChainDataModel = require("./data/main-chain-data-model")
@@ -207,28 +205,7 @@ module.exports = class MainChain extends BaseChain {
                 }
 
                 //saving temporary blocks
-                newData.blocksMapByHeight[block.height] = block;
-                newData.blocksMapByHash[block.hash().toString("hex")] = block;
-
-                const txs = await block.getTransactions();
-                for (let i=0; i < txs.length; i++) {
-                    const tx = txs[i];
-                    newData.transactionsMapByHash[ tx.hash().toString("hex") ] = {
-                        block: block.height,
-                        blockTimestamp: block.timestamp,
-                        merkleLeafHeight: i,
-                        tx,
-                    };
-                }
-
-                newData.end = newData.end + 1;
-                newData.transactionsIndex = newData.transactionsIndex + block.txCount();
-                newData.tokensIndex = newData.tokensIndex + block.newTokensCount();
-                newData.chainwork = newData.chainwork.add(  block.work );
-                newData.hash = block.hash();
-                newData.prevHash = block.prevHash;
-                newData.kernelHash = block.kernelHash();
-                newData.prevKernelHash = block.prevKernelHash;
+                await newData.importBlock(block);
 
                 successIndex = i;
 
@@ -238,7 +215,6 @@ module.exports = class MainChain extends BaseChain {
             if (successIndex === undefined) throw new Exception(this, "SuccessIndex is undefined");
 
             blocks = blocks.splice(0 , successIndex+1);
-
 
             //saving the blocks which will be removed from oldData
             for (let i=0; i < blocksRemoved.length; i++){

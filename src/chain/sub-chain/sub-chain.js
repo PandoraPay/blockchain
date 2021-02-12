@@ -52,7 +52,7 @@ module.exports = class SubChain extends BaseChain{
 
             if ( await block.validateBlock(this) !== true ) throw new Exception(this, "Block is invalid", block.height );
 
-            this.insertBlock(block);
+            await this.insertBlock(block);
 
             if (this.data.start > block.height)
                 this.data.start = block.height;
@@ -70,12 +70,12 @@ module.exports = class SubChain extends BaseChain{
         return true;
     }
 
-    insertBlock(block){
+    async insertBlock(block){
 
-        if (this.data.blocks[block.height])
+        if (this.data.blocksMapByHeight[block.height])
             throw new Exception(this, 'block already found', block.height );
 
-        if (!this.data.blocks[block.height]) {
+        if (!this.data.blocksMapByHeight[block.height]) {
             let insertPosition;
             for (let j = 0; j < this.data.listBlocks.length - 1; j++)
                 if (this.data.listBlocks[j].height < block.height && (j + 1 < this.data.listBlocks.length && this.data.listBlocks[j + 1].height > block.height)) {
@@ -84,11 +84,9 @@ module.exports = class SubChain extends BaseChain{
                 }
             this.data.pushArray( "listBlocks", block, "object", undefined, insertPosition );
             this.data.pushArray( "listHashes", block.hash(), "object", undefined, insertPosition );
-            this.data.pushArray( "listKernelHashes", block.kernelHash(), "object", undefined, insertPosition );
         }
-        this.data.blocks[block.height] = block;
-        this.data.hashes[block.hash().toString('hex')] = block;
-        this.data.kernelHashes[block.kernelHash().toString('hex')] = block;
+
+        await this.data.importBlock(block);
 
     }
 
@@ -103,7 +101,7 @@ module.exports = class SubChain extends BaseChain{
 
     async saveChain(){
 
-        return this._scope.app.mainChain.addBlocks( this.data.blocks );
+        return this._scope.app.mainChain.addBlocks( this.data.listBlocks );
 
     }
 
