@@ -55,7 +55,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
         if (token.equals(TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer)) //00 token
             token = TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong;
 
-        const out = await this._scope.mainChain.data.tokenHashMap.getTokenNode( token );
+        const out = await this._scope.mainChain.data.tokenHashMap.getTokenNodeData( token );
 
         if (out)
             return out.toJSON();
@@ -63,10 +63,7 @@ module.exports = class TokenCommonSocketRouterPlugin extends SocketRouterPlugin 
     }
 
     _getContentCount(){
-
-        const out = this._scope.mainChain.data.tokensIndex;
-        return out;
-
+        return this._scope.mainChain.data.tokensIndex;
     }
 
     async _getContentIds({ index = 0, limit = this._scope.argv.transactions.protocol.protocolMaxTokensIds }){

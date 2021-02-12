@@ -201,11 +201,9 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
             return node.nonce;
 
-        } else {
-
+        } else
             throw new Exception(this, "updateNonce error - account doesn't exist", {publicKeyHash: publicKeyHash, value });
 
-        }
     }
 
     async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKeyHash, delegateFee ){

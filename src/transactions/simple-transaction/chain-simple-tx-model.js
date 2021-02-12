@@ -71,7 +71,7 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
         /**
          * Store txId into TxHashMap
          */
-        await chainData.txInfoHashMap.updateMap( this.hash().toString("hex"), {
+        await chainData.txInfoHashMap.addMap( this.hash().toString("hex"), {
             blockTimestamp: block.timestamp,
             blockHeight: block.height,
             merkleHeight,
@@ -83,7 +83,7 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
          */
         const revertInfoPreviousState = await this.getTransactionRevertInfoPreviousState( chain, chainData, block, merkleHeight, merkleLeafHeight );
         if (revertInfoPreviousState)
-            await chainData.txRevertInfoHashMap.updateMap( this.hash().toString("hex"), { data: JSON.stringify(revertInfoPreviousState) } );
+            await chainData.txRevertInfoHashMap.addMap( this.hash().toString("hex"), { data: JSON.stringify(revertInfoPreviousState) } );
 
         /**
          * Store TxId into AddressTxMap
@@ -216,11 +216,9 @@ module.exports = class ChainSimpleTxModel extends SimpleTxModel {
         await chainData.accountHashMap.updateNonce( this.vin[0].publicKeyHash, -1);
 
         return true;
-
     }
 
     async getTransactionRevertInfoPreviousState(chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight){
-        return undefined;
     }
 
     async processTransactionRevertInfoPreviousState(revertInfoData, chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){

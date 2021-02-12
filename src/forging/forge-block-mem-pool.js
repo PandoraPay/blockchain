@@ -73,7 +73,7 @@ module.exports = class ForgeBlockMemPool {
                 }
                 else if (tx.nonce === nonce) { //real tx and not only reserved nonce
 
-                    const out = await this._includeTransaction( block._scope.chain, chainData, transactions, block, tx);
+                    const out = await this._includeTransaction( chain, chainData, transactions, block, tx);
                     if ( !out ){
                         this._scope.logger.warn(this, "Include Transaction didn't match", { nonce: nonce, txNonce: tx.nonce, out } );
                         break;

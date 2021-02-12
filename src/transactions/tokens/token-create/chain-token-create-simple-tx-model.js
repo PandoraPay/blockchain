@@ -32,7 +32,7 @@ module.exports = class ChainTokenCreateSimpleTxModel extends ChainSimpleTxModel 
         const tokenPublicKeyHash = this._scope.cryptography.addressGenerator.generateContractPublicKeyHashFromAccountPublicKeyHash( this.vin[0].publicKeyHash, this.nonce );
         if ( !tokenPublicKeyHash.equals(this.tokenData.tokenPublicKeyHash) ) throw new Exception(this, 'tokenPublicKeyHash is not matching');
 
-        const exists = await chainData.tokenHashMap.getTokenNode( tokenPublicKeyHash );
+        const exists = await chainData.tokenHashMap.getTokenNodeData( tokenPublicKeyHash );
         if (exists) throw new Exception(this, 'Token already exists');
 
         const existsTokenName = await chainData.tokenNameMap.getMap( this.tokenData.name.toUpperCase() );

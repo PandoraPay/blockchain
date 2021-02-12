@@ -19,7 +19,7 @@ module.exports = class ChainTokenUpdateSupplySimpleTxModel extends ChainSimpleTx
 
         if (balance <= this.vin[0].amount ) throw new Exception(this, "resulting balance would be zero" );
 
-        const token = await chainData.tokenHashMap.getTokenNode( this.tokenUpdateData.tokenPublicKeyHash );
+        const token = await chainData.tokenHashMap.getTokenNodeData( this.tokenUpdateData.tokenPublicKeyHash );
         if (!token) throw new Exception(this, `Token doesn't exist`);
 
         if (token.verificationPublicKeyHash.equals(this._scope.argv.blockchain.genesis.BURN_PUBLIC_KEY_HASH))

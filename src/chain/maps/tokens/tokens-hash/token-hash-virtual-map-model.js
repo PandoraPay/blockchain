@@ -29,18 +29,21 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
     async currencyExists(tokenPublicKeyHash){
 
         if (!Buffer.isBuffer(tokenPublicKeyHash) && StringHelper.isHex(tokenPublicKeyHash) ) tokenPublicKeyHash = Buffer.from(tokenPublicKeyHash, "hex");
-
         if ( EnumHelper.validateEnum( tokenPublicKeyHash.toString("hex") , TxTokenCurrencyTypeEnum) ) return true; //00 token
 
-        const exists = await this.getTokenNode(tokenPublicKeyHash);
-
-        if (exists) return true; //user created token
+        tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
+        const exists = await this.existsMap(tokenPublicKeyHash);
+        if (exists) return true;
 
         throw new Exception(this, "Token Currency was not found");
     }
 
     async getTokenNode( tokenPublicKeyHash ){
+        tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
+        return this.getMap(tokenPublicKeyHash);
+    }
 
+    async getTokenNodeData( tokenPublicKeyHash ){
         tokenPublicKeyHash = this.processLeafLabel(tokenPublicKeyHash);
         const node = await this.getMap(tokenPublicKeyHash);
         return node.data;
@@ -50,7 +53,7 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
 
         if (value === 0) throw new Exception(this, "value needs to be different than zero");
 
-        const node = await this.getMap(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'));
+        const node = await this.getMap(TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idLong );
         if (!node) throw new Exception(this, "node was not found");
 
         const supply = node.data.supply;
@@ -58,7 +61,7 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
         if (supply + value > node.maxSupply) throw new Exception(this, "supply would exceed max supply", {supply, value});
         node.data.supply = supply + value;
 
-        await node.save();
+        await this.updateMap( TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idLong, node );
 
         return node.data.supply;
     }
@@ -82,7 +85,7 @@ module.exports = class TokenHashVirtualMapModel extends HashVirtualMapModel {
 
         node.data.supply = supply + value;
 
-        await node.save();
+        await this.updateMap( tokenPublicKeyHash, node );
 
         return node.data.supply;
 
