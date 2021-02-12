@@ -1,8 +1,6 @@
 const SubChain = require( "../sub-chain/sub-chain");
 const ForkSubChainDataModel = require( "./data/fork-sub-chain-data-model");
 
-const {Helper, Exception} = require('kernel').helpers;
-
 module.exports = class ForkSubChain extends SubChain{
 
     constructor(scope) {
@@ -13,8 +11,9 @@ module.exports = class ForkSubChain extends SubChain{
 
         this.data.forkEnd = forkSubchain2.data.forkEnd;
         for (let i=0; i < forkSubchain2.data.listHashes.length; i++){
-            this.data.pushArray( "listHashes", forkSubchain2.data.listHashes[i].buffer );
-            this.data.pushArray( "listKernelHashes", forkSubchain2.data.listKernelHashes[i].buffer );
+
+            this.data.pushArray( "listHashes", forkSubchain2.data.listHashes[i].buffer, "object" );
+            this.data.pushArray( "listKernelHashes", forkSubchain2.data.listKernelHashes[i].buffer, "object" );
 
             this.data.hashes[ forkSubchain2.data.listHashes[i].buffer.toString('hex')] = true;
             this.data.kernelHashes[ forkSubchain2.data.listKernelHashes[i].buffer.toString('hex')] = true;

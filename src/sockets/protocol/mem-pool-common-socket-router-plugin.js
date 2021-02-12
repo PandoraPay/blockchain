@@ -147,10 +147,10 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
         if (Buffer.isBuffer(txId)) txId = txId.toString("hex");
         if (typeof txId !== "string" && txId.length !== 64) throw new Exception(this, "TxId is invalid");
 
-        this._scope.logger.info(this, "new tx id received", { txId });
-
         if (this._transactionsDownloading[txId]) return this._transactionsDownloading[txId];
         if (this._scope.memPool.transactions[txId]) return true;
+
+        this._scope.logger.info(this, "new tx id received", { txId });
 
         let resolver;
         const promise = new Promise( resolve => resolver = resolve);
@@ -168,7 +168,7 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
                 throw new Exception(this, "Tx was not downloaded", {hash: txId, tx: tx});
 
         }catch(err){
-            //if (this._scope.argv.debug.enabled)
+            if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "newTxId raised an error", err);
         }finally{
             this._scope.logger.info(this, "new tx id received finalized", { txId });
@@ -188,10 +188,10 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
         const txId = transaction.hash();
         const txIdHex = txId.toString("hex");
 
-        this._scope.logger.info(this, "new tx received", { txIdHex , nonce: tx.nonce });
-
         if (this._transactionsDownloading[txIdHex]) return this._transactionsDownloading[txIdHex];
         if (this._scope.memPool.transactions[txIdHex]) return true;
+
+        this._scope.logger.info(this, "new tx received", { txIdHex , nonce: tx.nonce });
 
         let resolver;
         const promise = new Promise( resolve => resolver = resolve);

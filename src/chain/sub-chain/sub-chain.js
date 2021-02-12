@@ -82,9 +82,9 @@ module.exports = class SubChain extends BaseChain{
                     insertPosition = j;
                     break;
                 }
-            this.data.pushArray( "listBlocks", block, undefined, undefined, insertPosition );
-            this.data.pushArray( "listHashes", block.hash(), undefined, undefined, insertPosition );
-            this.data.pushArray( "listKernelHashes", block.kernelHash(), undefined, undefined, insertPosition );
+            this.data.pushArray( "listBlocks", block, "object", undefined, insertPosition );
+            this.data.pushArray( "listHashes", block.hash(), "object", undefined, insertPosition );
+            this.data.pushArray( "listKernelHashes", block.kernelHash(), "object", undefined, insertPosition );
         }
         this.data.blocks[block.height] = block;
         this.data.hashes[block.hash().toString('hex')] = block;

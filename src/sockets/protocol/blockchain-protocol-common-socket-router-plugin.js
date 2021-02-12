@@ -136,10 +136,10 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
 
             //to be sure i don't exceed the limit
             forkSubchain.data.forkStart = forkHeight ;
-            forkSubchain.data.pushArray("listHashes", hash, "object", undefined, 0);
+            forkSubchain.data.pushArray("listHashes", hash, "object", undefined, undefined, 0);
             forkSubchain.data.hashes[ hash.toString("hex") ] = true;
 
-            forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, 0);
+            forkSubchain.data.pushArray("listKernelHashes", kernelHash, "object", undefined, undefined, 0);
             forkSubchain.data.kernelHashes[ kernelHash.toString("hex") ] = true;
 
             forkHeight--;
@@ -186,6 +186,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
         try{
 
             forkSubchain = this._getForkSubchainByBlockHash( reqHash );
+            const found = !!forkSubchain;
             if (!forkSubchain) {
 
                 //TODO first asking other clusters if they already met this req.hash
@@ -216,8 +217,10 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             }
 
             //this._scope.logger.log(this, "chainwork", { "initial value": chainwork.toString(), "data.chainwork": subchain.data.chainwork.toString() } );
-
             this._fillSocketForkSubchain( forkSubchain, socket );
+
+            if (found)
+                return true;
 
             const ready = await this.processingFork(forkSubchain, { reqBlocks} );
             if ( !ready )
