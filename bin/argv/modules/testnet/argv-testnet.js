@@ -19,6 +19,8 @@ module.exports = {
                 publicAddress:{
 
                     networkByte: 128, //testnet addresses
+                    networkByteLength: 2, //testnet addresses
+
                     networkPrefix: "PAND_TESTNET",
                     networkPrefixBuffer: Buffer.from("PAND_TESTNET", 'ascii'),
                     networkPrefixLength: 12,
@@ -40,7 +42,7 @@ module.exports = {
                 timestamp: Math.floor(new Date("05/13/2019 10:04 pm").getTime() / 1000),
 
                 stakes: {
-                    publicKeyHash: Buffer.from("33b9436c507a8deef91dbf249684bded6d9c1182", "hex"),
+                    publicKeyHash: Buffer.from("45150e7fbec39174cbb9e3d732570ff87b842056", "hex"),
                 },
 
                 /**

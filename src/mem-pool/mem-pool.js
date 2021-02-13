@@ -94,19 +94,13 @@ module.exports =  class MemPool {
 
     async newTransaction( txId, transaction, cloneTx, propagateToMasterCluster, preValidateTx, awaitPropagate, senderSockets ){
 
-        try{
+        if (cloneTx)
+            transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
 
-            if (cloneTx)
-                transaction = this._scope.mainChain.transactionsValidator.cloneTx(transaction);
+        //don't clone it as it was already cloned above
+        await this._insertTransactionInMemPool( txId, transaction, propagateToMasterCluster, true, preValidateTx, true, awaitPropagate, senderSockets );
 
-            //don't clone it as it was already cloned above
-            await this._insertTransactionInMemPool( txId, transaction, propagateToMasterCluster, true, preValidateTx, true, awaitPropagate, senderSockets );
-
-            return transaction;
-
-        }catch(err){
-            this._scope.logger.error(this, "Error adding transaction to mem pool", err);
-        }
+        return transaction;
 
     }
 

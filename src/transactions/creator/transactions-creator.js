@@ -21,7 +21,7 @@ module.exports = class TransactionsCreator {
         return nonce;
     }
 
-    async createSimpleTransaction( { vin, vout, privateKeys, nonce }, chain = this._scope.chain ){
+    async createSimpleTransaction( { vin, vout, privateKeys, extra, nonce }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (vout && !Array.isArray(vout)) vout = [vout];
@@ -32,11 +32,10 @@ module.exports = class TransactionsCreator {
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new ChainSimpleTxModel( this._scope, undefined, {
-
             vin: input,
             vout,
+            extra,
             nonce,
-
         }, "object" );
 
         nonce = await this._calculateNonce(chain, nonce, tx);
@@ -50,7 +49,7 @@ module.exports = class TransactionsCreator {
 
     }
 
-    async createDelegateSimpleTransaction( { vin, privateKeys, nonce, delegate }, chain = this._scope.chain ){
+    async createDelegateSimpleTransaction( { vin, privateKeys, extra, nonce, delegate }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
@@ -61,6 +60,7 @@ module.exports = class TransactionsCreator {
 
             vin: input,
             vout: [],
+            extra,
             nonce,
             delegate,
 
@@ -77,7 +77,7 @@ module.exports = class TransactionsCreator {
 
     }
 
-    async createTokenCreateSimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
+    async createTokenCreateSimpleTransaction( { vin, privateKeys, extra, nonce, tokenPublicKeyHash, tokenData }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
@@ -88,10 +88,10 @@ module.exports = class TransactionsCreator {
 
             vin: input,
             vout: [],
+            extra,
             nonce,
             tokenPublicKeyHash,
             tokenData,
-
         }, "object" );
 
         nonce = await this._calculateNonce(chain, nonce, tx);
@@ -110,7 +110,7 @@ module.exports = class TransactionsCreator {
 
     }
 
-    async createTokenUpdateSupplySimpleTransaction( { vin, privateKeys, nonce, tokenPublicKeyHash, supplySign, supplyValue }, chain = this._scope.chain ){
+    async createTokenUpdateSupplySimpleTransaction( { vin, privateKeys, extra, nonce, tokenPublicKeyHash, supplySign, supplyValue }, chain = this._scope.chain ){
 
         if (vin && !Array.isArray(vin)) vin = [vin];
         if (!vin || vin.length !== 1 ) throw new Exception(this, "Vin length needs to be 1");
@@ -123,6 +123,7 @@ module.exports = class TransactionsCreator {
 
             vin: input,
             vout: [],
+            extra,
             nonce,
             tokenPublicKeyHash,
             supplySign,

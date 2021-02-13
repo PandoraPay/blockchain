@@ -226,9 +226,9 @@ module.exports = class TestNet{
 
                             const txDsts = [];
                             for (let j=0; j < count; j++) {
-                                const privateAddress = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic( ).privateAddress;
+                                const privateKeyModel = this._scope.cryptography.addressGenerator.generatePrivateKeyFromMnemonic( ).privateKeyModel;
                                 txDsts.push({
-                                    address: privateAddress.getAddress().calculateAddress(),
+                                    address: privateKeyModel.getAddress().calculateAddress(),
                                     amount: amount / count,
                                 });
                             }

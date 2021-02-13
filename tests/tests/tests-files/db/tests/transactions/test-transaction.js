@@ -36,8 +36,8 @@ module.exports = function run () {
 
             const wallet = this._scope.wallet.addresses[0];
 
-            const out1 = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic( ).privateAddress;
-            const out2 = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic( ).privateAddress;
+            const out1 = this._scope.cryptography.addressGenerator.generatePrivateKeyFromMnemonic( ).privateKeyModel;
+            const out2 = this._scope.cryptography.addressGenerator.generatePrivateKeyFromMnemonic( ).privateKeyModel;
 
             const outTx = await chain.transactionsCreator.createSimpleTransaction( {
                 vin: [{

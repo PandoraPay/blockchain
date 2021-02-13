@@ -156,23 +156,21 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
         const promise = new Promise( resolve => resolver = resolve);
         this._transactionsDownloading[txId] = promise;
 
-        let txOut;
-
         try{
 
             const tx = await socket.emitAsync('transactions/get-transaction', {hash: txId, type: "buffer"}, this._scope.argv.networkSettings.networkTimeout );
 
-            if (tx && tx.tx)
-                txOut = await this._scope.memPool.newTransaction( txId, tx.tx, false, true, true, false, [socket] );
-            else
+            if (!tx || !tx.tx)
                 throw new Exception(this, "Tx was not downloaded", {hash: txId, tx: tx});
+
+            await this._scope.memPool.newTransaction(txId, tx.tx, false, true, true, false, [socket]);
+            resolver({result: true});
 
         }catch(err){
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "newTxId raised an error", err);
+            resolver({result: false, error: err.toString() })
         }finally{
-            this._scope.logger.info(this, "new tx id received finalized", { txId });
-            resolver(!!txOut);
             delete this._transactionsDownloading[txId];
         }
 
@@ -197,16 +195,14 @@ module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugi
         const promise = new Promise( resolve => resolver = resolve);
         this._transactionsDownloading[txIdHex] = promise;
 
-
-        let out;
-
         try{
-            out = await this._scope.memPool.newTransaction( txId, transaction, false, true, true, false, [socket] );
+            const out = await this._scope.memPool.newTransaction( txId, transaction, false, true, true, false, [socket] );
+            resolver({result: !!out});
         }catch(err){
             if (this._scope.argv.debug.enabled)
                 this._scope.logger.error(this, "newTx raised an error", err);
+            resolver({result: false, error: err.toString() });
         }finally{
-            resolver(!!out);
             delete this._transactionsDownloading[txIdHex];
         }
 

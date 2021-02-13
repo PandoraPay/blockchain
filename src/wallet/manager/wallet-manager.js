@@ -2,7 +2,7 @@ const {EncryptedModel} = require('cryptography').models;
 const {EncryptedTypeEnum} = require('cryptography').enums;
 const {Helper, Exception, BufferHelper} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
-const {AddressModel} = require('cryptography').addresses.public;
+const {AddressModel} = require('cryptography').addresses.address;
 
 const WalletAddressModel = require( "../addresses/wallet-address-model");
 const WalletAddressTypeEnum = require( "../addresses/wallet-address-type-enum");
@@ -115,38 +115,36 @@ module.exports = class WalletManager{
 
         }
 
-        let privateAddress;
+        let privateKeyModel;
         if (json.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT ){
 
-            privateAddress = this._scope.cryptography.addressValidator.validatePrivateAddress( {
+            privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( {
                 privateKey: json.keys.private.value,
                 publicKey: json.keys.public.value,
             } );
 
         }
 
-        return this.importPrivateKeyAddress(privateAddress, json.type, Number.parseInt( json.mnemonicSequenceIndex.value.toString("hex"), 16 ), password, save )
+        return this.importPrivateKeyModel(privateKeyModel, json.type, Number.parseInt( json.mnemonicSequenceIndex.value.toString("hex"), 16 ), password, save )
 
     }
 
-    async importPrivateKeyAddress( privateKey, type, mnemonicSequenceIndex = 0, password, save){
+    async importPrivateKeyModel( privateKeyModel, type, mnemonicSequenceIndex = 0, password, save){
 
-        let privateAddress;
-
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateAddress = this._scope.cryptography.addressValidator.validatePrivateAddress(privateKey);
-        if (!privateAddress) throw new Exception(this, "Private Key is invalid" );
+        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress(privateKeyModel);
+        if (!privateKeyModel) throw new Exception(this, "Private Key is invalid" );
 
         //validating mnemonic Sequence Index
         this.wallet.encryption.decryptWallet(password);
 
         const mnemonic = this.wallet.encryption.decryptMnemonic();
 
-        let privateAddressMnemonic;
+        let privateKeyModelFromMnemonic;
 
-        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateAddressMnemonic = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceIndex ).privateAddress;
+        if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) privateKeyModelFromMnemonic = this._scope.cryptography.addressGenerator.generatePrivateKeyFromMnemonic(  mnemonic, mnemonicSequenceIndex ).privateKeyModel;
 
         //mnemonic sequence index is not matching, it must be generated from a different mnemonic seed
-        if (!privateAddress.privateKey.equals( privateAddressMnemonic.privateKey ))
+        if (!privateKeyModel.privateKey.equals( privateKeyModelFromMnemonic.privateKey ))
             mnemonicSequenceIndex = 0;
 
         const walletAddress = this.wallet._createSimpleModelObject( WalletAddressModel, undefined, "addresses", {
@@ -166,11 +164,11 @@ module.exports = class WalletManager{
 
                 private:{
                     encryption: EncryptedTypeEnum.PLAIN_TEXT,
-                    value: privateAddress.privateKey,
+                    value: privateKeyModel.privateKey,
                 },
                 public:{
                     encryption: EncryptedTypeEnum.PLAIN_TEXT,
-                    value: privateAddress.publicKey,
+                    value: privateKeyModel.publicKey,
                 },
 
             },
@@ -185,15 +183,15 @@ module.exports = class WalletManager{
 
         const mnemonic = this.wallet.encryption.decryptMnemonic();
 
-        let mnemonicSequenceCounter, privateKey;
+        let mnemonicSequenceCounter, privateKeyInfo;
 
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) {
             mnemonicSequenceCounter = this.wallet.encryption.decryptMnemonicSequenceCounter();
-            privateKey = this._scope.cryptography.addressGenerator.generateAddressFromMnemonic(  mnemonic, mnemonicSequenceCounter ) ;
+            privateKeyInfo = this._scope.cryptography.addressGenerator.generatePrivateKeyFromMnemonic(  mnemonic, mnemonicSequenceCounter ) ;
         } else throw new Exception(this, "Invalid Type");
 
 
-        await this.importPrivateKeyAddress( privateKey.privateAddress, type,  mnemonicSequenceCounter, undefined, false );
+        await this.importPrivateKeyModel( privateKeyInfo.privateKeyModel, type,  mnemonicSequenceCounter, undefined, false );
 
         let mnemonicSequenceCounterObject;
         if (type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT)
@@ -212,8 +210,8 @@ module.exports = class WalletManager{
             await this.wallet.save();
 
         return {
-            sequence: privateKey.sequence,
-            privateAddress: privateKey.privateAddress,
+            sequence: privateKeyInfo.sequence,
+            privateKeyModel: privateKeyInfo.privateKeyModel,
         }
 
     }

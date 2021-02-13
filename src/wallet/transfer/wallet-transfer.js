@@ -26,10 +26,11 @@ module.exports = class WalletTransfer {
 
     }
 
-    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer, nonce, memPoolValidateTxData, paymentId, password, networkByte} ){
+    async transferSimple( { address, txDsts, fee, feeTokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer, nonce, memPoolValidateTxData, extra, password, networkByte} ){
 
-        if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
         if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
+
+        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption)
 
         const {vin, privateKeys} = await this._calculateRequiredFunds({address, txDsts, fee, feeTokenCurrency, password, networkByte});
 
@@ -40,15 +41,15 @@ module.exports = class WalletTransfer {
             vout: outs,
             privateKeys,
             nonce,
+            extra,
         } );
 
         await this._scope.memPool.newTransaction( txOut.tx.hash(), txOut.tx,  false,true, memPoolValidateTxData, true );
 
         return txOut;
-
     }
 
-    async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, paymentId, password, networkByte }){
+    async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, extra, password, networkByte }){
 
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
@@ -61,16 +62,15 @@ module.exports = class WalletTransfer {
                 maxSize: 20,
             }, "delegatePublicKeyHash", ()=>{}, "object", {}  );
 
+        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
+
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
 
         const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
-        if (fee === undefined){
-            fee = 0;
-            //TODO CALCULATE FEE
-        }
+        if (fee === undefined) fee = this.computeFee();
 
         if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
 
@@ -83,6 +83,7 @@ module.exports = class WalletTransfer {
             privateKeys: [ {
                 privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
+            extra,
             nonce,
             delegate,
         } );
@@ -90,14 +91,14 @@ module.exports = class WalletTransfer {
         await this._scope.memPool.newTransaction(txOut.tx.hash(), txOut.tx, false, true, memPoolValidateTxData, true);
 
         return txOut;
-
     }
 
-    async tokenCreate({address, fee, nonce, tokenData, memPoolValidateTxData, paymentId, password, networkByte}){
+    async tokenCreate({address, fee, nonce, tokenData, memPoolValidateTxData, extra, password, networkByte}){
 
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
@@ -105,13 +106,9 @@ module.exports = class WalletTransfer {
         const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
-        if (fee === undefined){
-            fee = 0;
-            //TODO CALCULATE FEE
-        }
+        if (fee === undefined) fee = this.computeFee();
 
         if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
-
 
         const txOut =  await this._scope.mainChain.transactionsCreator.createTokenCreateSimpleTransaction( {
             vin: [{
@@ -122,6 +119,7 @@ module.exports = class WalletTransfer {
             privateKeys: [ {
                 privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
+            extra,
             nonce,
             tokenData,
         } );
@@ -131,11 +129,12 @@ module.exports = class WalletTransfer {
         return txOut;
     }
 
-    async tokenUpdateSupply({address, fee, nonce, tokenPublicKeyHash, supplySign, supplyValue, memPoolValidateTxData, paymentId, password, networkByte}){
+    async tokenUpdateSupply({address, fee, nonce, tokenPublicKeyHash, supplySign, supplyValue, memPoolValidateTxData, extra, password, networkByte}){
 
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
+        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
@@ -143,10 +142,7 @@ module.exports = class WalletTransfer {
         const memPoolPending = this._scope.memPool.getMemPoolPendingBalance(walletAddress.keys.decryptPublicKeyHash(), tokenCurrency )[ tokenCurrency.toString("hex") ] || 0;
 
         //calculate fee
-        if (fee === undefined){
-            fee = 0;
-            //TODO CALCULATE FEE
-        }
+        if (fee === undefined) fee = this.computeFee();
 
         if (foundFunds + memPoolPending < fee  ) throw new Exception(this, "Not enough funds", { foundFunds, memPoolPending, fee });
 
@@ -160,6 +156,7 @@ module.exports = class WalletTransfer {
             privateKeys: [ {
                 privateKey: walletAddress.keys.decryptPrivateKey()
             } ],
+            extra,
             nonce,
             tokenPublicKeyHash,
             supplySign,
@@ -171,7 +168,9 @@ module.exports = class WalletTransfer {
         return txOut;
     }
 
-    async _calculateRequiredFunds({address, txDsts, fee, feeTokenCurrency, password, networkByte}){
+    async _calculateRequiredFunds({address, txDsts, extra, fee, feeTokenCurrency, password, networkByte}){
+
+        if ( typeof feeTokenCurrency === "string" && StringHelper.isHex(feeTokenCurrency) ) feeTokenCurrency = Buffer.from(feeTokenCurrency, "hex");
 
         const requiredFunds = {};
 
@@ -193,15 +192,12 @@ module.exports = class WalletTransfer {
         for (const tokenCurrency in requiredFunds)
             await this._scope.mainChain.data.tokenHashMap.currencyExists(tokenCurrency);
 
+        //calculate fee
+        if (fee === undefined) fee = this.computeFee();
+
         if ( requiredFunds[ feeTokenCurrency.toString('hex') ] ) await this._scope.mainChain.data.tokenHashMap.currencyExists(feeTokenCurrency);
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-
-        //calculate fee
-        if (fee === undefined){
-            fee = 0;
-            //TODO CALCULATE FEE
-        }
 
         for (const tokenCurrency in requiredFunds) {
 
@@ -254,7 +250,21 @@ module.exports = class WalletTransfer {
         }
 
         return outs;
+    }
 
+    computeFee(){
+        //TODO CALCULATE FEE
+        return 0;
+    }
+
+    async generateExtra(extraMessage, extraEncryptionOption){
+
+        if (typeof extraMessage === "string")
+            extraMessage = Buffer.from(extraMessage);
+
+        if ( !extraEncryptionOption ) return extraMessage;
+
+        return this._scope.cryptography.cryptoSignature.encrypt(extraMessage, extraEncryptionOption );
     }
 
 }

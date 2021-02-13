@@ -55,18 +55,8 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         if (!Buffer.isBuffer(delegatePublicKeyHash) || delegatePublicKeyHash.length !== 20) throw new Exception(this, "delegatePublicKeyHash is invalid", delegatePublicKeyHash);
         if ( delegatePrivateKey && (!Buffer.isBuffer(delegatePrivateKey) || delegatePrivateKey.length !== 32) ) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
 
-        if ( !delegatePublicKeyHash.length ){
-
-            if (this._scope.argv.walletStakes.allowDelegatingPrivateKey) throw new Exception(this, "You need to delegate first. Your stake is not delegated");
-            else {
-                const privateKey = await this._scope.masterCluster.sendMessage("wallet-stakes", {
-                    message: "wallet-stakes/get-delegator-stake-private-key",
-                    publicKey: publicKey.toString("hex"),
-                }, false, true );
-                const privateKeyAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
-                throw new Exception(this, "You need to delegate your stake to the following public key", privateKeyAddress.publicKey );
-            }
-        }
+        if ( !delegatePublicKeyHash.length )
+            throw new Exception(this, "You need to delegate first. Your stake is not delegated");
 
         const concat = Buffer.concat([
             this._challenge,
@@ -77,21 +67,6 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
 
         const verify = this._scope.cryptography.cryptoSignature.verify( concat, signature, publicKey );
         if (!verify) throw new Exception(this, "Signature is invalid");
-
-        if (!this._scope.argv.walletStakes.allowDelegatingPrivateKey) {
-            delegatePrivateKey = undefined;
-        }
-
-        if ( !delegatePrivateKey ){
-
-            const privateKey = await this._scope.masterCluster.sendMessage("wallet-stakes", {
-                message: "wallet-stakes/get-delegator-stake-private-key",
-                publicKey: publicKey.toString("hex"),
-            }, false, false );
-
-            delegatePrivateKey = privateKey;
-
-        }
 
         const out = await this._scope.walletStakes.addWalletStake({publicKey, delegatePublicKeyHash, delegatePrivateKey});
 

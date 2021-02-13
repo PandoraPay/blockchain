@@ -56,32 +56,6 @@ module.exports = class WalletAddressTransparentKeysModel extends DBModel {
     }
 
 
-
-    /**
-     * extract delegate private key
-     */
-    decryptDelegateStakePrivateAddress(delegateNonce, password){
-
-        const privateKey = this.decryptPrivateKey(password);
-        const privateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
-
-        return privateAddress.getDelegateStakePrivateAddress(delegateNonce);
-    }
-
-    /**
-     * Decrypt Delegator Stake private key
-     * @param publicKey
-     * @param password
-     * @returns {*}
-     */
-    decryptDelegatorStakePrivateAddress(publicKey, password){
-        const privateKey = this.decryptPrivateKey(password);
-        const privateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(privateKey);
-
-        return privateAddress.getDelegatorStakePrivateAddress(publicKey);
-    }
-
-
     /**
      * Sign a message using privateKey
      * @param message

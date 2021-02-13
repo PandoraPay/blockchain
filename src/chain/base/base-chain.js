@@ -35,6 +35,9 @@ module.exports = class BaseChain extends AsyncEvents{
         const data = this.createData();
         data.fromObject( this.data.toObject() );
         data._grindingLockedTransfersFunds = {...this.data._grindingLockedTransfersFunds}; //not necessary to be cloned as it is immutable
+        data.blocksMapByHeight = {...this.data.blocksMapByHeight};
+        data.blocksMapByHash = {...this.data.blocksMapByHash};
+        data.transactionsMapByHash = {...this.data.transactionsMapByHash};
         data.setFallbacks(this.data);
         return data;
     }

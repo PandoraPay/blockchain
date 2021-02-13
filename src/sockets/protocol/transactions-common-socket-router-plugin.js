@@ -77,7 +77,6 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
                 tx: (type === "json") ? memPoolTx.toJSONRaw() : memPoolTx.toType(type),
                 memPool: true,
                 memPoolQueued: !!this._scope.memPool.queuedTxs[hash],
-                txId: memPoolTx.hash().toString("hex"),
             };
 
         //included in blockchain
@@ -89,7 +88,6 @@ module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouter
                 block: out.block,
                 blockTimestamp: out.blockTimestamp,
                 confirmations: chainData.end - out.block,
-                txId: out.tx.hash().toString("hex"),
             };
 
 

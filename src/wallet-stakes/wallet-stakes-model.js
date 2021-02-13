@@ -52,14 +52,6 @@ module.exports = class WalletStakesModel extends DBModel{
                     this._scope.logger.error(this, "update-delegate-stake raised an error", err);
                 }
 
-            } else
-            if (data.message === "wallet-stakes/get-delegator-stake-private-key") { //used to get the master
-
-                const {publicKey} = data;
-
-                const delegatorStakePrivateAddress = this._scope.wallet.addresses[0].keys.decryptDelegatorStakePrivateAddress( publicKey );
-                return delegatorStakePrivateAddress.privateKey.toString("hex");
-
             }
 
         });
@@ -78,10 +70,10 @@ module.exports = class WalletStakesModel extends DBModel{
         if (typeof delegatePublicKeyHash === "string" && StringHelper.isHex(delegatePublicKeyHash)) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
         if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
 
-        const delegatorStakePrivateAddress = this._scope.cryptography.addressGenerator.generatePrivateAddressFromPrivateKey(delegatePrivateKey);
+        const delegatorStakePrivateKeyModel = this._scope.cryptography.addressGenerator.generatePrivateKeyModelFromPrivateKey(delegatePrivateKey);
 
-        if ( !delegatorStakePrivateAddress.publicKey.equals(delegatePublicKeyHash) )
-            throw new Exception(this, "Your stake delegate's public key is not matching with the private key", delegatorStakePrivateAddress.publicKey );
+        if ( !delegatorStakePrivateKeyModel.publicKey.equals(delegatePublicKeyHash) )
+            throw new Exception(this, "Your stake delegate's public key is not matching with the private key", delegatorStakePrivateKeyModel.publicKey );
 
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
 
