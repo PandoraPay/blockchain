@@ -84,16 +84,15 @@ module.exports = class WalletEncryption {
         return true;
     }
 
-    async removeEncryptionWallet(oldPassword){
+    async removeEncryptionWallet(oldPassword, askPassword = true){
+
+        oldPassword = this._processPassword(oldPassword, askPassword);
 
         this.decryptWallet( oldPassword );
 
-        if (this._password !== oldPassword) throw new Exception(this, "Old password is not matching");
+        if (!this._password.equals( oldPassword) ) throw new Exception(this, "Current password is not matching");
 
-        this._operate( async it => {
-            it.removeEncryptionKey( this._password );
-            delete it._unlocked;
-        } );
+        this._operate( async it =>  it.removeEncryptionKey( this._password ) );
 
         this.setEncrypted(false);
         this.setPassword(undefined);
