@@ -45,7 +45,6 @@ module.exports = class WalletModel extends DBModel {
         this.addresses = [];
         this.version = 0;
         this.encrypted = false;
-        this.salt = BufferHelper.generateRandomBuffer( 32 );
 
         this.encryption.setEncrypted(false);
         this.encryption.setPassword(undefined);
@@ -59,10 +58,8 @@ module.exports = class WalletModel extends DBModel {
     }
 
     onLoaded(){
-
         this.encryption.setPassword(undefined);
         this.encryption.setIsDecrypted(false);
-
     }
 
     async loadWallet(){

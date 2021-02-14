@@ -39,27 +39,12 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     position: 100,
                 },
 
-                /**
-                 * Used for encryption
-                 */
-                salt: {
-                    type: "buffer",
-                    minSize: 32,
-                    maxSize: 32,
-
-                    default(){
-                        return BufferHelper.generateRandomBuffer(32);
-                    },
-
-                    position: 101,
-                },
-
                 encrypted: {
 
                     type: "boolean",
                     default: false,
 
-                    position: 102,
+                    position: 101,
                 },
 
                 mnemonic: {
@@ -68,7 +53,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     schemaBuildClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
-                    position: 103,
+                    position: 102,
                 },
 
                 mnemonicChecksum: {
@@ -76,7 +61,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     minSize: 32,
                     maxSize: 32,
 
-                    position: 104,
+                    position: 103,
                 },
 
                 mnemonicSequenceCounter: {
@@ -85,7 +70,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     schemaBuildClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
-                    position: 105,
+                    position: 104,
                 },
 
                 addresses: {
@@ -96,7 +81,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     minSize: 0,
                     maxSize: 4095,
 
-                    position: 106,
+                    position: 105,
                 },
 
             },

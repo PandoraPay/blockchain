@@ -31,7 +31,14 @@ module.exports = class WalletEncryption {
         if (password.length < 6)
             throw new Exception(this, "Password too weak");
 
-        return CryptoHelper.dkeccak256( Buffer.concat([ Buffer.from(password), this.wallet.salt]) );
+        /**
+         * TODO: replace dkeccak256 with Argon2D
+         */
+        let hash = Buffer.concat([ Buffer.from(password), Buffer.from("f9208f470894dc84b6ea316f0ee29c6983cc5f540c305572b7d3b8458db539bf", 'hex')]);
+        for (let i=0; i < 1000; i++)
+            hash = CryptoHelper.dkeccak256( CryptoHelper.dsha256( hash ) );
+
+        return hash;
     }
 
     decryptWallet(password, askPassword = true ){

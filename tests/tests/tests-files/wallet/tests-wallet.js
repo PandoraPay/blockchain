@@ -25,8 +25,6 @@ module.exports = function run () {
 
             await wallet.clearWallet();
 
-            this.expect( wallet.salt.equals( Buffer.alloc(32) ), false );
-
             const mnemonic = wallet.encryption.decryptMnemonic();
             this.expect( Array.isArray( mnemonic ), true );
             this.expect( mnemonic.length, 24 );
@@ -62,8 +60,6 @@ module.exports = function run () {
         'export & import wallets': async function () {
 
             await wallet.clearWallet();
-            const salt = wallet.salt;
-            this.expect( salt.equals( Buffer.alloc(32) ), false );
 
             for (let i = 0; i < count; i++)
                 await wallet.manager.createNewAddress();
@@ -73,12 +69,10 @@ module.exports = function run () {
             const json = wallet.toJSON();
 
             await wallet.clearWallet();
-            this.expect( wallet.salt.equals(salt), false );
 
             this.expect(wallet.addresses.length, 0);
             wallet.fromJSON( json );
             this.expect(wallet.addresses.length, count );
-            this.expect( wallet.salt, salt );
 
             const buffer = wallet.toBuffer();
 
@@ -86,7 +80,6 @@ module.exports = function run () {
             this.expect(wallet.addresses.length, 0);
             wallet.fromBuffer( buffer );
             this.expect(wallet.addresses.length, count );
-            this.expect( wallet.salt, salt );
 
         },
 
@@ -94,8 +87,6 @@ module.exports = function run () {
         'create wallets encrypted': async function(){
 
             await wallet.clearWallet();
-            const salt = wallet.salt;
-            this.expect( salt.equals( Buffer.alloc(32) ), false );
 
             const mnemonic = wallet.encryption.decryptMnemonic();
             this.expect( Array.isArray( mnemonic ), true );
@@ -108,7 +99,6 @@ module.exports = function run () {
 
             const password = BufferHelper.generateRandomBuffer( 32 );
             await wallet.encryption.encryptWallet(undefined, password );
-            this.expect( wallet.salt, salt );
 
             this.expect( wallet.encrypted, true );
             this.expect(wallet.mnemonic.value.length >= 100, true);
@@ -134,10 +124,8 @@ module.exports = function run () {
 
             //try to load it again
             await wallet.load();
-            this.expect( wallet.salt, salt );
 
             wallet.encryption.logoutEncryptionWallet();
-            this.expect( wallet.salt, salt );
 
             this.expect(wallet.encrypted, true);
             this.expect(wallet.mnemonic.value.length >= 100, true);
@@ -167,23 +155,17 @@ module.exports = function run () {
         'encrypt it, add account, decrypt it, load it decrypted': async function (){
 
             await wallet.clearWallet();
-            const salt = wallet.salt;
-            this.expect( salt.equals( Buffer.alloc(32) ), false );
-
             const password = BufferHelper.generateRandomBuffer( 32 );
 
             await wallet.manager.createNewAddress();
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(false), true);
-            this.expect( wallet.salt, salt );
 
             await wallet.encryption.encryptWallet(undefined, password);
-            this.expect( wallet.salt, salt );
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(true), true);
 
             await wallet.load();
-            this.expect( wallet.salt, salt );
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(true), true);
 
@@ -200,19 +182,16 @@ module.exports = function run () {
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(false), true);
 
             await wallet.load();
-            this.expect( wallet.salt, salt );
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(false), true);
 
             await wallet.manager.createNewAddress();
 
             await wallet.save();
-            this.expect( wallet.salt, salt );
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(false), true);
 
             await wallet.load();
-            this.expect( wallet.salt, salt );
 
             this.expect(  wallet.encryption.checkIfIsReallyEncrypted(false), true);
 
