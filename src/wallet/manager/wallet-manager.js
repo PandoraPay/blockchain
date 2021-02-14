@@ -1,6 +1,6 @@
 const {EncryptedModel} = require('cryptography').models;
 const {EncryptedTypeEnum} = require('cryptography').enums;
-const {Helper, Exception, BufferHelper} = require('kernel').helpers;
+const {Helper, Exception, BufferHelper, StringHelper} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
 const {AddressModel} = require('cryptography').addresses.address;
 
@@ -25,7 +25,7 @@ module.exports = class WalletManager{
         for (let i=0; i < this.wallet.addresses.length; i++){
 
             const walletAddress = this.wallet.addresses[i];
-            const publicAddress = walletAddress.keys.decryptPublicAddress();
+            const publicAddress = walletAddress.keys.decryptAddress();
             if ( (address instanceof WalletAddressModel && address === walletAddress) || (typeof address === "string" && publicAddress.calculateAddress() === address ) || (address instanceof AddressModel && address.calculateAddress() === publicAddress.calculateAddress() ) )
                 return returnIndex ? i : walletAddress;
         }
@@ -264,23 +264,45 @@ module.exports = class WalletManager{
 
     printWallet(){
 
-        for (let i=0; i < this.wallet.addresses.length; i++) {
-            this._scope.logger.warn(this, `Wallet ${i} - ${this.wallet.addresses[i].name} `, this.wallet.addresses[i].toJSON());
-            if (this.wallet.addresses[i].type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT)
-                this._scope.logger.warn(this, `Wallet ${i} - ${this.wallet.addresses[i].name} PublicKeyHash `, this.wallet.addresses[i].keys.decryptPublicKeyHash() );
+        let i = -1;
+        for (const walletAddress of this.wallet.addresses) {
+            i++;
+            this._scope.logger.warn(this, `Wallet ${i} - ${walletAddress.name} `, walletAddress.toJSON());
+            if (walletAddress.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT)
+                this._scope.logger.warn(this, `Wallet ${i} - ${walletAddress.name} PublicKeyHash `, walletAddress.keys.decryptPublicKeyHash() );
         }
 
 
     }
 
-    async printWalletBalances(){
-
-        for (let i=0; i < this.wallet.addresses.length; i++){
-
-            const balances = await this.wallet.addresses[i].keys.decryptBalances();
-            this._scope.logger.warn(this, `Wallet Balance ${i} - ${this.wallet.addresses[i].keys.decryptPublicAddress().calculateAddress() } `, balances === undefined ? 'none' : balances );
-
+    printWalletBalances(){
+        let i = -1;
+        for (const walletAddress of this.wallet.addresses) {
+            i++;
+            const balances = walletAddress.keys.decryptBalances();
+            this._scope.logger.warn(this, `Wallet Balance ${i} - ${walletAddress.keys.decryptAddress().calculateAddress() } `, balances === undefined ? 'none' : balances );
         }
+    }
+
+    async decryptTxExtra(tx, returnString = true, password){
+
+        if (!tx.extra.length) return;
+
+        if (tx.extra[0] === 0) return tx.extra.toString().slice(1);
+        else if (tx.extra[0] === 1)
+            for (const vout of tx.vout)
+                if (vout.publicKeyHash)
+                    for (const walletAddress of this.wallet.addresses) {
+                        const publicKeyHash = walletAddress.keys.decryptPublicKeyHash(password);
+                        if (publicKeyHash.equals( vout.publicKeyHash) ) {
+
+                            const extra = Buffer.alloc(tx.extra.length-1);
+                            tx.extra.copy(extra, 0, 1, tx.extra.length );
+
+                            const decrypted = await walletAddress.keys.decryptExtraEncryptedMessage(extra, password);
+                            if (decrypted) return returnString ? StringHelper.sanitizeText(decrypted.toString()) : decrypted;
+                        }
+                    }
 
     }
 

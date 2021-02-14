@@ -33,7 +33,7 @@ module.exports = class TestNet{
 
             setTimeout( () => {
 
-                const wallets = this._scope.wallet.addresses.map( it => it.keys.decryptPublicAddress( ).calculateAddress() );
+                const wallets = this._scope.wallet.addresses.map( it => it.keys.decryptAddress( ).calculateAddress() );
 
 
                 this._scope.masterCluster.sendMessage("testnet-wallet", {  wallets }, false );
@@ -173,7 +173,7 @@ module.exports = class TestNet{
 
                         for (let address of this._testnetWallets)
                             await this._scope.wallet.transfer.transferSimple({
-                                address: wallet.keys.decryptPublicAddress(),
+                                address: wallet.keys.decryptAddress(),
                                 txDsts: [{
                                     address,
                                     amount,
@@ -235,7 +235,7 @@ module.exports = class TestNet{
 
 
                             await this._scope.wallet.transfer.transferSimple({
-                                address: wallet.keys.decryptPublicAddress(),
+                                address: wallet.keys.decryptAddress(),
                                 txDsts,
                             });
 

@@ -17,22 +17,25 @@ module.exports = class WalletAddressTransparentKeysModel extends DBModel {
     /**
      * Getting Public Address
      */
-    decryptPublicAddress(networkByte , password, ){
-
+    decryptAddress(networkByte , password, ){
         const publicKey =  this.decryptPublicKey( password );
+        return this._scope.cryptography.addressGenerator.generateAddressFromPublicKey( publicKey, networkByte);
+    }
 
-        const publicAddress = this._scope.cryptography.addressGenerator.generateAddressFromPublicKey( publicKey, networkByte);
-        return publicAddress;
+    /**
+     * Getting Public Address
+     */
+    decryptAddressPublicKey( networkByte , password, ){
+        const publicKey =  this.decryptPublicKey( password );
+        return this._scope.cryptography.addressGenerator.generateAddressPublicKeyFromPublicKey( publicKey, networkByte);
     }
 
     /**
      * extracting private key
      */
     decryptPrivateKey(password){
-
         this.wallet.encryption.decryptWallet(password);
         return this.private.decryptKey();
-
     }
 
     /**
@@ -64,7 +67,6 @@ module.exports = class WalletAddressTransparentKeysModel extends DBModel {
     sign(message,  password ){
 
         const privateKey = this.decryptPrivateKey( password );
-
         return this._scope.cryptography.cryptoSignature.sign( message, privateKey );
 
     }
@@ -78,21 +80,23 @@ module.exports = class WalletAddressTransparentKeysModel extends DBModel {
     verify(message, signature, password ){
 
         const publicKey = this.decryptPublicKey( password );
-
         return this._scope.cryptography.cryptoSignature.verify( message, signature, publicKey );
 
     }
 
-    async decryptBalances(password){
+    decryptBalances(password){
         const publicKeyHash = this.decryptPublicKeyHash(password);
         return this.wallet._scope.mainChain.data.accountHashMap.getBalances( publicKeyHash );
     }
 
-    async decryptBalance(tokenCurrency, password){
-
+    decryptBalance(tokenCurrency, password){
         const publicKeyHash = this.decryptPublicKeyHash(password);
         return this.wallet._scope.mainChain.data.accountHashMap.getBalance( publicKeyHash, tokenCurrency );
+    }
 
+    async decryptExtraEncryptedMessage(message, password){
+        const privateKey = this.decryptPrivateKey( password );
+        return this._scope.cryptography.cryptoSignature.decrypt( message, privateKey );
     }
 
 }

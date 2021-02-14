@@ -262,9 +262,10 @@ module.exports = class WalletTransfer {
         if (typeof extraMessage === "string")
             extraMessage = Buffer.from(extraMessage);
 
-        if ( !extraEncryptionOption ) return extraMessage;
+        if ( !extraEncryptionOption ) return Buffer.concat([ Buffer.from('00','hex'), extraMessage ]);
 
-        return this._scope.cryptography.cryptoSignature.encrypt(extraMessage, extraEncryptionOption );
+        const encrypted = await this._scope.cryptography.cryptoSignature.encrypt(extraMessage, extraEncryptionOption );
+        return Buffer.concat([Buffer.from('01', 'hex'), encrypted]);
     }
 
 }
