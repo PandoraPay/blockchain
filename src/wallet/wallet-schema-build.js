@@ -1,5 +1,5 @@
 const {DBSchemaBuild} = require('kernel').db;
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
+const {Helper, BufferHelper} = require('kernel').helpers;
 const {CryptoHelper} = require('kernel').helpers.crypto;
 
 const {EncryptedSchemaBuilt} = require('cryptography').schemas.EncryptedSchemaBuild;
@@ -39,12 +39,27 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     position: 100,
                 },
 
+                /**
+                 * Used for encryption
+                 */
+                salt: {
+                    type: "buffer",
+                    minSize: 32,
+                    maxSize: 32,
+
+                    default(){
+                        return BufferHelper.generateRandomBuffer(32);
+                    },
+
+                    position: 101,
+                },
+
                 encrypted: {
 
                     type: "boolean",
                     default: false,
 
-                    position: 101,
+                    position: 102,
                 },
 
                 mnemonic: {
@@ -53,7 +68,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     schemaBuildClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
-                    position: 102,
+                    position: 103,
                 },
 
                 mnemonicChecksum: {
@@ -61,7 +76,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     minSize: 32,
                     maxSize: 32,
 
-                    position: 103,
+                    position: 104,
                 },
 
                 mnemonicSequenceCounter: {
@@ -70,7 +85,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     schemaBuildClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
-                    position: 104,
+                    position: 105,
                 },
 
                 addresses: {
@@ -81,7 +96,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                     minSize: 0,
                     maxSize: 4095,
 
-                    position: 105,
+                    position: 106,
                 },
 
             },

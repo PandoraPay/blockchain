@@ -1,5 +1,6 @@
 const {EncryptedTypeEnum} = require('cryptography').enums;
 const {Helper, Exception} = require('kernel').helpers;
+const {CryptoHelper} = require('kernel').helpers.crypto;
 
 module.exports = class WalletEncryption {
 
@@ -15,6 +16,24 @@ module.exports = class WalletEncryption {
         return this._scope.wallet;
     }
 
+    _processPassword(password, askPassword){
+
+        if (Buffer.isBuffer(password) && password.length === 32) return password;
+
+        if (!password) {
+            if (!askPassword) throw new Exception(this, "Ask Password is set false");
+            password = this._scope.cli.askInput('Enter your password',);
+        }
+
+        if (!password || typeof password !== "string" )
+            throw new Exception(this, "Invalid password");
+
+        if (password.length < 6)
+            throw new Exception(this, "Password too weak");
+
+        return CryptoHelper.dkeccak256( Buffer.concat([ Buffer.from(password), this.wallet.salt]) );
+    }
+
     decryptWallet(password, askPassword = true ){
 
         if ( !this.wallet.encrypted ) return true;
@@ -22,13 +41,7 @@ module.exports = class WalletEncryption {
 
         if (this.wallet.mnemonic.encryption === EncryptedTypeEnum.NON_EXISTENT ) throw new Exception(this, "Mnemonic is missing");
 
-        if ( !Buffer.isBuffer(password) || password.length !== 32 ){
-
-            if (!askPassword) throw new Exception(this, "Ask Password is set false");
-
-            password = this._scope.cli.askInput('Enter your password', );
-
-        }
+        password = this._processPassword(password, askPassword);
 
         const mnemonicBuff = this.wallet.mnemonic.decryptKey(password);
         const mnemonic = mnemonicBuff.toString("utf8");
@@ -43,11 +56,11 @@ module.exports = class WalletEncryption {
         return true;
     }
 
-    async encryptWallet(oldPassword, newPassword){
+    async encryptWallet(oldPassword, newPassword, askPassword = true ){
 
-        if ( this.wallet.encrypted ) this.decryptWallet( oldPassword );
+        if ( this.wallet.encrypted ) this.decryptWallet( oldPassword, askPassword );
 
-        if (!newPassword) throw new Exception(this, "Password is not set");
+        newPassword = this._processPassword(newPassword, askPassword);
 
         this._operate( it => it.encryptKey( newPassword ) );
 

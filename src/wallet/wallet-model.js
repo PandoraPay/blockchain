@@ -1,5 +1,5 @@
 const {DBModel} = require('kernel').db;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
+const {BufferHelper} = require('kernel').helpers;
 
 const WalletAddressTypeEnum = require("./addresses/wallet-address-type-enum")
 const WalletManager = require("./manager/wallet-manager")
@@ -45,6 +45,7 @@ module.exports = class WalletModel extends DBModel {
         this.addresses = [];
         this.version = 0;
         this.encrypted = false;
+        this.salt = BufferHelper.generateRandomBuffer( 32 );
 
         this.encryption.setEncrypted(false);
         this.encryption.setPassword(undefined);

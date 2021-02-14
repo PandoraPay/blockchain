@@ -177,7 +177,8 @@ module.exports = class TestNet{
                                 txDsts: [{
                                     address,
                                     amount,
-                                }]
+                                }],
+                                extra: {extraMessage: 'Funding testnet cluster address', extraEncryptionOption: '' }
                             });
 
                         moneySent = true;

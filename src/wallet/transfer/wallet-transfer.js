@@ -30,7 +30,8 @@ module.exports = class WalletTransfer {
 
         if (txDsts && !Array.isArray(txDsts)) txDsts = [txDsts];
 
-        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption)
+        if (extra && !Buffer.isBuffer(extra) )
+            extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption)
 
         const {vin, privateKeys} = await this._calculateRequiredFunds({address, txDsts, fee, feeTokenCurrency, password, networkByte});
 
@@ -62,7 +63,8 @@ module.exports = class WalletTransfer {
                 maxSize: 20,
             }, "delegatePublicKeyHash", ()=>{}, "object", {}  );
 
-        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
+        if (extra && !Buffer.isBuffer(extra) )
+            extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
@@ -98,7 +100,9 @@ module.exports = class WalletTransfer {
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
+
+        if (extra && !Buffer.isBuffer(extra) )
+            extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
@@ -134,7 +138,9 @@ module.exports = class WalletTransfer {
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-        extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
+
+        if (extra && !Buffer.isBuffer(extra) )
+            extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
 
         const foundFunds = await this._scope.mainChain.data.accountHashMap.getBalance( walletAddress.keys.decryptPublicKeyHash(), tokenCurrency );
         if (!foundFunds) throw new Exception(this, "Not enough funds");
