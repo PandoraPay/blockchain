@@ -58,7 +58,7 @@ class WalletAddressSchemaBuild extends DBSchemaBuild {
 
                 mnemonicSequenceIndex: {
                     type: "object",
-                    schemaBuildClass: EncryptedSchemaBuilt,
+                    schemaBuiltClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
                     position: 103,
@@ -67,7 +67,7 @@ class WalletAddressSchemaBuild extends DBSchemaBuild {
                 keys: {
                     type: "object",
 
-                    schemaBuildClass() {
+                    schemaBuiltClass() {
                         if (this.type === WalletAddressTypeEnum.WALLET_ADDRESS_TRANSPARENT) return WalletAddressTransparentKeySchemaBuilt;
                     },
                     modelClass(){

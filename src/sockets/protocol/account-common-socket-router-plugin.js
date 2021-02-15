@@ -107,13 +107,13 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
 
         }
 
-        throw "Account is invalid";
+        throw Error("Account is invalid");
 
     }
     async _getBalance({account, token}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 
@@ -128,7 +128,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
     async _getNonce({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 
@@ -141,7 +141,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
     async _getDelegate({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 
@@ -154,7 +154,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
     async _getBalanceIncludingMemPool({account, tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const chainData = this._scope.mainChain.data;
 
@@ -195,7 +195,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
     async _getNonceIncludingMemPool({account}){
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 
@@ -214,7 +214,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
         throw {message: "not implemented"};
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 
@@ -237,7 +237,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
         throw {message: "not implemented"};
 
         const address = this._scope.cryptography.addressValidator.validateAddress( account );
-        if (!address) throw "Transparent Account is invalid";
+        if (!address) throw Error("Transparent Account is invalid");
 
         const publicKeyHash = address.publicKeyHash;
 

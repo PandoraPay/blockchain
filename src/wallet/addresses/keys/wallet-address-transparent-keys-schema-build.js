@@ -33,7 +33,7 @@ class WalletAddressTransparentKeySchemaBuild extends DBSchemaBuild {
 
                 private:{
                     type: "object",
-                    schemaBuildClass: EncryptedSchemaBuilt,
+                    schemaBuiltClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
                     position: 101,
@@ -41,7 +41,7 @@ class WalletAddressTransparentKeySchemaBuild extends DBSchemaBuild {
 
                 public:{
                     type: "object",
-                    schemaBuildClass: EncryptedSchemaBuilt,
+                    schemaBuiltClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
                     position: 102,

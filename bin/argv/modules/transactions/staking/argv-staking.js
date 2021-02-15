@@ -4,7 +4,7 @@ module.exports = {
 
     stakingGrindingLockedTransfersBlocks: 50, // Used to solve "Stake Griding Attack Vector" for POS by locking the funds sent from transactions
 
-    delegateStakingFeePercentage: 10000,
+    delegateStakingFeePercentage: 50000,
 
     getMinimumStakeRequiredForForging(blockHeight){
 
@@ -14,7 +14,7 @@ module.exports = {
     },
 
     _initArgv(parents){
-        if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
+        if (!parents[0].transactions.coins.coinDenomination) throw Error("invalid coinDenomination");
         this._coinDenomination = parents[0].transactions.coins.coinDenomination;
     }
 

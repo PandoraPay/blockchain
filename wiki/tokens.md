@@ -11,7 +11,7 @@ Token **burning** - transaction to decrease the supply of a specific token
 var createToken = async (name, description, ticker, maxSupply, decimalSeparator) =>{
 
     const mainAddress = PandoraWallet.$store.state.addresses.list[PandoraWallet.$store.state.wallet.mainAddress]
-    if (!mainAddress) throw "Main address was not found";
+    if (!mainAddress) throw Error("Main address was not found");
 
     const addressWallet = PandoraPay.wallet.manager.getWalletAddressByAddress( mainAddress.address, false );
 
@@ -38,10 +38,10 @@ var createToken = async (name, description, ticker, maxSupply, decimalSeparator)
 
     console.log(out);
 
-    if (!out) throw "Transaction couldn't be made";
+    if (!out) throw Error("Transaction couldn't be made");
 
     const outConsensus = await PandoraConsensus._client.emitAsync("mem-pool/new-tx", {tx: out.tx.toBuffer() }, 0);
-    if (!outConsensus) throw "Transaction was not included in MemPool";
+    if (!outConsensus) throw Error("Transaction was not included in MemPool");
 
     await PandoraConsensus.downloadAccountTransactions(mainAddress.address);
 
@@ -69,10 +69,10 @@ createToken("TOKEN X", "token2 description 1234", "TOCKX", 2100000000000000, 8 )
 
 var changeSupply = async (tokenPublicKeyHash, supplyValue = 10) =>{
 
-    if (!tokenPublicKeyHash) throw "tokenPublicKeyHash argument is missing";
+    if (!tokenPublicKeyHash) throw Error("tokenPublicKeyHash argument is missing");
 
     const mainAddress = PandoraWallet.$store.state.addresses.list[PandoraWallet.$store.state.wallet.mainAddress]
-    if (!mainAddress) throw "Main address was not found";
+    if (!mainAddress) throw Error("Main address was not found");
 
     const addressWallet = PandoraPay.wallet.manager.getWalletAddressByAddress( mainAddress.address, false );
 
@@ -91,10 +91,10 @@ var changeSupply = async (tokenPublicKeyHash, supplyValue = 10) =>{
 
     console.log(out);
 
-    if (!out) throw "Transaction couldn't be made";
+    if (!out) throw Error("Transaction couldn't be made");
 
     const outConsensus = await PandoraConsensus._client.emitAsync("mem-pool/new-tx", {tx: out.tx.toBuffer() }, 0);
-    if (!outConsensus) throw "Transaction was not included in MemPool";
+    if (!outConsensus) throw Error("Transaction was not included in MemPool");
 
     await PandoraConsensus.downloadAccountTransactions(mainAddress.address);
 

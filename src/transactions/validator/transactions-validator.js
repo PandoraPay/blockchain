@@ -37,7 +37,7 @@ module.exports = class TransactionsValidator{
         if (Buffer.isBuffer(input )) scriptVersion = MarshalData.unmarshalNumber( BufferReader.create(input) );
         else if ( input instanceof BaseTxModel) scriptVersion = input.scriptVersion;
         else if ( typeof input === "object" ) scriptVersion = input.scriptVersion;
-        else throw "invalid data type";
+        else throw Error("invalid data type");
 
         if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return ChainSimpleTxModel;
         if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION ) return ChainDelegateStakeSimpleTxModel;

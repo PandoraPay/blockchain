@@ -3,7 +3,7 @@ const coinDenomination = Math.pow(10,decimalSeparator);
 const maxSupplyCoins = 42000000000;
 
 if (maxSupplyCoins * coinDenomination >= Number.MAX_SAFE_INTEGER)
-    throw "invalid coin denomination";
+    throw Error("invalid coin denomination");
 
 module.exports = {
 

@@ -1,6 +1,6 @@
-const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
+const {Exception, StringHelper, BufferReader, EnumHelper} = require('kernel').helpers;
 const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
-const {MarshalFields} = require('kernel').marshal;
+const {MarshalData} = require('kernel').marshal;
 
 module.exports = class WalletTransfer {
 
@@ -50,18 +50,14 @@ module.exports = class WalletTransfer {
         return txOut;
     }
 
-    async changeDelegate({address, fee, nonce, delegate, memPoolValidateTxData, extra, password, networkByte }){
+    async delegateStake({address, fee, nonce, delegate, memPoolValidateTxData, extra, password, networkByte }){
 
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
 
         if (delegate && typeof delegate.delegatePublicKeyHash === "string" && StringHelper.isHex(delegate.delegatePublicKeyHash ) )
-            delegate.delegatePublicKeyHash = MarshalFields.marshal_buffer_toBuffer( Buffer.from( delegate.delegatePublicKeyHash, "hex"), {
-                specifyLength: true,
-                minSize: 20,
-                maxSize: 20,
-            }, "delegatePublicKeyHash", ()=>{}, "object", {}  );
+            delegate.delegatePublicKeyHash = MarshalData.marshalBuffer( Buffer.from( delegate.delegatePublicKeyHash, "hex"), 20, false, true );
 
         if (extra && !Buffer.isBuffer(extra) )
             extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);

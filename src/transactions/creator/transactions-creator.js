@@ -57,13 +57,11 @@ module.exports = class TransactionsCreator {
         const input = vin.map( it => { it.signature = Buffer.alloc(65); return it} );
 
         const tx = new ChainDelegateStakeSimpleTxModel ( this._scope, undefined, {
-
             vin: input,
             vout: [],
             extra,
             nonce,
-            delegate,
-
+            delegate
         }, "object" );
 
         nonce = await this._calculateNonce(chain, nonce, tx);

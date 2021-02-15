@@ -22,7 +22,7 @@ class WalletStakesSchemaBuild extends DBSchemaBuild{
 
                 delegatedStakesStored: {
                     type: "array",
-                    schemaBuildClass: DelegatedStakeSchemaBuilt,
+                    schemaBuiltClass: DelegatedStakeSchemaBuilt,
                     modelClass: DelegatedStakeModel,
 
                     minSize: 0,

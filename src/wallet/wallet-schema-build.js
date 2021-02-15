@@ -50,7 +50,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                 mnemonic: {
 
                     type: "object",
-                    schemaBuildClass: EncryptedSchemaBuilt,
+                    schemaBuiltClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
                     position: 102,
@@ -67,7 +67,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
                 mnemonicSequenceCounter: {
 
                     type: "object",
-                    schemaBuildClass: EncryptedSchemaBuilt,
+                    schemaBuiltClass: EncryptedSchemaBuilt,
                     modelClass: EncryptedModel,
 
                     position: 104,
@@ -75,7 +75,7 @@ class WalletSchemaBuild extends DBSchemaBuild {
 
                 addresses: {
                     type: "array",
-                    schemaBuildClass: WalletAddressSchemaBuilt,
+                    schemaBuiltClass: WalletAddressSchemaBuilt,
                     modelClass: WalletAddressModel,
 
                     minSize: 0,

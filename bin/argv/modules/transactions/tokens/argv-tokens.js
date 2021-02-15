@@ -8,7 +8,7 @@ module.exports = {
     },
 
     _initArgv(parents){
-        if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
+        if (!parents[0].transactions.coins.coinDenomination) throw Error("invalid coinDenomination");
         this._coinDenomination = parents[0].transactions.coins.coinDenomination;
     }
 

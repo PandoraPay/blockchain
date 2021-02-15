@@ -3,10 +3,10 @@ module.exports = {
 
     getBlockRewardAt(blockHeight, circulatingSupply){
 
-        if (typeof blockHeight !== "number") throw "blockHeight is invalid";
-        if (typeof circulatingSupply !== "number" ) throw "circulatingSupply is invalid";
-        if ( circulatingSupply < 0 ) throw "circulatingSupply is negative"
-        if ( circulatingSupply === 0 && blockHeight > 0) throw "circulatingSupply was not set"
+        if (typeof blockHeight !== "number") throw Error("blockHeight is invalid");
+        if (typeof circulatingSupply !== "number" ) throw Error("circulatingSupply is invalid");
+        if ( circulatingSupply < 0 ) throw Error("circulatingSupply is negative")
+        if ( circulatingSupply === 0 && blockHeight > 0) throw Error("circulatingSupply was not set")
 
         if (circulatingSupply >= this._fixedMaxSupply ) return 0; //making sure the coin supply is fixed
 
@@ -35,7 +35,7 @@ module.exports = {
         this.blockTime =
         this._argvBlock = parents[0].block;
 
-        if (!parents[0].transactions.coins.coinDenomination) throw "invalid coinDenomination";
+        if (!parents[0].transactions.coins.coinDenomination) throw Error("invalid coinDenomination");
         this._coinDenomination = parents[0].transactions.coins.coinDenomination;
         this._fixedMaxSupply = parents[0].transactions.coins.fixedMaxSupply;
     }

@@ -16,11 +16,17 @@ module.exports = class WalletAddressModel extends DBModel {
      * extracting mnemonic sequence index
      */
 
-    decryptMnemonicSequenceIndex(password){
-        this.wallet.encryption.decryptWallet(password);
+    decryptMnemonicSequenceIndex(){
+        this.wallet.encryption.decryptWallet();
         return this.mnemonicSequenceIndex.decryptKey();
     }
 
+    decryptGetDelegateStakePrivateKeyModel( delegateNonce ){
+        this.wallet.encryption.decryptWallet();
+        const privateKey = this.keys.decryptPrivateKey();
+        const privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( { privateKey, } );
 
+        return privateKeyModel.getDelegateStakePrivateKeyModel(delegateNonce);
+    }
 
 }

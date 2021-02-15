@@ -1,6 +1,6 @@
 const {Helper, Exception, EnumHelper} = require('kernel').helpers;
 
-const AccountHashMapDataDelegate = require( "../../../chain/maps/account-hash/element/data/account-data-delegate-schema-build");
+const {AccountDataDelegateSchemaBuilt} = require( "../../../chain/maps/account-hash/element/data/account-data-delegate-schema-build");
 const {ChainSimpleTxSchemaBuild} = require('../chain-simple-tx-schema-build')
 const { TxScriptTypeEnum } = require('cryptography').transactions;
 
@@ -36,7 +36,7 @@ class ChainDelegateStakeSimpleTxSchemaBuild extends ChainSimpleTxSchemaBuild {
 
                 delegate: {
                     type: "object",
-                    schemaBuildClass: AccountHashMapDataDelegate,
+                    schemaBuiltClass: AccountDataDelegateSchemaBuilt,
 
                     position: 2001,
                 },
