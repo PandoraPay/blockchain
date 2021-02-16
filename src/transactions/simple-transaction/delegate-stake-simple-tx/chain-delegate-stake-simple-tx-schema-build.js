@@ -16,8 +16,8 @@ class ChainDelegateStakeSimpleTxSchemaBuild extends ChainSimpleTxSchemaBuild {
 
                     default: TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION,
 
-                    validation(script){
-                        return script === TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION;
+                    validation(scriptVersion){
+                        return scriptVersion === TxScriptTypeEnum.TX_SCRIPT_DELEGATE_STAKE_TRANSACTION;
                     }
                 },
 

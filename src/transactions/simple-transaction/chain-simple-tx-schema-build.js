@@ -25,6 +25,6 @@ class ChainSimpleTxSchemaBuild extends SimpleTxSchemaBuild {
 }
 
 module.exports = {
-    ChainSimpleTxSchemaBuild: ChainSimpleTxSchemaBuild,
+    ChainSimpleTxSchemaBuild,
     ChainSimpleTxSchemaBuilt: new ChainSimpleTxSchemaBuild()
 }

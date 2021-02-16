@@ -32,7 +32,7 @@ class TxMerkleTreeSchemaBuild extends MerkleTreeSchemaBuild {
 
             },
 
-        }, schema, false) );
+        }, schema, true) );
     }
 
 }

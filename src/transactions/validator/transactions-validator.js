@@ -30,13 +30,17 @@ module.exports = class TransactionsValidator{
 
     getTxClass(input){
 
-        if (typeof input === "string" && StringHelper.isHex(input)) input = Buffer.from(input, "hex");
+        let version, scriptVersion;
 
-        let scriptVersion;
-
-        if (Buffer.isBuffer(input )) scriptVersion = MarshalData.unmarshalNumber( BufferReader.create(input) );
-        else if ( input instanceof BaseTxModel) scriptVersion = input.scriptVersion;
-        else if ( typeof input === "object" ) scriptVersion = input.scriptVersion;
+        if (Buffer.isBuffer(input )) {
+            const reader = BufferReader.create(input);
+            version = MarshalData.unmarshalNumber( reader ); //version first number
+            scriptVersion = MarshalData.unmarshalNumber( reader ); //script version 2nd number
+        }
+        else if ( input instanceof BaseTxModel || typeof input === "object"  ){
+            version = input.version;
+            scriptVersion = input.scriptVersion;
+        }
         else throw Error("invalid data type");
 
         if ( scriptVersion === TxScriptTypeEnum.TX_SCRIPT_SIMPLE_TRANSACTION ) return ChainSimpleTxModel;
