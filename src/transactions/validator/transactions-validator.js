@@ -1,9 +1,9 @@
 
-const {TxTypeEnum, TxScriptTypeEnum} = require('cryptography').transactions;
-const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
-const {MarshalData} = require('kernel').marshal;
+const {TxTypeEnum, TxScriptTypeEnum} = PandoraLibrary.transactions;
+const {BaseTxModel} = PandoraLibrary.transactions.baseTransaction;
+const {MarshalData} = PandoraLibrary.marshal;
 
-const {BufferReader, Exception, EnumHelper, StringHelper, BufferHelper} = require('kernel').helpers;
+const {BufferReader, Exception, EnumHelper, StringHelper, BufferHelper} = PandoraLibrary.helpers;
 
 const ChainSimpleTxModel = require( "../simple-transaction/chain-simple-tx-model")
 const ChainDelegateStakeSimpleTxModel = require( "../simple-transaction/delegate-stake-simple-tx/chain-delegate-stake-simple-tx-model")

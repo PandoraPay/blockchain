@@ -1,5 +1,5 @@
-const {BufferUniqueSchemaBuild} = require('kernel').schemas.BufferUniqueSchemaBuild;
-const {Helper, Exception} = require('kernel').helpers;
+const {BufferUniqueSchemaBuild} = PandoraLibrary.schemas.BufferUniqueSchemaBuild;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 class SubChainDataKernelHashUniqueSchemaBuild extends BufferUniqueSchemaBuild {
 

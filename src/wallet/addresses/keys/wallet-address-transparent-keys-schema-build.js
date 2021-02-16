@@ -1,8 +1,8 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
-const {EncryptedSchemaBuilt} = require('cryptography').schemas.EncryptedSchemaBuild;
-const {EncryptedModel} = require('cryptography').models;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, Exception, EnumHelper} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
+const {EncryptedSchemaBuilt} = PandoraLibrary.schemas.EncryptedSchemaBuild;
+const {EncryptedModel} = PandoraLibrary.models;
 
 class WalletAddressTransparentKeySchemaBuild extends DBSchemaBuild {
 

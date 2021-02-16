@@ -1,7 +1,7 @@
-const  {Helper} = require('kernel').helpers;
-const {describe} = require('kernel').tests;
+const  {Helper} = PandoraLibrary.helpers;
+const {describe} = PandoraLibrary.tests;
 
-const {asyncTimeout} = require('kernel').helpers.AsyncInterval;
+const {asyncTimeout} = PandoraLibrary.helpers.AsyncInterval;
 
 module.exports = function run (dbType) {
 

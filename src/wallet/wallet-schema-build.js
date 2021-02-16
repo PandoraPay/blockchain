@@ -1,9 +1,9 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, BufferHelper} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, BufferHelper} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
-const {EncryptedSchemaBuilt} = require('cryptography').schemas.EncryptedSchemaBuild;
-const {EncryptedModel} = require('cryptography').models;
+const {EncryptedSchemaBuilt} = PandoraLibrary.schemas.EncryptedSchemaBuild;
+const {EncryptedModel} = PandoraLibrary.models;
 
 const WalletAddressModel = require('./addresses/wallet-address-model')
 const {WalletAddressSchemaBuilt} = require('./addresses/wallet-address-schema-build')

@@ -1,4 +1,4 @@
-const {describe} = require('kernel').tests;
+const {describe} = PandoraLibrary.tests;
 
 const BlockModel = require( "../../../../../../src/block/block-model")
 const {BlockSchemaBuilt, BlockSchemaBuild} = require( "../../../../../../src/block/block-schema-build")

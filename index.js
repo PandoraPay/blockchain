@@ -36,13 +36,9 @@ const WalletAddressModel = require("./src/wallet/addresses/wallet-address-model"
 const WalletAddressTypeEnum = require("./src/wallet/addresses/wallet-address-type-enum");
 const WalletAddressTransparentKeysModel = require("./src/wallet/addresses/keys/wallet-address-transparent-keys-model");
 
-const {Helper} = require('kernel').helpers;
+const {Helper} = PandoraLibrary.helpers;
 
-let merged = Helper.merge( {}, kernel, true)
-merged = Helper.merge(  merged, cryptography, true)
-merged = Helper.merge( merged, networking, true)
-
-const library = Helper.merge(merged, {
+const library = Helper.merge( PandoraLibrary, {
 
     app: new App({}),
 
@@ -120,13 +116,13 @@ const library = Helper.merge(merged, {
 }, true );
 
 if (typeof window !== "undefined") {
-    window.library = library;
+    window.PandoraLibrary = library;
     window.PandoraPay = window.app = library.app;
     window.blockchain = library;
 }
 
 if (typeof global !== "undefined"){
-    global.library = library;
+    global.PandoraLibrary = library;
     global.PandoraPay = global.app = library.app;
     global.blockchain = library;
 }

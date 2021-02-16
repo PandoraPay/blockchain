@@ -1,4 +1,4 @@
-const {describeList} = require('kernel').tests;
+const {describeList} = PandoraLibrary.tests;
 
 const ArgvTest = require("./argv/argv-test")
 

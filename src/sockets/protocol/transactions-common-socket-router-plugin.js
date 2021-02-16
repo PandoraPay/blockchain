@@ -1,4 +1,4 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
 
 module.exports = class TransactionsCommonSocketRouterPlugin extends SocketRouterPlugin {
 

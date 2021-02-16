@@ -5,10 +5,10 @@ const TestTransactionsChain = require( "../tests/transactions/stake/test-transac
 const TestTransactionsChainCluster = require( "../tests/transactions/stake/test-transactions-chain-cluster")
 const TestTransaction = require("../tests/transactions/test-transaction")
 
-const  {Helper} = require('kernel').helpers;
-const {describe} = require('kernel').tests;
-const {DBConstructor} = require('kernel').db;
-const {cluster} = require('kernel').masterCluster;
+const  {Helper} = PandoraLibrary.helpers;
+const {describe} = PandoraLibrary.tests;
+const {DBConstructor} = PandoraLibrary.db;
+const {cluster} = PandoraLibrary.masterCluster;
 
 /**
  *

@@ -1,5 +1,5 @@
-const {SimpleTxModel} = require('cryptography').transactions.simpleTransaction;
-const {Helper, Exception} = require('kernel').helpers;
+const {SimpleTxModel} = PandoraLibrary.transactions.simpleTransaction;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const {ChainSimpleTxSchemaBuilt} = require('./chain-simple-tx-schema-build')
 

@@ -1,6 +1,6 @@
-const {MerkleTreeModel} = require('kernel').dataStructures.merkleTree;
-const {Helper, Exception} = require('kernel').helpers;
-const {BaseTxModel} = require('cryptography').transactions.baseTransaction;
+const {MerkleTreeModel} = PandoraLibrary.dataStructures.merkleTree;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {BaseTxModel} = PandoraLibrary.transactions.baseTransaction;
 
 const {TxMerkleTreeSchemaBuilt} = require('./schema/tx-merkle-tree-schema-build')
 const ChainTokenCreateSimpleTxModel = require( "../../../transactions/tokens/token-create/chain-token-create-simple-tx-model")

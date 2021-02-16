@@ -1,5 +1,5 @@
 const SubChainDataModel = require( "../../sub-chain/data/sub-chain-data-model");
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const {ForkSubChainDataSchemaBuilt} = require('./fork-sub-chain-data-schema-build')
 

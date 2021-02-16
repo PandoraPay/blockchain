@@ -1,5 +1,5 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, Exception, EnumHelper} = PandoraLibrary.helpers;
 const {DelegatedStakeSchemaBuilt} = require('./delegated-stake/delegated-stake-schema-build')
 const DelegatedStakeModel = require('./delegated-stake/delegated-stake-model')
 

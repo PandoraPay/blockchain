@@ -1,7 +1,7 @@
-const {BN} = require('kernel').utils;
+const {BN} = PandoraLibrary.utils;
 
-const {AsyncEvents} = require('kernel').helpers.events;
-const {Helper, Exception} = require('kernel').helpers;
+const {AsyncEvents} = PandoraLibrary.helpers.events;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const BlockModel = require("../../block/block-model");
 const BaseChainDataModel = require("./base-chain-data-model")

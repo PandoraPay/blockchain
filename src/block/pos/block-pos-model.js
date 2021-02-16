@@ -1,7 +1,7 @@
-const {DBModel} = require('kernel').db;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
-const {BN, bn128} = require('kernel').utils;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {DBModel} = PandoraLibrary.db;
+const {Helper, EnumHelper, Exception} = PandoraLibrary.helpers;
+const {BN, bn128} = PandoraLibrary.utils;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
 
 const {BlockPoSSchemaBuilt} = require('./block-pos-schema-build')
 

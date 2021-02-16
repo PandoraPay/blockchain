@@ -1,8 +1,8 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
-const {Helper, Exception} = require('kernel').helpers;
-const {MarshalData} = require('kernel').marshal;
-const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
-const {BN, BigNumber} = require('kernel').utils;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {MarshalData} = PandoraLibrary.marshal;
+const  {setAsyncInterval, clearAsyncInterval} = PandoraLibrary.helpers.AsyncInterval;
+const {BN, BigNumber} = PandoraLibrary.utils;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list

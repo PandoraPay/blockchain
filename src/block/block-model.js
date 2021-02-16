@@ -1,6 +1,6 @@
-const {DBModel} = require('kernel').db;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
-const {BN} = require('kernel').utils;
+const {DBModel} = PandoraLibrary.db;
+const {Helper, EnumHelper, Exception} = PandoraLibrary.helpers;
+const {BN} = PandoraLibrary.utils;
 
 const {BlockSchemaBuilt} = require('./block-schema-build')
 

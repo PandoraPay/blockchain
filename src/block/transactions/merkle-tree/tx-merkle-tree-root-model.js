@@ -1,5 +1,5 @@
-const {MerkleTreeRootModel} = require('kernel').dataStructures.merkleTree;
-const {Helper, Exception} = require('kernel').helpers;
+const {MerkleTreeRootModel} = PandoraLibrary.dataStructures.merkleTree;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const TxMerkleTreeNodeModel = require( "./tx-merkle-tree-node-model")
 

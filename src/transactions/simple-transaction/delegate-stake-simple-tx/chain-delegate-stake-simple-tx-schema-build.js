@@ -1,8 +1,8 @@
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
+const {Helper, Exception, EnumHelper} = PandoraLibrary.helpers;
 
 const {AccountDataDelegateSchemaBuilt} = require( "../../../chain/maps/account-hash/element/data/account-data-delegate-schema-build");
 const {ChainSimpleTxSchemaBuild} = require('../chain-simple-tx-schema-build')
-const { TxScriptTypeEnum } = require('cryptography').transactions;
+const { TxScriptTypeEnum } = PandoraLibrary.transactions;
 
 class ChainDelegateStakeSimpleTxSchemaBuild extends ChainSimpleTxSchemaBuild {
 

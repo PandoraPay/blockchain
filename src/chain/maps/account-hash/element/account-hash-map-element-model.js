@@ -1,4 +1,4 @@
-const {DBModel} = require('kernel').db;
+const {DBModel} = PandoraLibrary.db;
 const {AccountHashMapElementSchemaBuilt} = require('./account-hash-map-element-schema-build')
 
 module.exports = class AccountHashMapElementModel extends DBModel {

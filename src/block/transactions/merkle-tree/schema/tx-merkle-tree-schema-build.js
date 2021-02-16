@@ -1,5 +1,5 @@
-const {MerkleTreeSchemaBuild} = require('kernel').dataStructures.merkleTree.schema.MerkleTreeSchemaBuild;
-const {Helper} = require('kernel').helpers;
+const {MerkleTreeSchemaBuild} = PandoraLibrary.dataStructures.merkleTree.schema.MerkleTreeSchemaBuild;
+const {Helper} = PandoraLibrary.helpers;
 
 const {TxMerkleTreeRootSchemaBuilt} = require("./tx-merkle-tree-root-schema-build");
 const TxMerkleTreeRootModel = require('../tx-merkle-tree-root-model')

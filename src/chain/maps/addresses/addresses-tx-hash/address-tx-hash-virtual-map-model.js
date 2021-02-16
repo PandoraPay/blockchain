@@ -1,5 +1,5 @@
-const {HashVirtualMapModel} = require('kernel').dataStructures.hashMap;
-const {Helper, Exception} = require('kernel').helpers;
+const {HashVirtualMapModel} = PandoraLibrary.dataStructures.hashMap;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const {AddressTxHashMapElementSchemaBuilt} = require( "./address-tx-hash-map-element-schema-build")
 

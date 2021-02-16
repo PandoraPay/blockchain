@@ -1,4 +1,4 @@
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const ChainSimpleTxModel = require( "../../simple-transaction/chain-simple-tx-model");
 const {ChainTokenUpdateSupplySimpleTxSchemaBuilt} = require('./chain-token-update-supply-simple-tx-schema-build')

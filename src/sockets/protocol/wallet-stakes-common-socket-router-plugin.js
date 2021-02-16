@@ -1,5 +1,5 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
-const {Helper, BufferHelper, StringHelper, Exception} = require('kernel').helpers;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
+const {Helper, BufferHelper, StringHelper, Exception} = PandoraLibrary.helpers;
 
 module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRouterPlugin {
 

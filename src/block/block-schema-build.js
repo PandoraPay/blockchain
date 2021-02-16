@@ -1,8 +1,8 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {CryptoHelper} = require('kernel').helpers.crypto;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 const BlockVersionEnum = require( "./block-version-enum")
-const {BN} = require('kernel').utils;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
+const {BN} = PandoraLibrary.utils;
+const {Helper, EnumHelper, Exception} = PandoraLibrary.helpers;
 
 const TxMerkleTreeModel = require( "./transactions/merkle-tree/tx-merkle-tree-model");
 const BlockPoSModel = require( "./pos/block-pos-model")

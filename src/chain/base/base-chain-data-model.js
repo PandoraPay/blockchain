@@ -1,9 +1,9 @@
-const {DBModel} = require('kernel').db;
-const {Helper, Exception} = require('kernel').helpers;
-const {BN, BigNumber} = require('kernel').utils;
-const {StringHelper} = require('networking').sockets.protocol;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
-const {SimpleTxModel} = require('cryptography').transactions.simpleTransaction;
+const {DBModel} = PandoraLibrary.db;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {BN, BigNumber} = PandoraLibrary.utils;
+const {StringHelper} = PandoraLibrary.sockets.protocol;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
+const {SimpleTxModel} = PandoraLibrary.transactions.simpleTransaction;
 
 const BlockModel = require( "../../block/block-model");
 const TxMerkleTreeNodeModel = require( "../../block/transactions/merkle-tree/tx-merkle-tree-node-model")

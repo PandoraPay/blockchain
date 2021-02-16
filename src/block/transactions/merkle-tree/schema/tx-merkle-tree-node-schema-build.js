@@ -1,6 +1,6 @@
-const {MerkleTreeNodeSchemaBuild} = require('kernel').dataStructures.merkleTree.schema.MerkleTreeNodeSchemaBuild;
-const {Helper, Exception} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
+const {MerkleTreeNodeSchemaBuild} = PandoraLibrary.dataStructures.merkleTree.schema.MerkleTreeNodeSchemaBuild;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
 class TxMerkleTreeNodeSchemaBuild extends MerkleTreeNodeSchemaBuild {
 

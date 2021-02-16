@@ -1,4 +1,4 @@
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const BlockModel = require( "../block-model");
 const {GenesisSchemaBuilt} = require('./genesis-schema-build')

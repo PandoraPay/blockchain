@@ -1,4 +1,4 @@
-const {BN} = require('kernel').utils;
+const {BN} = PandoraLibrary.utils;
 
 module.exports = {
 

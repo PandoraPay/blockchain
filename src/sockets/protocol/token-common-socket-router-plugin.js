@@ -1,6 +1,6 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
-const {Exception, StringHelper, BufferHelper, EnumHelper} = require('kernel').helpers;
-const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = require('cryptography').transactions.TxTokenCurrencyTypeEnum;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
+const {Exception, StringHelper, BufferHelper, EnumHelper} = PandoraLibrary.helpers;
+const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = PandoraLibrary.transactions.TxTokenCurrencyTypeEnum;
 
 const TokenHashMapElementModel = require("../../chain/maps/tokens/tokens-hash/token-hash-map-element-model")
 

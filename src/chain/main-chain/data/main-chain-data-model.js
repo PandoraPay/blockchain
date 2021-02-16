@@ -1,6 +1,6 @@
 
-const {Helper, Exception} = require('kernel').helpers;
-const {MarshalData} = require('kernel').marshal;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {MarshalData} = PandoraLibrary.marshal;
 
 const BaseChainDataModel = require( "../../base/base-chain-data-model");
 

@@ -1,8 +1,8 @@
 const ForkSubChain = require( "../fork-sub-chain/fork-sub-chain");
 
-const {Exception, Helper} = require('kernel').helpers;
-const {MarshalData} = require('kernel').marshal;
-const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = require('cryptography').transactions.TxTokenCurrencyTypeEnum;
+const {Exception, Helper} = PandoraLibrary.helpers;
+const {MarshalData} = PandoraLibrary.marshal;
+const {TX_TOKEN_CURRENCY_NATIVE_TYPE} = PandoraLibrary.transactions.TxTokenCurrencyTypeEnum;
 
 const BaseChain = require("../base/base-chain")
 const SubChain = require("../sub-chain/sub-chain")

@@ -1,6 +1,6 @@
-const {HashVirtualMapModel} = require('kernel').dataStructures.hashMap;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
-const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
+const {HashVirtualMapModel} = PandoraLibrary.dataStructures.hashMap;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
+const {Helper, Exception, StringHelper, EnumHelper} = PandoraLibrary.helpers;
 
 const {AccountHashMapElementSchemaBuilt} = require( "./element/account-hash-map-element-schema-build")
 const AccountHashMapElementModel = require('./element/account-hash-map-element-model')

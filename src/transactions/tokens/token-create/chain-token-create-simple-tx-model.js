@@ -1,5 +1,5 @@
-const {Helper, Exception} = require('kernel').helpers;
-const {TxTypeEnum, TxScriptTypeEnum, TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {TxTypeEnum, TxScriptTypeEnum, TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
 
 const ChainSimpleTxModel = require("../../simple-transaction/chain-simple-tx-model")
 const {ChainTokenCreateSimpleTxSchemaBuilt} = require('./chain-token-create-simple-tx-schema-build')

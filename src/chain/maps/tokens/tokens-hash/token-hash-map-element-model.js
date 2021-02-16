@@ -1,4 +1,4 @@
-const {DBModel} = require('kernel').db;
+const {DBModel} = PandoraLibrary.db;
 
 const {TokenHashMapElementSchemaBuilt} = require('./token-hash-map-element-schema-build')
 

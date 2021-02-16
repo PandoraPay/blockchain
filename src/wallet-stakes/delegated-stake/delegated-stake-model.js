@@ -1,4 +1,4 @@
-const {DBModel} = require('kernel').db;
+const {DBModel} = PandoraLibrary.db;
 
 const {DelegatedStakeSchemaBuilt} = require('./delegated-stake-schema-build')
 

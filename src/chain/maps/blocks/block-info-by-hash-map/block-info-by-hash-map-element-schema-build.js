@@ -1,5 +1,5 @@
 const {BlockByHashMapElementSchemaBuild} = require('../../blocks/block-by-hash-map/block-by-hash-map-element-schema-build')
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 class BlockInfoByHashMapElementSchemaBuild extends BlockByHashMapElementSchemaBuild{
 

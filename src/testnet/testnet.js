@@ -1,4 +1,4 @@
-const {Exception, Helper} = require('kernel').helpers;
+const {Exception, Helper} = PandoraLibrary.helpers;
 
 module.exports = class TestNet{
 

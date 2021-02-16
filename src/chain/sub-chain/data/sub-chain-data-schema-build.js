@@ -1,5 +1,5 @@
 const {BaseChainDataSchemaBuild} = require('../../base/base-chain-data-schema-build')
-const {Helper} = require('kernel').helpers;
+const {Helper} = PandoraLibrary.helpers;
 
 const {SubChainDataHashUniqueSchemaBuilt} = require( "./hash/sub-chain-data-hash-unique-schema-build");
 const {SubChainDataKernelHashUniqueSchemaBuilt} = require( "./hash/sub-chain-data-kernel-hash-unique-schema-build");

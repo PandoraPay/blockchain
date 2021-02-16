@@ -1,6 +1,6 @@
-const {MerkleTreeRootSchemaBuild} = require('kernel').dataStructures.merkleTree.schema.MerkleTreeRootSchemaBuild;
-const {MerkleTreeRoot} = require('kernel').dataStructures.merkleTree;
-const {Helper, Exception} = require('kernel').helpers;
+const {MerkleTreeRootSchemaBuild} = PandoraLibrary.dataStructures.merkleTree.schema.MerkleTreeRootSchemaBuild;
+const {MerkleTreeRoot} = PandoraLibrary.dataStructures.merkleTree;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 class TxMerkleTreeRootSchemaBuild extends MerkleTreeRootSchemaBuild {
 

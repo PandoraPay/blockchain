@@ -1,6 +1,6 @@
-const {EncryptedTypeEnum} = require('cryptography').enums;
-const {Helper, Exception} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
+const {EncryptedTypeEnum} = PandoraLibrary.enums;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
 module.exports = class WalletEncryption {
 

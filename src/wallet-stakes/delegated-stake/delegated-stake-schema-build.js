@@ -1,5 +1,5 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper} = require('kernel').helpers;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper} = PandoraLibrary.helpers;
 
 class DelegatedStakeSchemaBuild extends DBSchemaBuild{
 

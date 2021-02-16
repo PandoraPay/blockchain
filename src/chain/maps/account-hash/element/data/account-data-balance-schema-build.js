@@ -1,6 +1,6 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, Exception, EnumHelper} = PandoraLibrary.helpers;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
 
 class AccountDataBalanceSchemaBuild extends DBSchemaBuild {
 

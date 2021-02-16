@@ -1,5 +1,5 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
-const {Exception} = require('kernel').helpers;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
+const {Exception} = PandoraLibrary.helpers;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list

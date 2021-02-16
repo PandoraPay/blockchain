@@ -1,5 +1,5 @@
-const {Helper, Exception} = require('kernel').helpers;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {Helper, Exception} = PandoraLibrary.helpers;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
 const ForgeBlockMemPool = require('./forge-block-mem-pool')
 
 module.exports = class ForgeBlock {

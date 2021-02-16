@@ -1,5 +1,5 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, Exception} = require('kernel').helpers;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const {TokenDataSchemaBuild} = require('../../../../chain/maps/tokens/tokens-hash/data/token-data-schema-build')
 

@@ -1,4 +1,4 @@
-const {HashVirtualMapModel} = require('kernel').dataStructures.hashMap;
+const {HashVirtualMapModel} = PandoraLibrary.dataStructures.hashMap;
 
 const {BlockInfoByHashMapElementSchemaBuilt} = require( "./block-info-by-hash-map-element-schema-build")
 

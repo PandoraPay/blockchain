@@ -1,6 +1,6 @@
-const {DBModel} = require('kernel').db;
-const {Helper, Exception, BufferHelper, StringHelper} = require('kernel').helpers;
-const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
+const {DBModel} = PandoraLibrary.db;
+const {Helper, Exception, BufferHelper, StringHelper} = PandoraLibrary.helpers;
+const  {setAsyncInterval, clearAsyncInterval} = PandoraLibrary.helpers.AsyncInterval;
 
 const DelegatedStakeModel = require( "./delegated-stake/delegated-stake-model")
 const {WalletStakesSchemaBuilt} = require( "./wallet-stakes-schema-build")

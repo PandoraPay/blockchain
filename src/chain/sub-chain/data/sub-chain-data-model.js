@@ -1,4 +1,4 @@
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const BaseChainDataModel = require( "../../base/base-chain-data-model");
 const BlockModel = require( "../../../block/block-model")

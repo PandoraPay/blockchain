@@ -1,4 +1,4 @@
-const {Helper, BufferHelper} = require('kernel').helpers;
+const {Helper, BufferHelper} = PandoraLibrary.helpers;
 
 module.exports = (argv) =>  Helper.merge( argv, {
 

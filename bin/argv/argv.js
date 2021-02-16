@@ -1,4 +1,4 @@
-const {Helper} = require('kernel').helpers;
+const {Helper} = PandoraLibrary.helpers;
 
 const ArgvBlockchain = require("./modules/blockchain/argv-blockchain")
 const ArgvBlock = require("./modules/block/argv-block")

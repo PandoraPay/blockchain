@@ -1,6 +1,6 @@
 const {ChainSimpleTxSchemaBuild} = require('../../simple-transaction/chain-simple-tx-schema-build')
-const {TxTypeEnum, TxScriptTypeEnum, TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
-const {Helper, Exception} = require('kernel').helpers;
+const {TxTypeEnum, TxScriptTypeEnum, TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const { ChainTokenUpdateSupplyDataSchemaBuilt } = require('./data/chain-token-update-supply-data-schema-build')
 

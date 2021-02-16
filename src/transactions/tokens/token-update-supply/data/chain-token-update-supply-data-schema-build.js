@@ -1,5 +1,5 @@
-const {SchemaBuild} = require('kernel').marshal;
-const {Helper, Exception} = require('kernel').helpers;
+const {SchemaBuild} = PandoraLibrary.marshal;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 class ChainTokenUpdateSupplyDataSchemaBuild extends SchemaBuild {
 

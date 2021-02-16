@@ -1,8 +1,8 @@
-const {EncryptedModel} = require('cryptography').models;
-const {EncryptedTypeEnum} = require('cryptography').enums;
-const {Helper, Exception, BufferHelper, StringHelper} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
-const {AddressModel} = require('cryptography').addresses.address;
+const {EncryptedModel} = PandoraLibrary.models;
+const {EncryptedTypeEnum} = PandoraLibrary.enums;
+const {Helper, Exception, BufferHelper, StringHelper} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
+const {AddressModel} = PandoraLibrary.addresses.address;
 
 const WalletAddressModel = require( "../addresses/wallet-address-model");
 const WalletAddressTypeEnum = require( "../addresses/wallet-address-type-enum");

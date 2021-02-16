@@ -1,6 +1,6 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper} = require('kernel').helpers;
-const {MarshalData} = require('kernel').marshal;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper} = PandoraLibrary.helpers;
+const {MarshalData} = PandoraLibrary.marshal;
 
 class BaseChainDataSchemaBuild extends DBSchemaBuild {
 

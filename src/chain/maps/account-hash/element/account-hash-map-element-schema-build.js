@@ -1,5 +1,5 @@
-const {HashMapElementSchemaBuild} = require('kernel').dataStructures.hashMap.schema.HashMapElementSchemaBuild;
-const {Helper, Exception} = require('kernel').helpers;
+const {HashMapElementSchemaBuild} = PandoraLibrary.dataStructures.hashMap.schema.HashMapElementSchemaBuild;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const AccountDataBalanceModel = require( "./data/account-data-balance-model")
 const AccountDataDelegateModel = require( "./data/account-data-delegate-model")

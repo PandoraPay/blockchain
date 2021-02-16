@@ -1,5 +1,5 @@
-const {DBSchemaBuild} = require('kernel').db;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
+const {DBSchemaBuild} = PandoraLibrary.db;
+const {Helper, EnumHelper, Exception} = PandoraLibrary.helpers;
 
 class BlockPoSSchemaBuild extends DBSchemaBuild {
 

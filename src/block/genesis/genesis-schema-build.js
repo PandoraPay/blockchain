@@ -1,5 +1,5 @@
 const {BlockSchemaBuild} = require('../block-schema-build')
-const {Helper} = require('kernel').helpers;
+const {Helper} = PandoraLibrary.helpers;
 
 class GenesisSchemaBuild extends BlockSchemaBuild {
 

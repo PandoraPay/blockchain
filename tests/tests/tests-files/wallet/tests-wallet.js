@@ -1,5 +1,5 @@
-const {describe} = require('kernel').tests;
-const {Helper, BufferHelper} = require('kernel').helpers;
+const {describe} = PandoraLibrary.tests;
+const {Helper, BufferHelper} = PandoraLibrary.helpers;
 
 module.exports = function run () {
 

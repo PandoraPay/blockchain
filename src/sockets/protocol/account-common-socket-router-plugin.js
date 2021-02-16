@@ -1,6 +1,6 @@
-const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = require('networking').sockets.protocol;
-const {Exception} = require('kernel').helpers;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
+const {SocketRouterPlugin, StringHelper, BufferHelper, EnumHelper} = PandoraLibrary.sockets.protocol;
+const {Exception} = PandoraLibrary.helpers;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
 
 /**
  * https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_calls_list

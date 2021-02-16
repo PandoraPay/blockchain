@@ -1,5 +1,5 @@
-const {DBModel} = require('kernel').db;
-const {BufferHelper} = require('kernel').helpers;
+const {DBModel} = PandoraLibrary.db;
+const {BufferHelper} = PandoraLibrary.helpers;
 
 const WalletAddressTypeEnum = require("./addresses/wallet-address-type-enum")
 const WalletManager = require("./manager/wallet-manager")

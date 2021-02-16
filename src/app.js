@@ -1,8 +1,5 @@
-const kernel = require('kernel');
-const networking = require('networking');
-const cryptopgrahy = require('cryptography');
-const {NetworkTypeEnum} = require('kernel').enums;
-const {Helper, Exception, BufferHelper} = require('kernel').helpers;
+const {NetworkTypeEnum} = PandoraLibrary.enums;
+const {Helper, Exception, BufferHelper} = PandoraLibrary.helpers;
 
 const Argv = require( "../bin/argv/argv")
 const MainChain = require( "../src/chain/main-chain/main-chain");
@@ -27,7 +24,7 @@ const Testnet = require( "./testnet/testnet")
 
 const Tests = require( '../tests/tests/tests-index');
 
-module.exports = class App extends kernel.utils.App {
+module.exports = class App extends PandoraLibrary.utils.App {
 
     constructor(args){
         super(args);
@@ -68,8 +65,7 @@ module.exports = class App extends kernel.utils.App {
 
     setAdditionalEvents(){
 
-        cryptopgrahy.app.setAdditionalEvents.call(this);
-        networking.app.setAdditionalEvents.call(this);
+        super.setAdditionalEvents()
 
         this.events.on("start/argv-set", () =>{
 

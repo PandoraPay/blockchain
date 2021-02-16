@@ -1,5 +1,5 @@
 const {SubChainDataSchemaBuild} = require('../../sub-chain/data/sub-chain-data-schema-build')
-const {Helper, Exception} = require('kernel').helpers;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 class ForkSubChainDataSchemaBuild extends SubChainDataSchemaBuild {
 

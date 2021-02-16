@@ -1,6 +1,6 @@
-const {DBModel} = require('kernel').db;
-const {Helper, EnumHelper, Exception} = require('kernel').helpers;
-const {CryptoHelper} = require('kernel').helpers.crypto;
+const {DBModel} = PandoraLibrary.db;
+const {Helper, EnumHelper, Exception} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
 const {WalletAddressTransparentKeySchemaBuilt} = require('./wallet-address-transparent-keys-schema-build')
 

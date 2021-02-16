@@ -1,4 +1,4 @@
-const {DBModel} = require('kernel').db;
+const {DBModel} = PandoraLibrary.db;
 
 const {TokenDataSchemaBuilt} = require('./token-data-schema-build')
 

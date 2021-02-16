@@ -1,4 +1,4 @@
-const {DBModel} = require('kernel').db;
+const {DBModel} = PandoraLibrary.db;
 const {AccountDataBalanceSchemaBuilt} = require('./account-data-balance-schema-build')
 
 module.exports = class AccountDataBalanceModel extends DBModel {

@@ -1,5 +1,5 @@
 const {BaseChainDataSchemaBuild} = require( "../../base/base-chain-data-schema-build");
-const {Helper} = require('kernel').helpers;
+const {Helper} = PandoraLibrary.helpers;
 
 class MainChainDataSchemaBuild extends BaseChainDataSchemaBuild {
 

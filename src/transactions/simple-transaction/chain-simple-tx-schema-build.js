@@ -1,5 +1,5 @@
-const {SimpleTxSchemaBuild} = require('cryptography').transactions.simpleTransaction.SimpleTxSchemaBuild;
-const {Helper, Exception, EnumHelper} = require('kernel').helpers;
+const {SimpleTxSchemaBuild} = PandoraLibrary.transactions.simpleTransaction.SimpleTxSchemaBuild;
+const {Helper, Exception, EnumHelper} = PandoraLibrary.helpers;
 
 class ChainSimpleTxSchemaBuild extends SimpleTxSchemaBuild {
 

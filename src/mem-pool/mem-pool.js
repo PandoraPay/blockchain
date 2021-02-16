@@ -1,4 +1,4 @@
-const {Helper, Exception, StringHelper, ArrayHelper} = require('kernel').helpers;
+const {Helper, Exception, StringHelper, ArrayHelper} = PandoraLibrary.helpers;
 
 module.exports =  class MemPool {
 

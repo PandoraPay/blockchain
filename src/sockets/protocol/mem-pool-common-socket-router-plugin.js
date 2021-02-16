@@ -1,5 +1,5 @@
-const {SocketRouterPlugin} = require('networking').sockets.protocol;
-const {Helper, Exception, StringHelper, EnumHelper} = require('kernel').helpers;
+const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
+const {Helper, Exception, StringHelper, EnumHelper} = PandoraLibrary.helpers;
 
 module.exports = class MemPoolCommonSocketRouterPlugin extends SocketRouterPlugin {
 

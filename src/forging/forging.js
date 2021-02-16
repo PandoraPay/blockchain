@@ -1,5 +1,5 @@
-const  {setAsyncInterval, clearAsyncInterval} = require('kernel').helpers.AsyncInterval;
-const {Helper, Exception} = require('kernel').helpers;
+const  {setAsyncInterval, clearAsyncInterval} = PandoraLibrary.helpers.AsyncInterval;
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 const ForgeBlock = require( "./forge-block")
 

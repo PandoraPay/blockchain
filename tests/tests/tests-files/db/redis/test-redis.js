@@ -1,7 +1,7 @@
-const  {Helper} = require('kernel').helpers;
-const {describe} = require('kernel').tests;
-const {DBConstructor} = require('kernel').db;
-const {cluster} = require('kernel').masterCluster;
+const  {Helper} = PandoraLibrary.helpers;
+const {describe} = PandoraLibrary.tests;
+const {DBConstructor} = PandoraLibrary.db;
+const {cluster} = PandoraLibrary.masterCluster;
 
 const TestBlock = require("../tests/block/test-block");
 const TestChainCluster = require( "../tests/chain/test-chain-cluster");

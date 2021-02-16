@@ -1,6 +1,6 @@
-const {Exception, StringHelper, BufferReader, EnumHelper} = require('kernel').helpers;
-const {TxTokenCurrencyTypeEnum} = require('cryptography').transactions;
-const {MarshalData} = require('kernel').marshal;
+const {Exception, StringHelper, BufferReader, EnumHelper} = PandoraLibrary.helpers;
+const {TxTokenCurrencyTypeEnum} = PandoraLibrary.transactions;
+const {MarshalData} = PandoraLibrary.marshal;
 
 module.exports = class WalletTransfer {
 
@@ -55,9 +55,6 @@ module.exports = class WalletTransfer {
         const tokenCurrency = TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer;
 
         const walletAddress = this.wallet.manager.getWalletAddressByAddress(address, false, password, networkByte );
-
-        if (delegate && typeof delegate.delegatePublicKeyHash === "string" && StringHelper.isHex(delegate.delegatePublicKeyHash ) )
-            delegate.delegatePublicKeyHash = MarshalData.marshalBuffer( Buffer.from( delegate.delegatePublicKeyHash, "hex"), 20, false, true );
 
         if (extra && !Buffer.isBuffer(extra) )
             extra = await this.generateExtra(extra.extraMessage, extra.extraEncryptionOption);
