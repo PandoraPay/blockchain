@@ -52,19 +52,19 @@ module.exports = class BlockPoSModel extends DBModel {
         let delegateStakeForgerPublicKeyHash;
 
         let delegated;
-        if ( !accountNode.delegate.delegatePublicKeyHash.length || accountNode.delegate.delegatePublicKeyHash.equals( this.stakeForgerPublicKeyHash ) ) { //empty no delegation
+        if ( !accountNode.delegate.delegateStakePublicKeyHash.length || accountNode.delegate.delegateStakePublicKeyHash.equals( this.stakeForgerPublicKeyHash ) ) { //empty no delegation
             delegated = false;
         }
         else {
-            delegateStakeForgerPublicKeyHash = accountNode.delegate.delegatePublicKeyHash;
+            delegateStakeForgerPublicKeyHash = accountNode.delegate.delegateStakePublicKeyHash;
             delegated = true;
         }
 
         return {
             delegateStakeForgerPublicKeyHash,
             delegated,
-            delegateFee: accountNode.delegate.delegateFee,
-            delegateNonce: accountNode.delegate.delegateNonce,
+            delegateStakeFee: accountNode.delegate.delegateStakeFee,
+            delegateStakeNonce: accountNode.delegate.delegateStakeNonce,
             accountNode,
         }
     }
@@ -111,7 +111,7 @@ module.exports = class BlockPoSModel extends DBModel {
         const sum = fees;
         sum[ TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ] =  (sum[TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0) + coinbase; //reward
 
-        const { delegated,  delegateFee } = await this._getStakeDelegateForgerPublicKeyHash(chain, chainData);
+        const { delegated,  delegateStakeFee } = await this._getStakeDelegateForgerPublicKeyHash(chain, chainData);
 
         let distributions = {};
 
@@ -126,7 +126,7 @@ module.exports = class BlockPoSModel extends DBModel {
 
         } else { //delegated
 
-            const percentFee = delegateFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+            const percentFee = delegateStakeFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
             if (percentFee < 0 || percentFee > 1) throw new Exception(this, "Percent is invalid", {percentFee});
 
             for (const tokenCurrency in sum){

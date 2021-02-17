@@ -81,11 +81,11 @@ module.exports = class ForgeBlock {
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
-            const {delegated, delegateFee} = await block.pos._getStakeDelegateForgerPublicKeyHash();
+            const {delegated, delegateStakeFee} = await block.pos._getStakeDelegateForgerPublicKeyHash();
 
             if (this._scope.forging.reset) return;
 
-            if ( delegated && delegateFee )
+            if ( delegated && delegateStakeFee )
                 block.pos.stakeDelegateRewardPublicKeyHash = walletStakeDelegateRewardPublicKeyHash;
 
 
@@ -148,7 +148,7 @@ module.exports = class ForgeBlock {
 
                 if ( !delegatedStake.checkStake(block.height) ) break; //they are all sorted
 
-                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.publicKey, delegatedStake.delegatePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.publicKey, delegatedStake.delegateStakePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {

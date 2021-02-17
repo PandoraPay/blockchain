@@ -8,7 +8,7 @@ module.exports = class AccountDataBalanceModel extends DBModel {
     }
 
     isDataEmpty(){
-        if ( !this.delegateNonce && !this.delegatePublicKeyHash.length && !this.delegateFee ) return true;
+        if ( !this.delegateStakeNonce && !this.delegateStakePublicKeyHash.length && !this.delegateStakeFee ) return true;
         return false;
     }
 }

@@ -49,7 +49,7 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                         position: 102,
                     },
 
-                    delegatePublicKeyHash: {
+                    delegateStakePublicKeyHash: {
                         type: "buffer",
 
                         minSize: 0,
@@ -59,7 +59,7 @@ class DelegatedStakeSchemaBuild extends DBSchemaBuild{
                         position: 103,
                     },
 
-                    delegatePrivateKey: {
+                    delegateStakePrivateKey: {
                         type: "buffer",
                         minSize: 32,
                         axSize: 32,

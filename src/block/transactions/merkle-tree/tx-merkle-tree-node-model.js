@@ -1,5 +1,4 @@
 const {MerkleTreeNodeModel, MerkleTreeNodeTypeEnum} = PandoraLibrary.dataStructures.merkleTree;
-const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
 const {TxMerkleTreeNodeSchemaBuilt} = require('./schema/tx-merkle-tree-node-schema-build')
 

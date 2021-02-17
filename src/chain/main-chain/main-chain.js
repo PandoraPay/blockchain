@@ -356,8 +356,6 @@ module.exports = class MainChain extends BaseChain {
             if (this._scope.commonSocketRouterPluginsMap)
                 await this._scope.commonSocketRouterPluginsMap.blockchainProtocolCommonSocketRouterPlugin.propagateNewBlock( senderSockets );
 
-            //TODO mark that the chain was saved correctly
-
         } catch (err){
 
             this._scope.logger.error(this, "addBlock raised an error", err);

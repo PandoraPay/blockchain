@@ -206,12 +206,12 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
     }
 
-    async updateDelegate( publicKeyHash, delegateNonceUpdate, delegatePublicKeyHash, delegateFee ){
+    async updateDelegate( publicKeyHash, delegateStakeNonceUpdate, delegateStakePublicKeyHash, delegateStakeFee ){
 
-        if (!Buffer.isBuffer(delegatePublicKeyHash) && StringHelper.isHex(delegatePublicKeyHash) ) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
+        if (!Buffer.isBuffer(delegateStakePublicKeyHash) && StringHelper.isHex(delegateStakePublicKeyHash) ) delegateStakePublicKeyHash = Buffer.from(delegateStakePublicKeyHash, "hex");
 
-        if (delegateNonceUpdate > 1 || delegateNonceUpdate < -1) throw new Exception(this, "Value is bigger than 1 or less than -1");
-        if (delegateFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateFee is larger than percentage fee ", {delegateFee});
+        if (delegateStakeNonceUpdate > 1 || delegateStakeNonceUpdate < -1) throw new Exception(this, "Value is bigger than 1 or less than -1", {delegateStakeNonceUpdate});
+        if (delegateStakeFee > this._scope.argv.transactions.staking.delegateStakingFeePercentage ) throw new Exception(this, "delegateStakeFee is larger than percentage fee ", {delegateStakeFee});
 
         publicKeyHash = this.processLeafLabel(publicKeyHash);
 
@@ -221,9 +221,9 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
         if (prevDelegate !== undefined ){
 
-            node.delegate.delegateNonce = prevDelegate.delegateNonce + delegateNonceUpdate;
-            node.delegate.delegatePublicKeyHash = delegatePublicKeyHash;
-            node.delegate.delegateFee = delegateFee;
+            node.delegate.delegateStakeNonce = prevDelegate.delegateStakeNonce + delegateStakeNonceUpdate;
+            node.delegate.delegateStakePublicKeyHash = delegateStakePublicKeyHash;
+            node.delegate.delegateStakeFee = delegateStakeFee;
 
             if ( node.isDataEmpty() ){
                 await this.deleteMap(publicKeyHash);
@@ -236,7 +236,7 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
 
         } else {
 
-            throw new Exception(this, "updateDelegate error - account doesn't exist", {publicKeyHash: publicKeyHash, delegateNonceUpdate, delegatePublicKeyHash, delegateFee });
+            throw new Exception(this, "updateDelegate error - account doesn't exist", {publicKeyHash: publicKeyHash, delegateStakeNonceUpdate, delegateStakePublicKeyHash, delegateStakeFee });
 
         }
     }

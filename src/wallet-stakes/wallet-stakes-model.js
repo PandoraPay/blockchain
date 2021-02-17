@@ -26,32 +26,8 @@ module.exports = class WalletStakesModel extends DBModel{
 
             this._scope.logger.warn(this, "wallet-stakes-message", data.message);
 
-            if (data.message === "wallet-stakes/update-delegate-stake") {
-
-                try {
-                    const {publicKeyHash, delegatePublicKeyHash, delegatePrivateKey} = data;
-
-
-                    const oldDelegateStake = this.delegatedStakesMap[publicKeyHash];
-                    if (oldDelegateStake) {
-
-                        if (oldDelegateStake.delegatePublicKeyHash.toString("hex") === delegatePublicKeyHash && oldDelegateStake.delegatePrivateKey.toString("hex") === delegatePrivateKey )
-                            return true;
-
-                        oldDelegateStake.delegatePublicKeyHash = delegatePublicKeyHash;
-                        oldDelegateStake.delegatePrivateKey = delegatePrivateKey;
-
-                        await oldDelegateStake.save();
-
-                        return true;
-                    }
-
-                    return false;
-
-                } catch (err) {
-                    this._scope.logger.error(this, "update-delegate-stake raised an error", err);
-                }
-
+            if (data.message === "is-address-included") {
+                return !!this.delegatedStakesMap[data.publicKeyHash];
             }
 
         });
@@ -64,16 +40,26 @@ module.exports = class WalletStakesModel extends DBModel{
 
     }
 
-    async addWalletStake({publicKey, delegatePublicKeyHash, delegatePrivateKey}){
+    async walletStakeAlreadyIncluded(publicKeyHash){
+
+        if (typeof publicKeyHash === "string" && StringHelper.isHex(publicKeyHash)) publicKeyHash = Buffer.from(publicKeyHash, "hex");
+        if (!Buffer.isBuffer(publicKeyHash) || publicKeyHash.length !== 20) throw new Exception(this, 'Invalid PublicKeyHash');
+
+        const out = await this._scope.masterCluster.send( "wallet-stakes", {
+            message: "is-address-included",
+            publicKeyHash: publicKeyHash.toString('hex'),
+        }, true, true);
+
+        return out.reduce( (res, it) => res || it, false );
+    }
+
+    async addWalletStake({publicKey, delegateStakePrivateKey}){
 
         if (typeof publicKey === "string" && StringHelper.isHex(publicKey)) publicKey = Buffer.from(publicKey, "hex");
-        if (typeof delegatePublicKeyHash === "string" && StringHelper.isHex(delegatePublicKeyHash)) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
-        if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
+        if (typeof delegateStakePrivateKey === "string" && StringHelper.isHex(delegateStakePrivateKey)) delegateStakePrivateKey = Buffer.from(delegateStakePrivateKey, "hex");
 
-        const delegatorStakePrivateKeyModel = this._scope.cryptography.addressGenerator.generatePrivateKeyModelFromPrivateKey(delegatePrivateKey);
-
-        if ( !delegatorStakePrivateKeyModel.publicKey.equals(delegatePublicKeyHash) )
-            throw new Exception(this, "Your stake delegate's public key is not matching with the private key", delegatorStakePrivateKeyModel.publicKey );
+        const delegateStakePrivateKeyModel = this._scope.cryptography.addressGenerator.generatePrivateKeyModelFromPrivateKey(delegateStakePrivateKey);
+        const delegateStakePublicKeyModel = delegateStakePrivateKeyModel.getAddress();
 
         const publicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash( publicKey );
 
@@ -82,8 +68,8 @@ module.exports = class WalletStakesModel extends DBModel{
             throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
-        if (!delegate || !delegate.delegatePublicKeyHash.equals( delegatePublicKeyHash ))
-            throw new Exception(this, "You need to delegate your stake to the following public key", delegatePublicKeyHash );
+        if (!delegate || !delegate.delegateStakePublicKeyHash.equals( delegateStakePublicKeyModel.publicKeyHash ))
+            throw new Exception(this, "You need to delegate your stake to the following public key", delegateStakePublicKeyModel.publicKeyHash );
 
         const lock = await this.lock(-1, -1, 50, publicKeyHash.toString("hex") );
 
@@ -94,8 +80,8 @@ module.exports = class WalletStakesModel extends DBModel{
             const exists = await this._scope.masterCluster.sendMessage( "wallet-stakes", {
                 message: "wallet-stakes/update-delegate-stake",
                 publicKeyHash: publicKeyHash.toString("hex"),
-                delegatePublicKeyHash: delegatePublicKeyHash.toString("hex"),
-                delegatePrivateKey: delegatePrivateKey.toString("hex"),
+                delegateStakePublicKeyHash: delegateStakePublicKeyHash.toString("hex"),
+                delegateStakePrivateKey: delegateStakePublicKeyModel.privateKey.toString("hex"),
             }, true, true );
 
             //this._scope.logger.log(this, "exists", exists);
@@ -111,8 +97,8 @@ module.exports = class WalletStakesModel extends DBModel{
                 id: publicKeyHash.toString("hex"),
                 publicKey: publicKey.toString("hex"),
                 publicKeyHash: publicKeyHash.toString("hex"),
-                delegatePublicKeyHash: delegatePublicKeyHash.toString("hex"),
-                delegatePrivateKey: delegatePrivateKey.toString("hex"),
+                delegateStakePublicKeyHash: delegateStakePublicKeyHash.toString("hex"),
+                delegateStakePrivateKey: delegateStakePrivateKey.toString("hex"),
                 amount: stakingAmount,
                 errorDelegatePrivateKeyChanged: false,
             }, "object" );
@@ -180,7 +166,7 @@ module.exports = class WalletStakesModel extends DBModel{
             delegatedStake.amount = stakingAmount;
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( delegatedStake.publicKeyHash );
-        if (!delegate || !delegate.delegatePublicKeyHash.equals( delegatedStake.delegatePublicKeyHash ))
+        if (!delegate || !delegate.delegateStakePublicKeyHash.equals( delegatedStake.delegateStakePublicKeyHash ))
             delegatedStake.errorDelegatePrivateKeyChanged = true;
         else
             delegatedStake.errorDelegatePrivateKeyChanged = false;

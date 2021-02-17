@@ -1,5 +1,6 @@
 const {SocketRouterPlugin} = PandoraLibrary.sockets.protocol;
 const {Helper, BufferHelper, StringHelper, Exception} = PandoraLibrary.helpers;
+const {CryptoHelper} = PandoraLibrary.helpers.crypto;
 
 module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRouterPlugin {
 
@@ -13,6 +14,12 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
     getOneWayRoutes(){
 
         return {
+
+            "wallet-stakes/is-delegating-open": {
+                handle:  this._isDelegatingOpen,
+                maxCallsPerSecond:  100,
+                descr: "returns a challenge for signature "
+            },
 
             "wallet-stakes/challenge": {
                 handle:  this._getChallenge,
@@ -36,39 +43,49 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
 
     }
 
+    async _isDelegatingOpen({publicKeyHash}){
+
+        let alreadyIncluded = false;
+
+        if (this._scope.argv.walletStakes.allowDelegating && publicKeyHash)
+            alreadyIncluded = await this._scope.walletStakes.walletStakeAlreadyIncluded( publicKeyHash );
+
+        return {
+            allowDelegating: this._scope.argv.walletStakes.allowDelegating,
+            minimumFeePercentage: this._scope.argv.walletStakes.minimumFeePercentage,
+            maximumDelegates: this._scope.argv.walletStakes.maximumDelegates,
+            availableSlots: this._scope.argv.walletStakes.maximumDelegates - this._scope.walletStakes.delegatedStakesList,
+            alreadyIncluded,
+        }
+    }
+
     _getChallenge(){
         return this._challenge;
     }
 
-    async _importWalletStake({ publicKey, signature, delegatePublicKeyHash, delegatePrivateKey }){
+    async _importWalletStake({ publicKey, signature, delegateStakePrivateKey }){
 
         if (!this._scope.argv.walletStakes.allowDelegating)
             throw new Exception(this, "Delegating Stakes is not allowed");
 
         if (typeof publicKey === "string" && StringHelper.isHex(publicKey)) publicKey = Buffer.from(publicKey, "hex");
         if (typeof signature === "string" && StringHelper.isHex(signature)) signature = Buffer.from(signature, "hex");
-        if (typeof delegatePublicKeyHash === "string" && StringHelper.isHex(delegatePublicKeyHash)) delegatePublicKeyHash = Buffer.from(delegatePublicKeyHash, "hex");
-        if (typeof delegatePrivateKey === "string" && StringHelper.isHex(delegatePrivateKey)) delegatePrivateKey = Buffer.from(delegatePrivateKey, "hex");
+        if (typeof delegateStakePrivateKey === "string" && StringHelper.isHex(delegateStakePrivateKey)) delegateStakePrivateKey = Buffer.from(delegateStakePrivateKey, "hex");
 
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== 33) throw new Exception(this, "public key is invalid", publicKey);
         if (!Buffer.isBuffer(signature) || signature.length !== 65) throw new Exception(this, "signature is invalid", signature);
-        if (!Buffer.isBuffer(delegatePublicKeyHash) || delegatePublicKeyHash.length !== 20) throw new Exception(this, "delegatePublicKeyHash is invalid", delegatePublicKeyHash);
-        if ( delegatePrivateKey && (!Buffer.isBuffer(delegatePrivateKey) || delegatePrivateKey.length !== 32) ) throw new Exception(this, "delegatePrivateKey is invalid", delegatePrivateKey);
-
-        if ( !delegatePublicKeyHash.length )
-            throw new Exception(this, "You need to delegate first. Your stake is not delegated");
+        if ( delegateStakePrivateKey && (!Buffer.isBuffer(delegateStakePrivateKey) || delegateStakePrivateKey.length !== 32) ) throw new Exception(this, "delegateStakePrivateKey is invalid", delegatePrivateKey);
 
         const concat = Buffer.concat([
             this._challenge,
             publicKey,
-            delegatePublicKeyHash,
-            delegatePrivateKey ? delegatePrivateKey : Buffer.alloc(0),
+            delegateStakePrivateKey,
         ]);
 
-        const verify = this._scope.cryptography.cryptoSignature.verify( concat, signature, publicKey );
+        const verify = this._scope.cryptography.cryptoSignature.verify( CryptoHelper.dkeccak256(concat), signature, publicKey );
         if (!verify) throw new Exception(this, "Signature is invalid");
 
-        const out = await this._scope.walletStakes.addWalletStake({publicKey, delegatePublicKeyHash, delegatePrivateKey});
+        const out = await this._scope.walletStakes.addWalletStake({publicKey, delegateStakePrivateKey});
 
         return out;
 
@@ -82,7 +99,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         for (let i=0; i < delegatedStakesList.length; i++){
             out.push({
                 publicKeyHash: delegatedStakesList[i].publicKeyHash,
-                delegatePublicKeyHash: delegatedStakesList[i].delegatePublicKeyHash,
+                delegateStakePublicKeyHash: delegatedStakesList[i].delegateStakePublicKeyHash,
             });
         }
 

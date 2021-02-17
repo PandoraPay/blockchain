@@ -93,7 +93,7 @@ module.exports = class AccountCommonSocketRouterPlugin extends SocketRouterPlugi
             const account = await this._scope.mainChain.data.accountHashMap.getAccountNode( publicKeyHash );
             if (account) {
                 const result = account.toJSON();
-                result.delegate.delegatePublicKeyHash = account.delegate.delegatePublicKeyHash.toString('hex');
+                result.delegate.delegateStakePublicKeyHash = account.delegate.delegateStakePublicKeyHash.toString('hex');
                 return {
                     type: "transparent",
                     found: true,

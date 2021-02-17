@@ -21,12 +21,12 @@ module.exports = class WalletAddressModel extends DBModel {
         return this.mnemonicSequenceIndex.decryptKey();
     }
 
-    decryptGetDelegateStakePrivateKeyModel( delegateNonce ){
+    decryptGetDelegateStakePrivateKeyModel( delegateStakeNonce ){
         this.wallet.encryption.decryptWallet();
         const privateKey = this.keys.decryptPrivateKey();
         const privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( { privateKey, } );
 
-        return privateKeyModel.getDelegateStakePrivateKeyModel(delegateNonce);
+        return privateKeyModel.getDelegateStakePrivateKeyModel(delegateStakeNonce);
     }
 
 }

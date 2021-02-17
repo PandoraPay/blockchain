@@ -9,12 +9,12 @@ class AccountDataDelegateSchemaBuild extends DBSchemaBuild {
 
             fields: {
 
-                delegateNonce: {
+                delegateStakeNonce: {
                     type: "number",
                     position: 100,
                 },
 
-                delegatePublicKeyHash: {
+                delegateStakePublicKeyHash: {
                     type: "buffer",
 
                     minSize: 0,
@@ -28,11 +28,11 @@ class AccountDataDelegateSchemaBuild extends DBSchemaBuild {
                     position: 101,
                 },
 
-                delegateFee: {
+                delegateStakeFee: {
                     type: "number",
 
-                    validation(delegateFee){
-                        return delegateFee <= this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+                    validation(delegateStakeFee){
+                        return delegateStakeFee <= this._scope.argv.transactions.staking.delegateStakingFeePercentage;
                     },
 
                     position: 102,

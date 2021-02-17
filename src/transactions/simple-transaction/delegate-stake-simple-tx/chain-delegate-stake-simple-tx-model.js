@@ -23,8 +23,8 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         if (!delegate) throw new Exception(this, "delegate doesn't exist");
 
-        if ( this.delegate.delegateNonce < delegate.delegateNonce   ) throw new Exception(this, "Delegate.delegateNonce should be greater or equal with the previous value");
-        if ( this.delegate.delegateNonce > delegate.delegateNonce+1   ) throw new Exception(this, "Delegate.delegateNonce shouldn't that much big");
+        if ( this.delegate.delegateStakeNonce < delegate.delegateStakeNonce   ) throw new Exception(this, "Delegate.delegateStakeNonce should be greater or equal with the previous value");
+        if ( this.delegate.delegateStakeNonce > delegate.delegateStakeNonce+1   ) throw new Exception(this, "Delegate.delegateStakeNonce shouldn't that much big");
 
         return true;
     }
@@ -34,8 +34,8 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         await super.transactionAdded(chain, chainData, block, merkleHeight, merkleLeafHeight);
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateNonce - prevDelegateNonce, this.delegate.delegatePublicKeyHash, this.delegate.delegateFee );
+        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateStakeNonce : 0;
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateStakeNonce - prevDelegateNonce, this.delegate.delegateStakePublicKeyHash, this.delegate.delegateStakeFee );
 
         return true;
     }
@@ -48,18 +48,18 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
 
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
-            delegateNonce: delegate.delegateNonce,
-            delegatePublicKeyHash: delegate.delegatePublicKeyHash.toString('hex'),
-            delegateFee: delegate.delegateFee,
+            delegateStakeNonce: delegate.delegateStakeNonce,
+            delegateStakePublicKeyHash: delegate.delegateStakePublicKeyHash.toString('hex'),
+            delegateStakeFee: delegate.delegateStakeFee,
         };
     }
 
     async processTransactionRevertInfoPreviousState( revertInfoData, chain = this._scope.chain, chainData = chain.data, block, merkleHeight, merkleLeafHeight ){
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
-        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateNonce : 0;
+        const prevDelegateNonce = prevDelegate ? prevDelegate.delegateStakeNonce : 0;
 
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, prevDelegateNonce - revertInfoData.delegateNonce, Buffer.from(revertInfoData.delegatePublicKeyHash, 'hex'), revertInfoData.delegateFee );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, revertInfoData.delegateStakeNonce - prevDelegateNonce, Buffer.from(revertInfoData.delegateStakePublicKeyHash, 'hex'), revertInfoData.delegateStakeFee );
 
     }
 
