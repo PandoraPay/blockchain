@@ -1,5 +1,6 @@
 const BaseChain = require( "../base/base-chain")
 const SubChainData = require("./data/sub-chain-data-model");
+const {Helper, Exception} = PandoraLibrary.helpers;
 
 module.exports = class SubChain extends BaseChain{
 
@@ -75,18 +76,19 @@ module.exports = class SubChain extends BaseChain{
         if (this.data.blocksMapByHeight[block.height])
             throw new Exception(this, 'block already found', block.height );
 
-        if (!this.data.blocksMapByHeight[block.height]) {
-            let insertPosition;
-            for (let j = 0; j < this.data.listBlocks.length - 1; j++)
-                if (this.data.listBlocks[j].height < block.height && (j + 1 < this.data.listBlocks.length && this.data.listBlocks[j + 1].height > block.height)) {
-                    insertPosition = j;
-                    break;
-                }
-            this.data.pushArray( "listBlocks", block, "object", undefined, insertPosition );
-            this.data.pushArray( "listHashes", block.hash(), "object", undefined, insertPosition );
-        }
+        this.data.pushArray( "listBlocks", block, "object" );
 
-        await this.data.importBlock(block);
+        let found;
+        for (let i=0; i < this.data.listHashes.length; i++)
+            if (this.data.listHashes[i].buffer.equals( block.hash() )) {
+                found = true;
+                break;
+            }
+
+        if (!found)
+            this.data.pushArray( "listHashes", block.hash(), "object");
+
+        return this.data.importBlock(block);
 
     }
 

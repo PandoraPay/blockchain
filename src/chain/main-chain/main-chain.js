@@ -368,12 +368,16 @@ module.exports = class MainChain extends BaseChain {
 
                     this.data = oldData;
 
-                    for (const data of revertBackError){
+                    for (const data of revertBackError)
+                        if (data.type === "delete") {
+                            await data.block.delete();
+                            data.type = "done";
+                        }
+
+
+                    for (const data of revertBackError)
                         if (data.type === "save")
                             await data.block.save();
-                        else if (data.type === "delete")
-                            await data.block.delete();
-                    }
 
                     oldData.clearOnlyLocalBlocks();
 

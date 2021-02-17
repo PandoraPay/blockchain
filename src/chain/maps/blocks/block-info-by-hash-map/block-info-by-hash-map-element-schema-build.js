@@ -81,8 +81,8 @@ class BlockInfoByHashMapElementSchemaBuild extends BlockByHashMapElementSchemaBu
                 totalDifficulty: {
 
                     type: "bigNumber",
-
                     position: 20008,
+
                 },
 
             },

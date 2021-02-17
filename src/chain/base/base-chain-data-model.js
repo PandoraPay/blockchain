@@ -314,6 +314,9 @@ module.exports = class BaseChainDataModel extends DBModel {
             const block = this.blocksMapByHeight[height];
             delete this.blocksMapByHeight[height];
             delete this.blocksMapByHash[block.hash().toString('hex')];
+            const txs = await block.getTransactions();
+            for (const tx of txs)
+                delete this.transactionsMapByHash[ tx.hash().toString("hex") ];
             return true;
         }
 
