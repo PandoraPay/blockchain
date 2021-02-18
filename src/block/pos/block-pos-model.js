@@ -58,7 +58,7 @@ module.exports = class BlockPoSModel extends DBModel {
          */
         if (funds < this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: funds, stakingAmount: this.stakingAmount });
 
-        const delegatedAccountNode = await this._getForgerDelegatedNode(chainData);
+        const delegatedAccountNode = await this._getForgerDelegatedNode();
 
         if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, delegatedAccountNode.delegate.delegateStakePublicKey ) )
             throw new Exception(this, "POS signature is invalid");
@@ -66,8 +66,8 @@ module.exports = class BlockPoSModel extends DBModel {
         return true;
     }
 
-    async _getForgerDelegatedNode(chainData){
-        const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash);
+    async _getForgerDelegatedNode(chain = this._scope.chain, chainData = chain.data){
+        const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash.toString('hex'));
         if (!accountNode) throw new Exception(this, "Account was not found");
         if (accountNode.delegateVersion !== 1) throw new Exception(this, 'DelegateVersion is invalid');
         return accountNode;
@@ -81,7 +81,7 @@ module.exports = class BlockPoSModel extends DBModel {
         const sum = fees;
         sum[ TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ] =  (sum[TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0) + coinbase; //reward
 
-        const delegatedAccountNode = await this._getForgerDelegatedNode(chainData);
+        const delegatedAccountNode = await this._getForgerDelegatedNode();
 
         const distributions = {};
 

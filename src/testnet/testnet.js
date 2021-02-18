@@ -8,6 +8,7 @@ module.exports = class TestNet{
 
         this._testnetWallets = [];
         this._testnetWalletsSent = false;
+        this._testnetWalletsDelegateSent = false;
 
         this._prevBlockEnd = -1;
     }
@@ -35,10 +36,9 @@ module.exports = class TestNet{
 
                 const wallets = this._scope.wallet.addresses.map( it => it.keys.decryptAddress( ).calculateAddress() );
 
-
                 this._scope.masterCluster.sendMessage("testnet-wallet", {  wallets }, false );
 
-                this.createTestNetTransactionsToSlaveWallets();
+                this.createTestNetDelegateTransaction();
 
             }, 5000);
 
@@ -144,6 +144,42 @@ module.exports = class TestNet{
      *
      * @returns {Promise<void>}
      */
+
+    async createTestNetDelegateTransaction(){
+
+        let processing = false;
+
+        this._scope.mainChain.on("blocks/included", async ( {end} )=>{
+
+            if (this._testnetWalletsDelegateSent || processing) return;
+
+            try {
+                processing = true;
+
+                const amount = this._scope.argv.transactions.staking.getMinimumStakeRequiredForForging(end) * 80;
+                const wallet = await this._scope.wallet.transfer.findWalletAddressThatIsGreaterThanAmount( amount );
+                if (wallet && !this._testnetWalletsDelegateSent){
+
+                    await this._scope.wallet.transfer.delegateStake({
+                        address: wallet.keys.decryptAddress(),
+                        fee: 1,
+                        delegate: {
+                            delegateStakePublicKey: wallet.keys.decryptPublicKey(),
+                        }
+                    })
+
+                    this._testnetWalletsDelegateSent = true;
+                    this.createTestNetTransactionsToSlaveWallets();
+                }
+
+            }finally{
+                processing = false;
+            }
+
+
+        });
+
+    }
 
     async createTestNetTransactionsToSlaveWallets(){
 

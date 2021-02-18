@@ -10,12 +10,12 @@ module.exports = class ForkSubChain extends SubChain{
     mergeForks(forkSubChain2){
 
         this.data.forkEnd = forkSubChain2.data.forkEnd;
-        for (let i=0; i < forkSubChain2.data.listHashes.length; i++){
-
+        for (let i=0; i < forkSubChain2.data.listHashes.length; i++) {
             const hash = forkSubChain2.data.listHashes[i].buffer;
-            this.data.pushArray( "listHashes", hash, "object" );
-            this.data.blocksMapByHash[ hash.toString('hex')] = true;
-
+            if (!this.data.blocksMapByHash[hash.toString('hex')]) {
+                this.data.pushArray("listHashes", hash, "object");
+                this.data.blocksMapByHash[hash.toString('hex')] = true;
+            }
         }
 
         for (const socket of forkSubChain2.data.socketsList)

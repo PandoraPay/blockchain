@@ -19,12 +19,8 @@ module.exports = class AccountHashVirtualMapModel extends HashVirtualMapModel {
     }
 
     processLeafLabel(label){
-
         if (Buffer.isBuffer(label)) label = label.toString("hex");
-        if (typeof label !== "string" || label.length === 0) throw new Exception(this, "label length is invalid");
-
-        if (label.length !== 40) throw Error("label is not leaf");
-
+        if (typeof label !== "string" || label.length !== 40) throw new Exception(this, "label length is invalid");
         return label;
     }
 

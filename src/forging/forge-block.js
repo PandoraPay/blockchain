@@ -14,7 +14,14 @@ module.exports = class ForgeBlock {
 
     async _initializeBlockPOS(block, chain = block._scope.chain, chainData = chain.data){
 
-        let funds = await chain.data.accountHashMap.getBalance( block.pos.stakeForgerPublicKeyHash, TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer);
+        const delegatedAccountNode = await block.pos._getForgerDelegatedNode();
+
+        let funds;
+        for (const balance of delegatedAccountNode.balances)
+            if (balance.tokenCurrency.equals( TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.idBuffer ) ) {
+                funds = balance.amount;
+                break;
+            }
 
         //showing the number of coins
         //this._scope.logger.log(this, "I have money: ", block.pos.stakeForgerPublicKeyHash.toString("hex"), funds);
@@ -81,7 +88,7 @@ module.exports = class ForgeBlock {
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
-            const delegatedAccountNode = await block.pos._getForgerDelegatedNode(block._scope.chain.data);
+            const delegatedAccountNode = await block.pos._getForgerDelegatedNode();
 
             if (this._scope.forging.reset) return;
 

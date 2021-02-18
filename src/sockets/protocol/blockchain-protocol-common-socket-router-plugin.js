@@ -117,7 +117,7 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             //let's verify with all other forks, if they match, then we should merge them
             const forkSubChain2 = this._getForkSubChainByBlockHash( hash );
             if (forkSubChain2){
-                if (!forkSubChain2.data.processing && forkSubChain2.data.forkEnd < forkSubChain.data.forkEnd) {
+                if (forkSubChain2.data.ready && !forkSubChain2.data.processing && forkSubChain2.data.forkEnd < forkSubChain.data.forkEnd) {
                     forkSubChain2.mergeForks(forkSubChain);
                     return false;
                 }
@@ -316,8 +316,6 @@ module.exports = class BlockchainProtocolCommonSocketRouterPlugin extends Socket
             await forkSubChain.addBlocks(  [block] );
 
             forkSubChain.data.forkStart = forkSubChain.data.forkStart + 1 ;
-            if (forkSubChain.data.end === block.height)
-                forkSubChain.data.end = block.height+1;
 
         } catch (err){
 

@@ -43,7 +43,7 @@ module.exports = class SubChain extends BaseChain{
 
         blocks = await this.filterIdenticalBlocks(blocks);
 
-        if (blocks.length === 0) return false;
+        if ( !blocks.length ) return false;
 
         await this.data.spliceBlocks( this, blocks[0].height, );
 
