@@ -78,12 +78,12 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
 
         const delegateStakePrivateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( delegateStakePrivateKey );
         const delegateStakeAddressModel = delegateStakePrivateKeyModel.getAddressPublicKey();
-        const delegateStakePublicKeyHash = delegateStakeAddressModel.publicKeyHash;
+        const delegateStakePublicKey = delegateStakeAddressModel.publicKey;
 
         const concat = Buffer.concat([
             this._challenge,
             publicKey,
-            delegateStakePublicKeyHash,
+            delegateStakePublicKey,
             delegateStakePrivateKey ? delegateStakePrivateKeyModel.privateKey : Buffer.alloc(0),
         ]);
 
@@ -104,7 +104,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         for (let i=0; i < delegatedStakesList.length; i++){
             out.push({
                 publicKeyHash: delegatedStakesList[i].publicKeyHash,
-                delegateStakePublicKeyHash: delegatedStakesList[i].delegateStakePublicKeyHash,
+                delegateStakePublicKey: delegatedStakesList[i].delegateStakePublicKey,
             });
         }
 

@@ -14,16 +14,11 @@ class AccountDataDelegateSchemaBuild extends DBSchemaBuild {
                     position: 100,
                 },
 
-                delegateStakePublicKeyHash: {
+                delegateStakePublicKey: {
                     type: "buffer",
 
                     minSize: 0,
-                    maxSize: 20,
-                    specifyLength: true,
-
-                    validation(value){
-                        return value.length === 0 || value.length === 20;
-                    },
+                    maxSize: 33,
 
                     position: 101,
                 },

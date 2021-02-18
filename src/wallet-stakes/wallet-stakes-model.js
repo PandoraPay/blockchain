@@ -68,7 +68,7 @@ module.exports = class WalletStakesModel extends DBModel{
             throw new Exception(this, "Your don't have enough funds for staking or the node is not sync!", {stakingAmount} );
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( publicKeyHash );
-        if (!delegate || !delegate.delegateStakePublicKeyHash.equals( delegateStakePublicKeyModel.publicKeyHash ))
+        if (!delegate || !delegate.delegateStakePublicKey.equals( delegateStakePublicKeyModel.publicKey ))
             throw new Exception(this, "You need to delegate your stake to the following public key", delegateStakePublicKeyModel.publicKeyHash );
 
         const lock = await this.lock(-1, -1, 50, publicKeyHash.toString("hex") );
@@ -87,7 +87,6 @@ module.exports = class WalletStakesModel extends DBModel{
                 publicKeyHash: publicKeyHash.toString("hex"),
                 delegateStakePrivateKey: delegateStakePrivateKey.toString("hex"),
                 delegateStakePublicKey: delegateStakePrivateKeyModel.publicKey.toString("hex"),
-                delegateStakePublicKeyHash: delegateStakePublicKeyModel.publicKeyHash.toString("hex"),
                 amount: stakingAmount,
                 errorDelegatePrivateKeyChanged: false,
             }, "object" );
@@ -155,7 +154,7 @@ module.exports = class WalletStakesModel extends DBModel{
             delegatedStake.amount = stakingAmount;
 
         const delegate = await this._scope.mainChain.data.accountHashMap.getDelegate( delegatedStake.publicKeyHash );
-        if (!delegate || !delegate.delegateStakePublicKeyHash.equals( delegatedStake.delegateStakePublicKeyHash ))
+        if (!delegate || !delegate.delegateStakePublicKey.equals( delegatedStake.delegateStakePublicKey ))
             delegatedStake.errorDelegatePrivateKeyChanged = true;
         else
             delegatedStake.errorDelegatePrivateKeyChanged = false;

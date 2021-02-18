@@ -159,7 +159,7 @@ module.exports = class BlockModel extends DBModel {
             timestamp: this.timestamp,
             size: this.size(),
             txs: this.txCount(),
-            stakeForgerPublicKey: this.pos.stakeForgerPublicKey,
+            stakeForgerPublicKeyHash: this.pos.stakeForgerPublicKeyHash,
             totalDifficulty: this.totalDifficulty,
         }
     }

@@ -70,10 +70,10 @@ class BlockInfoByHashMapElementSchemaBuild extends BlockByHashMapElementSchemaBu
                     position: 20006,
                 },
 
-                stakeForgerPublicKey: {
+                stakeForgerPublicKeyHash: {
                     type: "buffer",
-                    maxSize: 33,
-                    minSize: 33,
+                    maxSize: 20,
+                    minSize: 20,
 
                     position: 20007,
                 },

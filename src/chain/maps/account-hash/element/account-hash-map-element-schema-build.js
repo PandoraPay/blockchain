@@ -52,11 +52,30 @@ class AccountHashMapElementSchemaBuild extends HashMapElementSchemaBuild {
                     position: 10002,
                 },
 
+                delegateVersion:{
+                    type: "number",
+                    default: 0,
+                    validation(delegateVersion){
+                        return (delegateVersion === 0 || delegateVersion === 1);
+                    },
+                    position: 10003,
+                },
+
                 delegate: {
                     type: "object",
                     modelClass: AccountDataDelegateModel,
 
-                    position: 10003,
+                    skipHashing(){
+                        return this.delegateVersion === 0;
+                    },
+                    skipMarshal(){
+                        return this.delegateVersion === 0;
+                    },
+                    skipSaving(){
+                        return this.delegateVersion === 0;
+                    },
+
+                    position: 10004,
                 },
 
             },

@@ -48,10 +48,10 @@ module.exports = class ForgeBlock {
 
     }
 
-    async forgeBlockWithPrivateKey(block, stakeForgerPublicKey, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
+    async forgeBlockWithPrivateKey(block, stakeForgerPublicKeyHash, stakeForgerDelegatePrivateKey, walletStakeDelegateRewardPublicKeyHash){
 
 
-        block.pos.stakeForgerPublicKey = stakeForgerPublicKey;
+        block.pos.stakeForgerPublicKeyHash = stakeForgerPublicKeyHash;
 
         //fill POS information into block
 
@@ -77,15 +77,15 @@ module.exports = class ForgeBlock {
         if ( kernelHash.compare ( block.target ) <= 0 ){
 
             console.log("");
-            this._scope.logger.info(this, "SOLUTION!!!", {height: block.height});
+            this._scope.logger.info(this, "SOLUTION!!!", {height: block.height, stakeForgerPublicKeyHash: stakeForgerPublicKeyHash.toString('hex') });
             this._scope.logger.info(this, block.target.toString("hex"));
             console.log("");
 
-            const {delegated, delegateStakeFee} = await block.pos._getStakeDelegateForgerPublicKeyHash();
+            const delegatedAccountNode = await block.pos._getForgerDelegatedNode(block._scope.chain.data);
 
             if (this._scope.forging.reset) return;
 
-            if ( delegated && delegateStakeFee )
+            if ( delegatedAccountNode.delegateStakeFee )
                 block.pos.stakeDelegateRewardPublicKeyHash = walletStakeDelegateRewardPublicKeyHash;
 
 
@@ -128,7 +128,7 @@ module.exports = class ForgeBlock {
 
                 const availableStakeAddress = this._scope.wallet.addresses[i];
 
-                const out = await this.forgeBlockWithPrivateKey(block, availableStakeAddress.keys.decryptPublicKey(), availableStakeAddress.keys.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, availableStakeAddress.keys.decryptPublicKeyHash(), availableStakeAddress.keys.decryptPrivateKey(), walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {
@@ -148,7 +148,7 @@ module.exports = class ForgeBlock {
 
                 if ( !delegatedStake.checkStake(block.height) ) break; //they are all sorted
 
-                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.delegateStakePublicKey, delegatedStake.delegateStakePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.publicKeyHash, delegatedStake.delegateStakePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {

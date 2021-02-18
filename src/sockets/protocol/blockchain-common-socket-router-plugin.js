@@ -128,9 +128,8 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
             timestamp: blockInfo.timestamp,
             size: blockInfo.size,
             txCount: blockInfo.txs,
-            forgedBy:  blockInfo.stakeForgerPublicKey,
-            hash: blockInfo.blockHash,
-            kernelHash: blockInfo.kernelHash,
+            forgedBy:  blockInfo.stakeForgerPublicKeyHash,
+            hash: blockInfo.blockHash,            kernelHash: blockInfo.kernelHash,
 
         };
 

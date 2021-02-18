@@ -9,13 +9,12 @@ class BlockPoSSchemaBuild extends DBSchemaBuild {
 
             fields: {
 
-                stakeForgerPublicKey: {
+                stakeForgerPublicKeyHash: {
                     type: "buffer",
-                    maxSize: 33,
-                    minSize: 33,
+                    maxSize: 20,
+                    minSize: 20,
 
                     preprocessor(publicKey) {
-                        delete this._stakeForgerPublicKeyHash;
                         delete this._stakeForgerAddress;
                         return publicKey;
                     },

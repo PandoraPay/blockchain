@@ -118,8 +118,9 @@ module.exports = class MainChain extends BaseChain {
 
         this._scope.logger.info(this, `Balance updated for Genesis ${this._scope.genesis.settings.stakes.publicKeyHash.toString('hex')}`)
         if (!this._scope.db.isSynchronized || this._scope.masterCluster.isMaster) {
+
             const reward = this._scope.argv.transactions.coinbase.getBlockRewardAt(0, 0 );
-            await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
+
             await this.data.tokenHashMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong.toString('hex'), {
                 data: {
                     version: 0,
@@ -140,7 +141,11 @@ module.exports = class MainChain extends BaseChain {
             });
             await this.data.tokenNameMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.name.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );
             await this.data.tokenTickerMap.addMap( TX_TOKEN_CURRENCY_NATIVE_TYPE.ticker.toUpperCase(), TX_TOKEN_CURRENCY_NATIVE_TYPE.idBufferLong );
+
+            await this.data.accountHashMap.updateBalance(this._scope.genesis.settings.stakes.publicKeyHash, reward );
+            await this.data.accountHashMap.updateDelegate(this._scope.genesis.settings.stakes.publicKeyHash, 0,  this._scope.wallet.addresses[0].keys.decryptPublicKey(), 0 );
             this.data.circulatingSupply = reward;
+
         }
 
         this.data.beingSaved = false;

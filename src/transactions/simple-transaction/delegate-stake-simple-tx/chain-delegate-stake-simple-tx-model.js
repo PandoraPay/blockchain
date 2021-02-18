@@ -35,7 +35,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
 
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateStakeNonce : 0;
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateStakeNonce - prevDelegateNonce, this.delegate.delegateStakePublicKeyHash, this.delegate.delegateStakeFee );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, this.delegate.delegateStakeNonce - prevDelegateNonce, this.delegate.delegateStakePublicKey, this.delegate.delegateStakeFee );
 
         return true;
     }
@@ -49,7 +49,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const delegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash );
         return {
             delegateStakeNonce: delegate.delegateStakeNonce,
-            delegateStakePublicKeyHash: delegate.delegateStakePublicKeyHash.toString('hex'),
+            delegateStakePublicKey: delegate.delegateStakePublicKey.toString('hex'),
             delegateStakeFee: delegate.delegateStakeFee,
         };
     }
@@ -59,7 +59,7 @@ module.exports = class ChainDelegateStakeSimpleTxModel extends ChainSimpleTxMode
         const prevDelegate = await chainData.accountHashMap.getDelegate( this.vin[0].publicKeyHash  );
         const prevDelegateNonce = prevDelegate ? prevDelegate.delegateStakeNonce : 0;
 
-        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, revertInfoData.delegateStakeNonce - prevDelegateNonce, Buffer.from(revertInfoData.delegateStakePublicKeyHash, 'hex'), revertInfoData.delegateStakeFee );
+        await chainData.accountHashMap.updateDelegate( this.vin[0].publicKeyHash, revertInfoData.delegateStakeNonce - prevDelegateNonce, Buffer.from(revertInfoData.delegateStakePublicKey, 'hex'), revertInfoData.delegateStakeFee );
 
     }
 

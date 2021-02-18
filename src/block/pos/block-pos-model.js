@@ -15,18 +15,10 @@ module.exports = class BlockPoSModel extends DBModel {
         return this._scope.parent;
     }
 
-    get stakeForgerPublicKeyHash(){
-
-        if (!this._stakeForgerPublicKeyHash)
-            this._stakeForgerPublicKeyHash = this._scope.cryptography.addressGenerator.generatePublicKeyHash(this.stakeForgerPublicKey);
-
-        return this._stakeForgerPublicKeyHash;
-    }
-
     get stakeForgerAddress(){
 
         if (!this._stakeForgerAddress)
-            this._stakeForgerAddress = this._scope.cryptography.addressGenerator.generateAddressFromPublicKey( this.stakeForgerPublicKey ).calculateAddress();
+            this._stakeForgerAddress = this._scope.cryptography.addressGenerator.generateAddressFromPublicKeyHash( this.stakeForgerPublicKeyHash ).calculateAddress();
 
         return this._stakeForgerAddress;
 
@@ -42,32 +34,6 @@ module.exports = class BlockPoSModel extends DBModel {
 
     get isStakeDelegateRewardPublicKeyHashEmpty(){
         return !this.stakeDelegateRewardPublicKeyHash.length;
-    }
-
-    async _getStakeDelegateForgerPublicKeyHash(chain = this._scope.chain, chainData = chain.data){
-
-        const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash);
-        if (!accountNode) throw new Exception(this, "Account was not found");
-
-        let delegateStakeForgerPublicKeyHash;
-
-        let delegated;
-
-        //empty no delegation
-        if ( !accountNode.delegate.delegateStakePublicKeyHash.length || accountNode.delegate.delegateStakePublicKeyHash.equals( this.stakeForgerPublicKeyHash ) )
-            delegated = false;
-        else {
-            delegateStakeForgerPublicKeyHash = accountNode.delegate.delegateStakePublicKeyHash;
-            delegated = true;
-        }
-
-        return {
-            delegated,
-            delegateStakeForgerPublicKeyHash,
-            delegateStakeFee: accountNode.delegate.delegateStakeFee,
-            delegateStakeNonce: accountNode.delegate.delegateStakeNonce,
-            accountNode,
-        }
     }
 
 
@@ -92,16 +58,19 @@ module.exports = class BlockPoSModel extends DBModel {
          */
         if (funds < this.stakingAmount) throw new Exception(this, "Account balance is not right", { balance: funds, stakingAmount: this.stakingAmount });
 
-        //verify signature
-        const { delegateStakeForgerPublicKeyHash } = await this._getStakeDelegateForgerPublicKeyHash(chain, chainData);
+        const delegatedAccountNode = await this._getForgerDelegatedNode(chainData);
 
-        if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, this.stakeForgerPublicKey ) )
+        if ( !this._scope.cryptography.cryptoSignature.verify( this._blockHashForForgerSignature(), this.stakeForgerSignature, delegatedAccountNode.delegate.delegateStakePublicKey ) )
             throw new Exception(this, "POS signature is invalid");
 
-        if (delegateStakeForgerPublicKeyHash && !delegateStakeForgerPublicKeyHash.equals( this.stakeForgerPublicKeyHash ))
-            throw new Exception(this, "POS delegate stake forger publick key hash is not matching");
-
         return true;
+    }
+
+    async _getForgerDelegatedNode(chainData){
+        const accountNode = await chainData.accountHashMap.getAccountNode(this.stakeForgerPublicKeyHash);
+        if (!accountNode) throw new Exception(this, "Account was not found");
+        if (accountNode.delegateVersion !== 1) throw new Exception(this, 'DelegateVersion is invalid');
+        return accountNode;
     }
 
     async _getRewardDistribution(chain = this._scope.chain, chainData = chain.data){
@@ -112,12 +81,12 @@ module.exports = class BlockPoSModel extends DBModel {
         const sum = fees;
         sum[ TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id ] =  (sum[TxTokenCurrencyTypeEnum.TX_TOKEN_CURRENCY_NATIVE_TYPE.id] || 0) + coinbase; //reward
 
-        const { delegated,  delegateStakeFee } = await this._getStakeDelegateForgerPublicKeyHash(chain, chainData);
+        const delegatedAccountNode = await this._getForgerDelegatedNode(chainData);
 
-        let distributions = {};
+        const distributions = {};
 
         //not delegated or reward address not specified
-        if ( !delegated || this.stakeDelegateRewardPublicKeyHash.length ){ //me
+        if ( !this.stakeDelegateRewardPublicKeyHash.length ){ //me
             for (const tokenCurrency in sum){
                 distributions[tokenCurrency] = {
                     owner: sum[tokenCurrency],  //owner
@@ -127,13 +96,12 @@ module.exports = class BlockPoSModel extends DBModel {
 
         } else { //delegated
 
-            const percentFee = delegateStakeFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
+            const percentFee = delegatedAccountNode.delegate.delegateStakeFee / this._scope.argv.transactions.staking.delegateStakingFeePercentage;
             if (percentFee < 0 || percentFee > 1) throw new Exception(this, "Percent is invalid", {percentFee});
 
             for (const tokenCurrency in sum){
 
                 const delegatorFee = Math.round( sum[tokenCurrency] * percentFee );
-
                 distributions[tokenCurrency] = {
                     owner: sum[tokenCurrency] - delegatorFee, //owner
                     delegator: delegatorFee, //delegator
