@@ -52,17 +52,18 @@ module.exports = class BlockPoSModel extends DBModel {
         let delegateStakeForgerPublicKeyHash;
 
         let delegated;
-        if ( !accountNode.delegate.delegateStakePublicKeyHash.length || accountNode.delegate.delegateStakePublicKeyHash.equals( this.stakeForgerPublicKeyHash ) ) { //empty no delegation
+
+        //empty no delegation
+        if ( !accountNode.delegate.delegateStakePublicKeyHash.length || accountNode.delegate.delegateStakePublicKeyHash.equals( this.stakeForgerPublicKeyHash ) )
             delegated = false;
-        }
         else {
             delegateStakeForgerPublicKeyHash = accountNode.delegate.delegateStakePublicKeyHash;
             delegated = true;
         }
 
         return {
-            delegateStakeForgerPublicKeyHash,
             delegated,
+            delegateStakeForgerPublicKeyHash,
             delegateStakeFee: accountNode.delegate.delegateStakeFee,
             delegateStakeNonce: accountNode.delegate.delegateStakeNonce,
             accountNode,

@@ -148,7 +148,7 @@ module.exports = class ForgeBlock {
 
                 if ( !delegatedStake.checkStake(block.height) ) break; //they are all sorted
 
-                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.publicKey, delegatedStake.delegateStakePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
+                const out = await this.forgeBlockWithPrivateKey(block, delegatedStake.delegateStakePublicKey, delegatedStake.delegateStakePrivateKey, walletStakeDelegateRewardPublicKeyHash  );
 
                 if (out)
                     return {

@@ -85,8 +85,9 @@ module.exports = class WalletStakesModel extends DBModel{
                 id: publicKeyHash.toString("hex"),
                 publicKey: publicKey.toString("hex"),
                 publicKeyHash: publicKeyHash.toString("hex"),
-                delegateStakePublicKeyHash: delegateStakePublicKeyModel.publicKeyHash.toString("hex"),
                 delegateStakePrivateKey: delegateStakePrivateKey.toString("hex"),
+                delegateStakePublicKey: delegateStakePrivateKeyModel.publicKey.toString("hex"),
+                delegateStakePublicKeyHash: delegateStakePublicKeyModel.publicKeyHash.toString("hex"),
                 amount: stakingAmount,
                 errorDelegatePrivateKeyChanged: false,
             }, "object" );
