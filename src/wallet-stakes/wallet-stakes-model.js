@@ -45,7 +45,7 @@ module.exports = class WalletStakesModel extends DBModel{
         if (typeof publicKeyHash === "string" && StringHelper.isHex(publicKeyHash)) publicKeyHash = Buffer.from(publicKeyHash, "hex");
         if (!Buffer.isBuffer(publicKeyHash) || publicKeyHash.length !== 20) throw new Exception(this, 'Invalid PublicKeyHash');
 
-        const out = await this._scope.masterCluster.send( "wallet-stakes", {
+        const out = await this._scope.masterCluster.sendMessage( "wallet-stakes", {
             message: "is-address-included",
             publicKeyHash: publicKeyHash.toString('hex'),
         }, true, true);
@@ -77,27 +77,15 @@ module.exports = class WalletStakesModel extends DBModel{
 
         try{
 
-            const exists = await this._scope.masterCluster.sendMessage( "wallet-stakes", {
-                message: "wallet-stakes/update-delegate-stake",
-                publicKeyHash: publicKeyHash.toString("hex"),
-                delegateStakePublicKeyHash: delegateStakePublicKeyHash.toString("hex"),
-                delegateStakePrivateKey: delegateStakePublicKeyModel.privateKey.toString("hex"),
-            }, true, true );
+            if (await this.walletStakeAlreadyIncluded(publicKeyHash) ) throw new Exception(this, 'Wallet Stake Already Included');
 
-            //this._scope.logger.log(this, "exists", exists);
+            if (this.delegatedStakesList.length >= this._scope.argv.walletStakes.maximumDelegates) throw new Exception(this, "Node is full of stake delegates ");
 
-            for (let i=0; i < exists.length; i++)
-                if ( exists[i] )
-                    return true;
-
-            if (this.delegatedStakesList.length >= this._scope.argv.walletStakes.maximumDelegates)
-                throw new Exception(this, "Node is full of stake delegates ");
-
-            const delegateStake = this._createSimpleModelObject( DelegatedStakeModel, undefined, "delegatedStakesStored", {
+            const delegateStake = this.pushArray( "delegatedStakesStored", {
                 id: publicKeyHash.toString("hex"),
                 publicKey: publicKey.toString("hex"),
                 publicKeyHash: publicKeyHash.toString("hex"),
-                delegateStakePublicKeyHash: delegateStakePublicKeyHash.toString("hex"),
+                delegateStakePublicKeyHash: delegateStakePublicKeyModel.publicKeyHash.toString("hex"),
                 delegateStakePrivateKey: delegateStakePrivateKey.toString("hex"),
                 amount: stakingAmount,
                 errorDelegatePrivateKeyChanged: false,

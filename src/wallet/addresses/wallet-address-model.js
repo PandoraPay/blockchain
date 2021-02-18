@@ -24,7 +24,7 @@ module.exports = class WalletAddressModel extends DBModel {
     decryptGetDelegateStakePrivateKeyModel( delegateStakeNonce ){
         this.wallet.encryption.decryptWallet();
         const privateKey = this.keys.decryptPrivateKey();
-        const privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( { privateKey, } );
+        const privateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( privateKey );
 
         return privateKeyModel.getDelegateStakePrivateKeyModel(delegateStakeNonce);
     }

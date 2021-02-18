@@ -54,7 +54,7 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
             allowDelegating: this._scope.argv.walletStakes.allowDelegating,
             minimumFeePercentage: this._scope.argv.walletStakes.minimumFeePercentage,
             maximumDelegates: this._scope.argv.walletStakes.maximumDelegates,
-            availableSlots: this._scope.argv.walletStakes.maximumDelegates - this._scope.walletStakes.delegatedStakesList,
+            availableSlots: this._scope.argv.walletStakes.maximumDelegates - this._scope.walletStakes.delegatedStakesList.length,
             alreadyIncluded,
         }
     }
@@ -76,10 +76,15 @@ module.exports = class WalletStakesCommonSocketRouterPlugin extends  SocketRoute
         if (!Buffer.isBuffer(signature) || signature.length !== 65) throw new Exception(this, "signature is invalid", signature);
         if ( delegateStakePrivateKey && (!Buffer.isBuffer(delegateStakePrivateKey) || delegateStakePrivateKey.length !== 32) ) throw new Exception(this, "delegateStakePrivateKey is invalid", delegatePrivateKey);
 
+        const delegateStakePrivateKeyModel = this._scope.cryptography.addressValidator.validatePrivateKeyAddress( delegateStakePrivateKey );
+        const delegateStakeAddressModel = delegateStakePrivateKeyModel.getAddressPublicKey();
+        const delegateStakePublicKeyHash = delegateStakeAddressModel.publicKeyHash;
+
         const concat = Buffer.concat([
             this._challenge,
             publicKey,
-            delegateStakePrivateKey,
+            delegateStakePublicKeyHash,
+            delegateStakePrivateKey ? delegateStakePrivateKeyModel.privateKey : Buffer.alloc(0),
         ]);
 
         const verify = this._scope.cryptography.cryptoSignature.verify( CryptoHelper.dkeccak256(concat), signature, publicKey );

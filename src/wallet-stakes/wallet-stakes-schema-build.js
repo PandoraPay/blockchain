@@ -26,7 +26,9 @@ class WalletStakesSchemaBuild extends DBSchemaBuild{
                     modelClass: DelegatedStakeModel,
 
                     minSize: 0,
-                    maxSize: 8190,
+                    maxSize(){
+                        return this._scope.argv.walletStakes.maximumDelegates;
+                    },
 
                     position: 101,
                 },
