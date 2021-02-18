@@ -88,7 +88,7 @@ module.exports = class BaseChainDataModel extends DBModel {
 
         this.end = this.end + 1;
         this.transactionsIndex = this.transactionsIndex + block.txCount();
-        this.tokensIndex = this.tokensIndex + await block.newTokensCount();
+        this.tokensIndex = this.tokensIndex + block.newTokensCount();
         this.chainwork = this.chainwork.add(  block.work );
         this.hash = block.hash();
         this.prevHash = block.prevHash;
@@ -208,6 +208,8 @@ module.exports = class BaseChainDataModel extends DBModel {
 
                 await block.removeBlock( chain, this);
 
+                await this._deleteBlockLocalData( i );
+
                 blocksRemoved.push( block );
             }
 
@@ -308,17 +310,23 @@ module.exports = class BaseChainDataModel extends DBModel {
         return this._deleteBlockByHeight(height);
     }
 
+    async _deleteBlockLocalData(height){
+
+        if (!this.blocksMapByHeight[height]) return;
+
+        const block = this.blocksMapByHeight[height];
+        delete this.blocksMapByHeight[height];
+        delete this.blocksMapByHash[block.hash().toString('hex')];
+        const txs = await block.getTransactions();
+        for (const tx of txs)
+            delete this.transactionsMapByHash[ tx.hash().toString("hex") ];
+        return true;
+    }
+
     async _deleteBlockByHeight(height){
 
-        if (this.blocksMapByHeight[height]){
-            const block = this.blocksMapByHeight[height];
-            delete this.blocksMapByHeight[height];
-            delete this.blocksMapByHash[block.hash().toString('hex')];
-            const txs = await block.getTransactions();
-            for (const tx of txs)
-                delete this.transactionsMapByHash[ tx.hash().toString("hex") ];
-            return true;
-        }
+        if (this.blocksMapByHeight[height])
+            return this._deleteBlockLocalData(height);
 
         const block = await this._getBlockByHeight(height);
         await block.delete();

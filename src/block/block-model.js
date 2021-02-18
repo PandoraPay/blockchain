@@ -144,8 +144,7 @@ module.exports = class BlockModel extends DBModel {
          */
         await chainData.blockInfoByHashMap.updateMap( this.hash().toString("hex"), this.getBlockInfo(), "object", {skipProcessingConstructionValues: true});
 
-        if (!chain.isForkSubChain)
-            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
+        await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyAdded(chain, chainData, this);
         
     }
 
@@ -166,8 +165,7 @@ module.exports = class BlockModel extends DBModel {
 
     async successfullyRemoved(chain = this._scope.chain, chainData = chain.data){
 
-        if (!chain.isForkSubChain)
-            await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyRemoved(chain, chainData, this);
+        await this.transactionsMerkleTree.transactionsMerkleTreeSuccessfullyRemoved(chain, chainData, this);
 
         /**
          * Remove hash from HashMap

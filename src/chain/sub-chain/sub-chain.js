@@ -71,7 +71,7 @@ module.exports = class SubChain extends BaseChain{
         return true;
     }
 
-    async insertBlock(block){
+    insertBlock(block){
 
         if (this.data.blocksMapByHeight[block.height])
             throw new Exception(this, 'block already found', block.height );

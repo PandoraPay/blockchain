@@ -115,7 +115,7 @@ module.exports = class App extends PandoraLibrary.utils.App {
                         this._scope.logger.log(this, "NETWORK TEST NET");
 
                         if (this._scope.argv.testnet.createNewTestNet )
-                            genesisSettings.timestamp = Math.trunc( new Date().getTime() / 1000 / 60 ) *60;
+                            genesisSettings.timestamp = Math.floor( new Date().getTime() / 1000 / 60 / 60 ) *60 * 60;
 
                         break;
 

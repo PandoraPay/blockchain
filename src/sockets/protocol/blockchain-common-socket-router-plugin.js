@@ -138,21 +138,14 @@ module.exports = class BlockchainCommonSocketRouterPlugin extends SocketRouterPl
     async _getBlockByHeight({index = this._scope.mainChain.data.end-1, type = "buffer"}){
         
         const block = await this._scope.mainChain.data.getBlockByHeight( index );
-
         if (!block) throw Exception(this, "Block was not found", {index: index} );
-
         return block.toType(type);
-        
     }
 
     async _getBlockByHash({hash, type = "buffer"}){
-
         const block = await this._scope.mainChain.data.getBlockByHash( hash );
-
         if (!block) throw Exception(this, "Block was not found", { hash: hash} );
-
         return await block.toType(type);
-
     }
 
     _getBlockCount(){

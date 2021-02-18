@@ -127,7 +127,6 @@ module.exports = class TxMerkleTreeModel extends MerkleTreeModel {
             for (let i = leaves.length-1; i >= 0; i--)
                 if (!leaves[i].pruned) {
                     const tx = leaves[i].transaction;
-
                     await tx.transactionRemoved(chain, chainData, block, leaves[i].height, i);
                 }
 

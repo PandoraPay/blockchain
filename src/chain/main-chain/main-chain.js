@@ -344,7 +344,8 @@ module.exports = class MainChain extends BaseChain {
 
             this._scope.forging.reset = true;
 
-            await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/forging-reset" }, true, false );
+            if (this._scope.db.isSynchronized )
+                await this._scope.masterCluster.sendMessage("main-chain", { message: "main-chain/forging-reset" }, true, false );
 
             await this.emit("blocks/included", {
                 blocks: blocks,
